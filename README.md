@@ -14,6 +14,13 @@ Max time limit check is skipped if specified value is < 1
 Average time limit check is skipped if specified value is < 1
 
 ## Examples
+```java
+@Test
+@PerformanceTest(warmUp = 10, repeats = 20, maxTimeLimit = 100)
+public void myUnitTest() {
+    
+}
+```
 
 ## Spring integration
 
