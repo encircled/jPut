@@ -32,21 +32,18 @@ public class PerformanceTestRun {
     }
 
     public long maxRunTime() {
-        checkIsReady();
-
-        return LongStream.of(runs).max().orElseThrow(IllegalStateException::new);
+        return LongStream.of(checkAndGetRuns()).max().orElseThrow(IllegalStateException::new);
     }
 
     public long averageRunTime() {
-        checkIsReady();
-
-        return Math.round(LongStream.of(runs).average().orElseThrow(IllegalStateException::new));
+        return Math.round(LongStream.of(checkAndGetRuns()).average().orElseThrow(IllegalStateException::new));
     }
 
-    private void checkIsReady() {
+    private long[] checkAndGetRuns() {
         if(!runsFinished) {
             throw new IllegalStateException("Not all runs are done yet!");
         }
+        return runs;
     }
 
     @Override

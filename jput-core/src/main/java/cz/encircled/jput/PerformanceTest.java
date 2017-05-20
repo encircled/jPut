@@ -20,4 +20,6 @@ public @interface PerformanceTest {
 
     long averageTimeLimit() default 0L;
 
+    long[] percentiles() default {};
+
 }

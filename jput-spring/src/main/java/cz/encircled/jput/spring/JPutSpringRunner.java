@@ -14,6 +14,9 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Map;
+import java.util.stream.LongStream;
+
 /**
  * @author Vlad on 20-May-17.
  */
@@ -79,6 +82,15 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
                 if (conf.maxTimeLimit > 0 && runMaxTime > conf.maxTimeLimit) {
                     String assertMessage = String.format("\nLimit max time = %d ms\nActual max time = %d ms\n\n", conf.maxTimeLimit, runMaxTime);
                     throw new AssertionFailedError(assertMessage + "Performance test failed, max time is greater then limit: " + run);
+                }
+                for (Map.Entry<Long, Long> percentile : conf.percentiles.entrySet()) {
+                    long matchingCount = LongStream.of(run.runs).filter(time -> time <= percentile.getValue()).count();
+                    int matchingPercents = Math.round(matchingCount * 100 / conf.repeats);
+                    if (matchingPercents < percentile.getKey()) {
+                        String assertMessage = "\nMax time = " + percentile.getValue() + "ms \nexpected percentile = " + percentile.getKey() +
+                                "%\nActual percentile = " + matchingPercents + "%\n\n";
+                        throw new AssertionFailedError(assertMessage + "Performance test failed, max time is greater then limit: " + run);
+                    }
                 }
             } catch (AssumptionViolatedException e) {
                 eachNotifier.addFailedAssumption(e);

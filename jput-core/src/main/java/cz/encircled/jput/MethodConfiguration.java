@@ -1,5 +1,8 @@
 package cz.encircled.jput;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Performance test configuration of a single junit test method
  *
@@ -14,6 +17,27 @@ public class MethodConfiguration {
     public long maxTimeLimit = 0L;
 
     public long averageTimeLimit = 0L;
+
+    public Map<Long, Long> percentiles = new HashMap<>(1);
+
+    public static MethodConfiguration fromAnnotation(PerformanceTest conf) {
+        long[] percentiles = conf.percentiles();
+        if (percentiles.length % 2 != 0) {
+            throw new IllegalStateException("Percentiles parameter count must be even");
+        }
+
+        MethodConfiguration methodConfiguration = new MethodConfiguration()
+                .setWarmUp(conf.warmUp())
+                .setRepeats(conf.repeats())
+                .setMaxTimeLimit(conf.maxTimeLimit())
+                .setAverageTimeLimit(conf.averageTimeLimit());
+
+        for (int i = 0; i < percentiles.length - 1; i++) {
+            methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]);
+        }
+
+        return methodConfiguration.valid();
+    }
 
     public MethodConfiguration setWarmUp(int warmUp) {
         this.warmUp = warmUp;
@@ -42,6 +66,14 @@ public class MethodConfiguration {
         if (repeats < 1L) {
             throw new IllegalStateException("Repeats count must be > 1");
         }
+        for (Long percentile : percentiles.keySet()) {
+            if (percentile < 1) {
+                throw new IllegalStateException("Percentile value must be > 0");
+            }
+            if (percentile > 100) {
+                throw new IllegalStateException("Percentile value must be < 100");
+            }
+        }
 
         return this;
     }
@@ -54,15 +86,6 @@ public class MethodConfiguration {
                 ", maxTimeLimit=" + maxTimeLimit + " ms" +
                 ", averageTimeLimit=" + averageTimeLimit + " ms" +
                 '}';
-    }
-
-    public static MethodConfiguration fromAnnotation(PerformanceTest conf) {
-        return new MethodConfiguration()
-                .setWarmUp(conf.warmUp())
-                .setRepeats(conf.repeats())
-                .setMaxTimeLimit(conf.maxTimeLimit())
-                .setAverageTimeLimit(conf.averageTimeLimit())
-                .valid();
     }
 
 }
