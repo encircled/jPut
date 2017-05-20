@@ -11,6 +11,13 @@
 
     <description>jPut</description>
 
+    <url>https://github.com/encircled/jPut</url>
+    <scm>
+        <connection>scm:git:https://github.com/encircled/jPut.git</connection>
+        <url>https://github.com/encircled/jPut.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
