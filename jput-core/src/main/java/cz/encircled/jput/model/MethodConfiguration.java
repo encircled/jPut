@@ -1,4 +1,6 @@
-package cz.encircled.jput;
+package cz.encircled.jput.model;
+
+import cz.encircled.jput.unit.PerformanceTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +16,12 @@ public class MethodConfiguration {
 
     public int repeats = 1;
 
+    // TODO use 100 percentile instead?
     public long maxTimeLimit = 0L;
 
     public long averageTimeLimit = 0L;
 
-    public Map<Long, Long> percentiles = new HashMap<>(1);
+    public Map<Long, Double> percentiles = new HashMap<>(1);
 
     public static MethodConfiguration fromAnnotation(PerformanceTest conf) {
         long[] percentiles = conf.percentiles();
@@ -33,7 +36,7 @@ public class MethodConfiguration {
                 .setAverageTimeLimit(conf.averageTimeLimit());
 
         for (int i = 0; i < percentiles.length - 1; i++) {
-            methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]);
+//            methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]); TODO
         }
 
         return methodConfiguration.valid();
