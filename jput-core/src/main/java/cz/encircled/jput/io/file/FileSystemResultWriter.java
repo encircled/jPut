@@ -22,6 +22,8 @@ public class FileSystemResultWriter implements TrendResultWriter {
 
     private final List<PerformanceTestRun> stack = new ArrayList<>();
 
+    private final Object flushMutex = new Object();
+
     private Path target;
 
     public FileSystemResultWriter(String pathToFile) {
@@ -37,9 +39,12 @@ public class FileSystemResultWriter implements TrendResultWriter {
 
     @Override
     public void flush() {
-        synchronized (stack) {
-            List<String> mapped = stack.stream().map(this::toFileFormat).collect(Collectors.toList());
-            stack.clear();
+        synchronized (flushMutex) {
+            List<String> mapped;
+            synchronized (stack) {
+                mapped = stack.stream().map(this::toFileFormat).collect(Collectors.toList());
+                stack.clear();
+            }
 
             try {
                 Files.write(target, mapped, StandardCharsets.UTF_8, APPEND, CREATE);
