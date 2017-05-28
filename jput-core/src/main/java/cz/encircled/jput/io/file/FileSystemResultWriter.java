@@ -1,6 +1,5 @@
 package cz.encircled.jput.io.file;
 
-import com.google.gson.Gson;
 import cz.encircled.jput.io.TrendResultWriter;
 import cz.encircled.jput.model.PerformanceTestRun;
 
@@ -10,8 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -22,8 +21,6 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public class FileSystemResultWriter implements TrendResultWriter {
 
     private final List<PerformanceTestRun> stack = new ArrayList<>();
-
-    private Gson gson = new Gson();
 
     private Path target;
 
@@ -41,15 +38,26 @@ public class FileSystemResultWriter implements TrendResultWriter {
     @Override
     public void flush() {
         synchronized (stack) {
-            String json = gson.toJson(stack);
+            List<String> mapped = stack.stream().map(this::toFileFormat).collect(Collectors.toList());
             stack.clear();
 
             try {
-                Files.write(target, Collections.singletonList(json), StandardCharsets.UTF_8, APPEND, CREATE);
+                Files.write(target, mapped, StandardCharsets.UTF_8, APPEND, CREATE);
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to append to file", e);
             }
         }
+    }
+
+    private String toFileFormat(PerformanceTestRun run) {
+        StringBuilder array = new StringBuilder();
+        for (long l : run.runs) {
+            if (array.length() > 0) {
+                array.append(",");
+            }
+            array.append(l);
+        }
+        return String.join(";", Long.toString(run.executionId), array.toString(), run.testClass + "#" + run.testMethod);
     }
 
 }

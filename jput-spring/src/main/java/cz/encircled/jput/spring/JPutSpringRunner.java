@@ -1,12 +1,12 @@
 package cz.encircled.jput.spring;
 
 import cz.encircled.jput.JPutContext;
-import cz.encircled.jput.Statistics;
 import cz.encircled.jput.model.MethodConfiguration;
 import cz.encircled.jput.model.PerformanceTestRun;
-import cz.encircled.jput.unit.PerformanceAnalyzer;
-import cz.encircled.jput.unit.PerformanceAnalyzerImpl;
+import cz.encircled.jput.trend.TrendAnalyzer;
 import cz.encircled.jput.unit.PerformanceTest;
+import cz.encircled.jput.unit.UnitPerformanceAnalyzer;
+import cz.encircled.jput.unit.UnitPerformanceResult;
 import junit.framework.AssertionFailedError;
 import org.junit.AssumptionViolatedException;
 import org.junit.internal.runners.model.EachTestNotifier;
@@ -23,7 +23,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 public class JPutSpringRunner extends SpringJUnit4ClassRunner {
 
-    private PerformanceAnalyzer analyzer = new PerformanceAnalyzerImpl();
+    private UnitPerformanceAnalyzer unitAnalyzer = JPutContext.getContext().getUnitPerformanceAnalyzer();
+
+    private TrendAnalyzer trendAnalyzer = JPutContext.getContext().getTrendAnalyzer();
 
     /**
      * Construct a new {@code SpringJUnit4ClassRunner} and initialize a
@@ -50,12 +52,13 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
             super.runChild(frameworkMethod, notifier);
             return;
         }
-        MethodConfiguration conf = MethodConfiguration.fromAnnotation(annotation);
-        PerformanceTestRun run = analyzer.build(conf, frameworkMethod.getMethod());
 
         if (isTestMethodIgnored(frameworkMethod)) {
             notifier.fireTestIgnored(description);
         } else {
+            MethodConfiguration conf = MethodConfiguration.fromAnnotation(annotation);
+            PerformanceTestRun run = unitAnalyzer.buildRun(conf, frameworkMethod.getMethod());
+
             Statement statement;
             try {
                 statement = methodBlock(frameworkMethod);
@@ -72,28 +75,13 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
                 for (int i = 1; i <= conf.repeats; i++) {
                     long start = System.currentTimeMillis();
                     statement.evaluate();
-                    analyzer.addRun(run, conf, System.currentTimeMillis() - start);
+                    unitAnalyzer.addRun(run, System.currentTimeMillis() - start);
                 }
 
-                long runAvgTime = Statistics.averageRunTime(run);
-                if (conf.averageTimeLimit > 0 && runAvgTime > conf.averageTimeLimit) {
-                    String assertMessage = String.format("\nLimit avg time = %d ms\nActual avg time = %d ms\n\n", conf.averageTimeLimit, runAvgTime);
-                    throw new AssertionFailedError(assertMessage + "Performance test failed, average time is greater then limit: " + analyzer.toString(run, conf));
+                UnitPerformanceResult result = unitAnalyzer.analyzeUnitTrend(run, conf);
+                if (result.isError()) {
+                    throw new AssertionFailedError("unit performance test failed" + unitAnalyzer.buildErrorMessage(result, conf));
                 }
-                long runMaxTime = Statistics.maxRunTime(run);
-                if (conf.maxTimeLimit > 0 && runMaxTime > conf.maxTimeLimit) {
-                    String assertMessage = String.format("\nLimit max time = %d ms\nActual max time = %d ms\n\n", conf.maxTimeLimit, runMaxTime);
-                    throw new AssertionFailedError(assertMessage + "Performance test failed, max time is greater then limit: " + analyzer.toString(run, conf));
-                }
-//                for (Map.Entry<Long, Long> percentile : conf.percentiles.entrySet()) { TODO
-//                    long matchingCount = LongStream.of(run.runs).filter(time -> time <= percentile.getValue()).count();
-//                    int matchingPercents = Math.round(matchingCount * 100 / conf.repeats);
-//                    if (matchingPercents < percentile.getKey()) {
-//                        String assertMessage = "\nMax time = " + percentile.getValue() + "ms \nexpected percentile = " + percentile.getKey() +
-//                                "%\nActual percentile = " + matchingPercents + "%\n\n";
-//                        throw new AssertionFailedError(assertMessage + "Performance test failed, max time is greater then limit: " + analyzer.toString(run, conf));
-//                    }
-//                }
             } catch (AssumptionViolatedException e) {
                 eachNotifier.addFailedAssumption(e);
             } catch (Throwable e) {
