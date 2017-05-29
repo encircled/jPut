@@ -1,7 +1,8 @@
 package cz.encircled.jput;
 
+import cz.encircled.jput.model.CommonConstants;
 import cz.encircled.jput.trend.TrendAnalyzer;
-import cz.encircled.jput.trend.TrendAnalyzerImpl;
+import cz.encircled.jput.trend.StandardSampleTrendAnalyzer;
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer;
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl;
 
@@ -17,11 +18,10 @@ public class JPutContext {
     private boolean isPerformanceTestEnabled;
 
     private JPutContext() {
-        String value = System.getProperty("jput.perf.enabled");
-        this.isPerformanceTestEnabled = value == null || Boolean.getBoolean(value);
+        this.isPerformanceTestEnabled = getBoolPropertyOrDefault(CommonConstants.PROP_ENABLED, true);
         this.contextExecutionId = System.currentTimeMillis();
         this.unitAnalyzer = new UnitPerformanceAnalyzerImpl();
-        this.trendAnalyzer = new TrendAnalyzerImpl();
+        this.trendAnalyzer = new StandardSampleTrendAnalyzer();
     }
 
     public static JPutContext getContext() {
@@ -42,6 +42,30 @@ public class JPutContext {
 
     public TrendAnalyzer getTrendAnalyzer() {
         return trendAnalyzer;
+    }
+
+    private String getProperty(String key, String defaultVal) {
+        String value = System.getProperty(key);
+        if (value == null) {
+            throw new IllegalStateException("JPut property [" + key + "] is mandatory");
+        }
+        return value;
+    }
+
+    private String getPropertyOrDefault(String key, String defaultVal) {
+        String value = System.getProperty(key);
+        if (value == null) {
+            return defaultVal;
+        }
+        return value;
+    }
+
+    private boolean getBoolPropertyOrDefault(String key, boolean defaultVal) {
+        String value = System.getProperty(key);
+        if (value == null) {
+            return defaultVal;
+        }
+        return Boolean.getBoolean(value);
     }
 
 }

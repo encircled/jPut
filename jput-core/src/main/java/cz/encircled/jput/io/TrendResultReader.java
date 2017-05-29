@@ -7,6 +7,6 @@ import cz.encircled.jput.model.PerformanceTestRun;
  */
 public interface TrendResultReader {
 
-    long[] getStandardSampleRuns(PerformanceTestRun newRun);
+    long[] getStandardSampleRuns(PerformanceTestRun newRun, int standardSampleSize);
 
 }

@@ -2,7 +2,7 @@ package cz.encircled.jput.test;
 
 import cz.encircled.jput.model.MethodTrendConfiguration;
 import cz.encircled.jput.model.PerformanceTestRun;
-import cz.encircled.jput.trend.TrendAnalyzerImpl;
+import cz.encircled.jput.trend.StandardSampleTrendAnalyzer;
 import cz.encircled.jput.trend.TrendResult;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class TrendAnalyzerTest {
 
-    private TrendAnalyzerImpl trendAnalyzer = new TrendAnalyzerImpl();
+    private StandardSampleTrendAnalyzer trendAnalyzer = new StandardSampleTrendAnalyzer();
 
     @Test
     public void testCollectRuns() {

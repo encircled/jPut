@@ -5,11 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cz.encircled.jput.trend.PerformanceTrend;
+
 /**
  * @author Vlad on 20-May-17.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface PerformanceTest {
 
     int warmUp() default 0;
@@ -21,5 +23,7 @@ public @interface PerformanceTest {
     long averageTimeLimit() default 0L;
 
     long[] percentiles() default {};
+
+    PerformanceTrend[] performanceTrend() default {};
 
 }

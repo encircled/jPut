@@ -1,15 +1,20 @@
 package cz.encircled.jput.io.file;
 
-import cz.encircled.jput.io.TrendResultReader;
-import cz.encircled.jput.model.PerformanceTestRun;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import cz.encircled.jput.io.TrendResultReader;
+import cz.encircled.jput.model.PerformanceTestRun;
 
 /**
  * @author Vlad on 28-May-17.
@@ -26,8 +31,16 @@ public class FileSystemResultReader implements TrendResultReader {
     }
 
     @Override
-    public long[] getStandardSampleRuns(PerformanceTestRun newRun) {
-        return runs.get(newRun.testClass + "#" + newRun.testMethod);
+    public long[] getStandardSampleRuns(PerformanceTestRun newRun, int standardSampleSize) {
+        String key = newRun.testClass + "#" + newRun.testMethod;
+        long[] sampleRuns = runs.get(key);
+        if (sampleRuns != null && sampleRuns.length > standardSampleSize) {
+            long[] trimmed = new long[standardSampleSize];
+            System.arraycopy(sampleRuns, 0, trimmed, 0, standardSampleSize);
+            sampleRuns = trimmed;
+            runs.put(key, sampleRuns);
+        }
+        return sampleRuns;
     }
 
     private void initRuns() {

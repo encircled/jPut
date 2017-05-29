@@ -1,18 +1,15 @@
 package cz.encircled.jput.model;
 
-import cz.encircled.jput.trend.PerformanceTrendTest;
-import org.apache.commons.math3.util.Pair;
-
 import java.util.List;
+
+import cz.encircled.jput.trend.PerformanceTrend;
+import cz.encircled.jput.unit.PerformanceTest;
+import org.apache.commons.math3.util.Pair;
 
 /**
  * @author Vlad on 27-May-17.
  */
 public class MethodTrendConfiguration {
-
-    public int warmUp = 0;
-
-    public int repeats = 1;
 
     /**
      * Count of first executions which will be used as a standard for trend measuring
@@ -48,16 +45,6 @@ public class MethodTrendConfiguration {
     public List<Pair<Integer, Double>> percentiles;
 
 
-    public MethodTrendConfiguration setWarmUp(int warmUp) {
-        this.warmUp = warmUp;
-        return this;
-    }
-
-    public MethodTrendConfiguration setRepeats(int repeats) {
-        this.repeats = repeats;
-        return this;
-    }
-
     public MethodTrendConfiguration setAverageTimeThreshold(double averageTimeThreshold) {
         this.averageTimeThreshold = averageTimeThreshold;
         this.measureAverageTime = true;
@@ -77,11 +64,9 @@ public class MethodTrendConfiguration {
         return this;
     }
 
-    public MethodTrendConfiguration fromAnnotation(PerformanceTrendTest conf) {
+    public MethodTrendConfiguration fromAnnotation(PerformanceTest unitConf, PerformanceTrend conf) {
         return new MethodTrendConfiguration()
-                .setWarmUp(conf.warmUp())
-                .setRepeats(conf.repeats())
-                .setAverageTimeThreshold(conf.averageTimeTreshold())
+                .setAverageTimeThreshold(conf.averageTimeThreshold())
 //                .setPercentiles(conf.percentiles())
                 ;
     }

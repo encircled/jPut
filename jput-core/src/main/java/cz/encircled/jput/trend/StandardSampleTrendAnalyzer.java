@@ -1,39 +1,16 @@
 package cz.encircled.jput.trend;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import cz.encircled.jput.Statistics;
 import cz.encircled.jput.model.MethodTrendConfiguration;
 import cz.encircled.jput.model.PerformanceTestRun;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 /**
  * @author Vlad on 27-May-17.
  */
-public class TrendAnalyzerImpl implements TrendAnalyzer {
-
-    @Override
-    public long[] filterPercentile(Collection<PerformanceTestRun> runs, int percentile) {
-        return new long[0];
-    }
-
-    public long[] collectRuns(Collection<PerformanceTestRun> standardSampleRuns) {
-        int pos = 0;
-
-        int totalLength = 0;
-        for (PerformanceTestRun run : standardSampleRuns) {
-            totalLength += run.runs.length;
-        }
-
-        long result[] = new long[totalLength];
-
-        for (PerformanceTestRun run : standardSampleRuns) {
-            System.arraycopy(run.runs, 0, result, pos, run.runs.length);
-            pos += run.runs.length;
-        }
-
-        return result;
-    }
+public class StandardSampleTrendAnalyzer implements TrendAnalyzer {
 
     @Override
     public TrendResult analyzeTestTrend(MethodTrendConfiguration configuration, PerformanceTestRun testRun, long... standardSampleRuns) {
@@ -58,6 +35,24 @@ public class TrendAnalyzerImpl implements TrendAnalyzer {
         }
 
         return new TrendResult();
+    }
+
+    public long[] collectRuns(Collection<PerformanceTestRun> standardSampleRuns) {
+        int pos = 0;
+
+        int totalLength = 0;
+        for (PerformanceTestRun run : standardSampleRuns) {
+            totalLength += run.runs.length;
+        }
+
+        long result[] = new long[totalLength];
+
+        for (PerformanceTestRun run : standardSampleRuns) {
+            System.arraycopy(run.runs, 0, result, pos, run.runs.length);
+            pos += run.runs.length;
+        }
+
+        return result;
     }
 
 }

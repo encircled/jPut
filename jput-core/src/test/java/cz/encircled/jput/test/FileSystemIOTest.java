@@ -1,14 +1,13 @@
 package cz.encircled.jput.test;
 
+import java.io.File;
+
 import cz.encircled.jput.io.TrendResultReader;
 import cz.encircled.jput.io.file.FileSystemResultReader;
 import cz.encircled.jput.io.file.FileSystemResultWriter;
 import cz.encircled.jput.model.PerformanceTestRun;
-import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
 
 /**
  * @author Vlad on 21-May-17.
@@ -17,7 +16,6 @@ public class FileSystemIOTest {
 
     @Test
     public void testWriter() {
-        UnitPerformanceAnalyzerImpl analyzer = new UnitPerformanceAnalyzerImpl();
         String pathToFile = System.getProperty("java.io.tmpdir") + "jput-test.data";
         new File(pathToFile).delete();
 
@@ -30,8 +28,10 @@ public class FileSystemIOTest {
         writer.flush();
 
         TrendResultReader reader = new FileSystemResultReader(pathToFile);
-        long[] runs = reader.getStandardSampleRuns(run);
-        Assert.assertArrayEquals(new long[]{100, 110, 120, 130, 115, 105}, runs);
+        long[] runs = reader.getStandardSampleRuns(run, 100);
+        Assert.assertArrayEquals(new long[]{ 100, 110, 120, 130, 115, 105 }, runs);
+        runs = reader.getStandardSampleRuns(run, 4);
+        Assert.assertArrayEquals(new long[]{ 100, 110, 120, 130 }, runs);
     }
 
 }
