@@ -23,6 +23,8 @@ public class MethodConfiguration {
 
     public Map<Long, Double> percentiles = new HashMap<>(1);
 
+    public MethodTrendConfiguration trendConfiguration;
+
     public static MethodConfiguration fromAnnotation(PerformanceTest conf) {
         long[] percentiles = conf.percentiles();
         if (percentiles.length % 2 != 0) {

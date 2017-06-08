@@ -1,5 +1,6 @@
 package cz.encircled.jput.trend;
 
+import cz.encircled.jput.model.MethodConfiguration;
 import cz.encircled.jput.model.MethodTrendConfiguration;
 import cz.encircled.jput.model.PerformanceTestRun;
 
@@ -10,4 +11,5 @@ public interface TrendAnalyzer {
 
     TrendResult analyzeTestTrend(MethodTrendConfiguration configuration, PerformanceTestRun testRun, long... standardSampleRuns);
 
+    String buildErrorMessage(TrendResult result, MethodConfiguration conf);
 }

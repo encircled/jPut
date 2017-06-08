@@ -1,8 +1,12 @@
 package cz.encircled.jput;
 
+import cz.encircled.jput.io.TrendResultReader;
+import cz.encircled.jput.io.TrendResultWriter;
+import cz.encircled.jput.io.file.FileSystemResultReader;
+import cz.encircled.jput.io.file.FileSystemResultWriter;
 import cz.encircled.jput.model.CommonConstants;
-import cz.encircled.jput.trend.TrendAnalyzer;
 import cz.encircled.jput.trend.StandardSampleTrendAnalyzer;
+import cz.encircled.jput.trend.TrendAnalyzer;
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer;
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl;
 
@@ -15,6 +19,8 @@ public class JPutContext {
     private final long contextExecutionId;
     private UnitPerformanceAnalyzer unitAnalyzer;
     private TrendAnalyzer trendAnalyzer;
+    private TrendResultReader trendResultReader;
+    private TrendResultWriter trendResultWriter;
     private boolean isPerformanceTestEnabled;
 
     private JPutContext() {
@@ -22,6 +28,10 @@ public class JPutContext {
         this.contextExecutionId = System.currentTimeMillis();
         this.unitAnalyzer = new UnitPerformanceAnalyzerImpl();
         this.trendAnalyzer = new StandardSampleTrendAnalyzer();
+
+        String pathToFile = System.getProperty("java.io.tmpdir") + "jput-test.data";
+        this.trendResultReader = new FileSystemResultReader(pathToFile); // TODO
+        this.trendResultWriter = new FileSystemResultWriter(pathToFile); // TODO
     }
 
     public static JPutContext getContext() {
@@ -42,6 +52,14 @@ public class JPutContext {
 
     public TrendAnalyzer getTrendAnalyzer() {
         return trendAnalyzer;
+    }
+
+    public TrendResultReader getTrendResultReader() {
+        return trendResultReader;
+    }
+
+    public TrendResultWriter getTrendResultWriter() {
+        return trendResultWriter;
     }
 
     private String getProperty(String key, String defaultVal) {

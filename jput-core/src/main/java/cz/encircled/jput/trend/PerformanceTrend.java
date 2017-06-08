@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface PerformanceTrend {
 
+    int standardSampleSize() default 10;
+
     /**
      * Static average time threshold.
      * <p>

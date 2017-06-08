@@ -1,9 +1,14 @@
 package cz.encircled.jput.spring;
 
 import cz.encircled.jput.JPutContext;
+import cz.encircled.jput.io.TrendResultReader;
+import cz.encircled.jput.io.TrendResultWriter;
 import cz.encircled.jput.model.MethodConfiguration;
+import cz.encircled.jput.model.MethodTrendConfiguration;
 import cz.encircled.jput.model.PerformanceTestRun;
+import cz.encircled.jput.trend.PerformanceTrend;
 import cz.encircled.jput.trend.TrendAnalyzer;
+import cz.encircled.jput.trend.TrendResult;
 import cz.encircled.jput.unit.PerformanceTest;
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer;
 import cz.encircled.jput.unit.UnitPerformanceResult;
@@ -27,6 +32,10 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
 
     private TrendAnalyzer trendAnalyzer = JPutContext.getContext().getTrendAnalyzer();
 
+    private TrendResultReader trendResultReader = JPutContext.getContext().getTrendResultReader();
+
+    private TrendResultWriter trendResultWriter = JPutContext.getContext().getTrendResultWriter();
+
     /**
      * Construct a new {@code SpringJUnit4ClassRunner} and initialize a
      * {@link org.springframework.test.context.TestContextManager} to provide Spring testing functionality to
@@ -47,16 +56,23 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
     @Override
     protected void runChild(FrameworkMethod frameworkMethod, RunNotifier notifier) {
         Description description = describeChild(frameworkMethod);
-        PerformanceTest annotation = frameworkMethod.getAnnotation(PerformanceTest.class);
-        if (annotation == null || !JPutContext.getContext().isPerformanceTestEnabled()) {
-            super.runChild(frameworkMethod, notifier);
-            return;
-        }
+
 
         if (isTestMethodIgnored(frameworkMethod)) {
             notifier.fireTestIgnored(description);
         } else {
+            PerformanceTest annotation = frameworkMethod.getAnnotation(PerformanceTest.class);
+            if (annotation == null || !JPutContext.getContext().isPerformanceTestEnabled()) {
+                super.runChild(frameworkMethod, notifier);
+                return;
+            }
+
             MethodConfiguration conf = MethodConfiguration.fromAnnotation(annotation);
+            PerformanceTrend trendAnnotation = annotation.performanceTrend().length > 0 ? annotation.performanceTrend()[0] : null;
+            if (trendAnnotation != null) {
+                conf.trendConfiguration = MethodTrendConfiguration.fromAnnotation(trendAnnotation);
+            }
+
             PerformanceTestRun run = unitAnalyzer.buildRun(conf, frameworkMethod.getMethod());
 
             Statement statement;
@@ -80,8 +96,19 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
 
                 UnitPerformanceResult result = unitAnalyzer.analyzeUnitTrend(run, conf);
                 if (result.isError()) {
-                    throw new AssertionFailedError("unit performance test failed" + unitAnalyzer.buildErrorMessage(result, conf));
+                    throw new AssertionFailedError("Unit performance test failed" + unitAnalyzer.buildErrorMessage(result, conf));
                 }
+                if (conf.trendConfiguration != null) {
+                    long[] standardSampleRuns = trendResultReader.getStandardSampleRuns(run, conf.trendConfiguration.standardSampleSize);
+                    if (standardSampleRuns != null && standardSampleRuns.length >= conf.trendConfiguration.standardSampleSize) {
+                        TrendResult trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration, run, standardSampleRuns);
+                        if (trendResult.isError()) {
+                            throw new AssertionFailedError("Trend performance test failed" + trendAnalyzer.buildErrorMessage(trendResult, conf));
+                        }
+                    }
+                }
+                trendResultWriter.appendTrendResult(run);
+                trendResultWriter.flush();
             } catch (AssumptionViolatedException e) {
                 eachNotifier.addFailedAssumption(e);
             } catch (Throwable e) {
@@ -93,6 +120,16 @@ public class JPutSpringRunner extends SpringJUnit4ClassRunner {
 
     }
 
+    @Override
+    protected Statement withAfters(FrameworkMethod frameworkMethod, Object testInstance, Statement statement) {
+        trendResultWriter.flush();
+        return super.withAfters(frameworkMethod, testInstance, statement);
+    }
 
+    @Override
+    protected Statement withAfterClasses(Statement statement) {
+        trendResultWriter.flush();
+        return super.withAfterClasses(statement);
+    }
 }
 

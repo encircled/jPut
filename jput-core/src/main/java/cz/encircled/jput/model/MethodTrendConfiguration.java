@@ -1,10 +1,9 @@
 package cz.encircled.jput.model;
 
-import java.util.List;
-
 import cz.encircled.jput.trend.PerformanceTrend;
-import cz.encircled.jput.unit.PerformanceTest;
 import org.apache.commons.math3.util.Pair;
+
+import java.util.List;
 
 /**
  * @author Vlad on 27-May-17.
@@ -44,6 +43,19 @@ public class MethodTrendConfiguration {
      */
     public List<Pair<Integer, Double>> percentiles;
 
+    public static MethodTrendConfiguration fromAnnotation(PerformanceTrend conf) {
+        return new MethodTrendConfiguration()
+                .setAverageTimeThreshold(conf.averageTimeThreshold())
+                .setUseAverageTimeVariance(conf.averageTimeVarianceThreshold())
+                .setStandardSampleSize(conf.standardSampleSize())
+//                .setPercentiles(conf.percentiles())
+                ;
+    }
+
+    public MethodTrendConfiguration setStandardSampleSize(int standardSampleSize) {
+        this.standardSampleSize = standardSampleSize;
+        return this;
+    }
 
     public MethodTrendConfiguration setAverageTimeThreshold(double averageTimeThreshold) {
         this.averageTimeThreshold = averageTimeThreshold;
@@ -62,13 +74,6 @@ public class MethodTrendConfiguration {
     public MethodTrendConfiguration setPercentiles(int[] percentiles) {
 //        this.percentiles = percentiles;
         return this;
-    }
-
-    public MethodTrendConfiguration fromAnnotation(PerformanceTest unitConf, PerformanceTrend conf) {
-        return new MethodTrendConfiguration()
-                .setAverageTimeThreshold(conf.averageTimeThreshold())
-//                .setPercentiles(conf.percentiles())
-                ;
     }
 
 }

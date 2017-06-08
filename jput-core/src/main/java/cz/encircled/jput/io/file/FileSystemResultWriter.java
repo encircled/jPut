@@ -56,6 +56,7 @@ public class FileSystemResultWriter implements TrendResultWriter {
 
     private String toFileFormat(PerformanceTestRun run) {
         StringBuilder array = new StringBuilder();
+        // TODO aggregate method runs?
         for (long l : run.runs) {
             if (array.length() > 0) {
                 array.append(",");
