@@ -7,6 +7,6 @@ import cz.encircled.jput.model.PerformanceTestExecution
  */
 interface TrendResultReader {
 
-    fun getStandardSampleRuns(newExecution: PerformanceTestExecution, standardSampleSize: Int): LongArray?
+    fun getReferenceExecutions(newExecution: PerformanceTestExecution, referenceExecutionsCount: Int): List<Long>
 
 }

@@ -11,23 +11,23 @@ import java.util.*
  */
 class StandardSampleTrendAnalyzer : TrendAnalyzer {
 
-    override fun analyzeTestTrend(configuration: MethodTrendConfiguration, testExecution: PerformanceTestExecution, vararg referenceTestExecutions: Long): TrendResult {
-        var standardSampleRuns: LongArray = referenceTestExecutions ?: return TrendResult()
-        Arrays.sort(standardSampleRuns)
+    override fun analyzeTestTrend(configuration: MethodTrendConfiguration, testExecution: PerformanceTestExecution, referenceExecutionTimes: List<Long>): TrendResult {
+        var standardSampleRuns: List<Long> = referenceExecutionTimes ?: return TrendResult()
+        standardSampleRuns.sorted()
         if (configuration.noisePercentilePercentile > 0) {
             standardSampleRuns = Statistics.getPercentile(standardSampleRuns, configuration.noisePercentilePercentile)
         }
 
         if (configuration.measureAverageTime) {
-            val standardAverage = Statistics.getAverage(*standardSampleRuns)
+            val standardAverage = Statistics.getAverage(standardSampleRuns)
 
             val deviation =
                     if (configuration.useAverageTimeVariance)
-                        Statistics.getDeviation(*standardSampleRuns)
+                        Statistics.getDeviation(standardSampleRuns)
                     else
                         standardAverage * configuration.averageTimeThreshold // TODO add validation > 0
 
-            val runMean = Statistics.getAverage(*testExecution.runs!!) // TODO percentile?
+            val runMean = Statistics.getAverage(testExecution.runs) // TODO percentile?
             if (runMean > standardAverage + deviation) {
                 val trendResult = TrendResult()
                 trendResult.isAverageMet = false
@@ -56,22 +56,7 @@ class StandardSampleTrendAnalyzer : TrendAnalyzer {
         return msg
     }
 
-    fun collectRuns(standardSampleExecutions: Collection<PerformanceTestExecution>): LongArray {
-        var pos = 0
-
-        var totalLength = 0
-        for ((_, _, _, runs) in standardSampleExecutions) {
-            totalLength += runs!!.size
-        }
-
-        val result = LongArray(totalLength)
-
-        for ((_, _, _, runs) in standardSampleExecutions) {
-            System.arraycopy(runs!!, 0, result, pos, runs.size)
-            pos += runs.size
-        }
-
-        return result
-    }
+    fun collectRuns(referenceExecutions: Collection<PerformanceTestExecution>): List<Long> =
+            referenceExecutions.map { it.runs }.flatten()
 
 }

@@ -90,10 +90,10 @@ constructor(clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
                 }
 
                 if (conf.trendConfiguration != null) {
-                    val standardSampleSize = conf.trendConfiguration!!.standardSampleSize * conf.repeats
-                    val standardSampleRuns = trendResultReader.getStandardSampleRuns(testRun, standardSampleSize)
-                    if (standardSampleRuns != null && standardSampleRuns.size >= conf.trendConfiguration!!.standardSampleSize) {
-                        val trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration!!, testRun, *standardSampleRuns)
+                    val referenceExecutionsCount = conf.trendConfiguration!!.standardSampleSize * conf.repeats
+                    val referenceExecutions = trendResultReader.getReferenceExecutions(testRun, referenceExecutionsCount)
+                    if (referenceExecutions.size >= conf.trendConfiguration!!.standardSampleSize) {
+                        val trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration!!, testRun, referenceExecutions)
                         if (trendResult.isError) {
                             throw AssertionFailedError("Trend performance test failed" + trendAnalyzer.buildErrorMessage(trendResult, conf))
                         }

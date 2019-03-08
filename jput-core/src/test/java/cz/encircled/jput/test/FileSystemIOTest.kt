@@ -5,6 +5,7 @@ import cz.encircled.jput.io.file.FileSystemResultWriter
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
+import kotlin.test.assertEquals
 
 /**
  * @author Vlad on 21-May-17.
@@ -25,10 +26,10 @@ class FileSystemIOTest {
         writer.flush()
 
         val reader = FileSystemResultReader(pathToFile)
-        var runs = reader.getStandardSampleRuns(run, 100)
-        Assert.assertArrayEquals(longArrayOf(100, 110, 120, 130, 115, 105), runs)
-        runs = reader.getStandardSampleRuns(run, 4)
-        Assert.assertArrayEquals(longArrayOf(100, 110, 120, 130), runs)
+        var runs = reader.getReferenceExecutions(run, 100)
+        assertEquals(listOf<Long>(100, 110, 120, 130, 115, 105), runs)
+        runs = reader.getReferenceExecutions(run, 4)
+        assertEquals(listOf<Long>(100, 110, 120, 130), runs)
     }
 
 }

@@ -9,7 +9,7 @@ import cz.encircled.jput.model.PerformanceTestExecution
  */
 interface TrendAnalyzer {
 
-    fun analyzeTestTrend(configuration: MethodTrendConfiguration, testExecution: PerformanceTestExecution, vararg standardSampleRuns: Long): TrendResult
+    fun analyzeTestTrend(configuration: MethodTrendConfiguration, testExecution: PerformanceTestExecution, referenceExecutionTimes: List<Long>): TrendResult
 
     fun buildErrorMessage(result: TrendResult, conf: MethodConfiguration): String
 }

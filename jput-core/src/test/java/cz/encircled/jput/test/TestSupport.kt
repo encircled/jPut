@@ -12,14 +12,14 @@ object TestSupport {
 
     fun getTestExecution(vararg times: Long): PerformanceTestExecution {
         val run = PerformanceTestExecution()
-        run.runs = times
+        run.runs = times.toMutableList()
         run.executionId = JPutContext.context.contextExecutionId
         return run
     }
 
     fun getTestExecution(method: Method, vararg times: Long): PerformanceTestExecution {
         val run = PerformanceTestExecution()
-        run.runs = times
+        run.runs = times.toMutableList()
         run.executionId = JPutContext.context.contextExecutionId
         run.testMethod = method.name
         run.testClass = method.declaringClass.name

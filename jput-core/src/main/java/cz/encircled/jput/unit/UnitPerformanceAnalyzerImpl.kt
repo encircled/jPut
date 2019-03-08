@@ -14,7 +14,6 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
 
     override fun buildTestExecution(configuration: MethodConfiguration, method: Method): PerformanceTestExecution {
         val run = PerformanceTestExecution()
-        run.runs = LongArray(configuration.repeats)
         run.testMethod = method.name
         run.testClass = method.declaringClass.name
         run.executionId = JPutContext.context.contextExecutionId
@@ -22,8 +21,7 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
     }
 
     private fun toString(execution: PerformanceTestExecution, configuration: MethodConfiguration): String {
-        val stats: String
-        stats = String.format("[ averageTime = %d ms, maxTime = %d ms]", Statistics.averageExecutionTime(execution), Statistics.maxExecutionTime(execution))
+        val stats = String.format("[ averageTime = %d ms, maxTime = %d ms]", Statistics.averageExecutionTime(execution), Statistics.maxExecutionTime(execution))
         return "PerformanceTestExecution{" +
                 "testMethod = " + execution.testMethod +
                 ", configuration = " + configuration +
@@ -32,21 +30,20 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
     }
 
     override fun addTestRun(execution: PerformanceTestExecution, elapsedTime: Long) {
-        execution.runs!![execution.positionCounter] = elapsedTime
-        execution.positionCounter++
+        execution.runs.add(elapsedTime)
     }
 
     override fun analyzeUnitTrend(execution: PerformanceTestExecution, conf: MethodConfiguration): UnitPerformanceResult {
         val result = UnitPerformanceResult()
 
         val runAvgTime = Statistics.averageExecutionTime(execution)
-        if (conf.averageTimeLimit > 0 && runAvgTime > conf.averageTimeLimit) {
+        if (conf.averageTimeLimit in 1..(runAvgTime - 1)) {
             result.isAverageLimitMet = false
             result.runAverageTime = runAvgTime
         }
 
         val runMaxTime = Statistics.maxExecutionTime(execution)
-        if (conf.maxTimeLimit > 0 && runMaxTime > conf.maxTimeLimit) {
+        if (conf.maxTimeLimit in 1..(runMaxTime - 1)) {
             result.isMaxLimitMet = false
             result.runMaxTime = runMaxTime
         }
