@@ -1,7 +1,6 @@
 package cz.encircled.jput.model
 
 import cz.encircled.jput.trend.PerformanceTrend
-import org.apache.commons.math3.util.Pair
 
 /**
  * @author Vlad on 27-May-17.
@@ -16,7 +15,7 @@ class MethodTrendConfiguration {
     /**
      * Only result from given percentile are counted for trend tests, thus ignoring highest deviations
      */
-    var noisePercentilePercentile: Double = 0.toDouble()
+    var noisePercentile: Double = 0.toDouble()
 
 
     // AVERAGE TIME
@@ -32,17 +31,12 @@ class MethodTrendConfiguration {
     var averageTimeThreshold: Double = 0.toDouble()
 
     /**
-     * true - if statistic variance of standard sample should be used for detecting trends
+     * true - if sample variance should be used for trend analysis
      */
-    var useAverageTimeVariance: Boolean = false
+    var useSampleVarianceAsThreshold: Boolean = false
 
 
     // PERCENTILES
-
-    /**
-     * percentiles
-     */
-    var percentiles: List<Pair<Int, Double>>? = null
 
     fun setStandardSampleSize(standardSampleSize: Int): MethodTrendConfiguration {
         this.standardSampleSize = standardSampleSize
@@ -56,7 +50,7 @@ class MethodTrendConfiguration {
     }
 
     fun setUseAverageTimeVariance(useAverageTimeVariance: Boolean): MethodTrendConfiguration {
-        this.useAverageTimeVariance = useAverageTimeVariance
+        this.useSampleVarianceAsThreshold = useAverageTimeVariance
         if (useAverageTimeVariance) {
             this.measureAverageTime = true
         }
@@ -73,8 +67,8 @@ class MethodTrendConfiguration {
         fun fromAnnotation(conf: PerformanceTrend): MethodTrendConfiguration {
             return MethodTrendConfiguration()
                     .setAverageTimeThreshold(conf.averageTimeThreshold)
-                    .setUseAverageTimeVariance(conf.averageTimeVarianceThreshold)
-                    .setStandardSampleSize(conf.countOfReferenceSamples)
+                    .setUseAverageTimeVariance(conf.useSampleVarianceAsThreshold)
+                    .setStandardSampleSize(conf.sampleSize)
             //  .setPercentiles(conf.percentiles())
         }
     }

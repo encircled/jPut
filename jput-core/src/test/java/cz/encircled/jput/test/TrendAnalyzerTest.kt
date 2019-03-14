@@ -1,19 +1,21 @@
 package cz.encircled.jput.test
 
+import cz.encircled.jput.JPutJUnitRunner
 import cz.encircled.jput.model.MethodTrendConfiguration
-import cz.encircled.jput.trend.StandardSampleTrendAnalyzer
+import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendResult
 import org.junit.Assert
 import org.junit.Test
-import java.util.*
+import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 
 /**
  * @author Vlad on 27-May-17.
  */
+@RunWith(JPutJUnitRunner::class)
 class TrendAnalyzerTest {
 
-    private val trendAnalyzer = StandardSampleTrendAnalyzer()
+    private val trendAnalyzer = SampleBasedTrendAnalyzer()
 
     @Test
     fun testCollectRuns() {
@@ -72,7 +74,6 @@ class TrendAnalyzerTest {
 
     private fun assertValid(trendResult: TrendResult) {
         Assert.assertTrue(trendResult.isAverageMet)
-        Assert.assertNull(trendResult.notMetPercentiles)
     }
 
 }

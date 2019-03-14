@@ -3,6 +3,9 @@ package cz.encircled.jput.unit
 import cz.encircled.jput.trend.PerformanceTrend
 
 /**
+ * TODO
+ * - delay between executions
+ *
  * Mark the test as a performance test, allowing to assert test execution time and analyze execution time trends
  *
  * @author Vlad on 20-May-17.
@@ -27,7 +30,7 @@ annotation class PerformanceTest(
         val maxTimeLimit: Long = 0L,
 
         /**
-         * Upper limit for average execution time when using **repeats > 1** in milliseconds
+         * Upper limit for average execution time when using **repeats > 1**, in milliseconds
          */
         val averageTimeLimit: Long = 0L,
 
@@ -36,6 +39,6 @@ annotation class PerformanceTest(
         /**
          * Performance trend analyzing
          */
-        val performanceTrend: Array<PerformanceTrend> = []
+        val trends: Array<PerformanceTrend> = []
 
 )

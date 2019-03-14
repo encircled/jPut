@@ -8,35 +8,27 @@ package cz.encircled.jput.trend
 annotation class PerformanceTrend(
 
         /**
-         * Count of reference samples picked for trend comparing
+         * Sample size which will be used for trend analysis
          */
-        val countOfReferenceSamples: Int = 10,
+        val sampleSize: Int = 30,
 
         /**
-         * Defines strategy of picking trend samples
+         * Defines the strategy for sample selection
          */
-        val trendReferenceStrategy: TrendReferenceStrategy,
+        val sampleSelectionStrategy: SelectionStrategy,
 
         /**
          * Static average time threshold.
          *
-         * Performance trend test will fail if average execution time is greater than average time of standard sample plus given threshold
+         * Performance trend test will fail if average execution time is greater than sample average time plus given threshold
          */
         val averageTimeThreshold: Double = -1.0,
 
         /**
-         * true - use statistic variance of base sample as an average time threshold
+         * if true - use the sample variance as an average time threshold
          *
-         * Performance trend test will fail if average execution time is greater than average time of standard sample plus its variance
+         * Performance trend test will fail if average execution time is greater than sample average time plus its variance
          */
-        val averageTimeVarianceThreshold: Boolean = false,
+        val useSampleVarianceAsThreshold: Boolean = false
 
-        val percentiles: Array<PercentileThreshold> = []
 )
-
-enum class TrendReferenceStrategy {
-
-    USE_FIRST,
-    USE_LATEST
-
-}

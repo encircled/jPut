@@ -1,8 +1,6 @@
 package cz.encircled.jput.test
 
-import cz.encircled.jput.io.file.FileSystemResultReader
-import cz.encircled.jput.io.file.FileSystemResultWriter
-import org.junit.Assert
+import cz.encircled.jput.recorder.FileSystemResultRecorder
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -10,14 +8,14 @@ import kotlin.test.assertEquals
 /**
  * @author Vlad on 21-May-17.
  */
-class FileSystemIOTest {
+class FileSystemRecorderTest {
 
     @Test
     fun testWriter() {
-        val pathToFile = System.getProperty("java.io.tmpdir") + "jput-test.data"
+        val pathToFile = System.getProperty("java.recorder.tmpdir") + "jput-test.data"
         File(pathToFile).delete()
 
-        val writer = FileSystemResultWriter(pathToFile)
+        val writer = FileSystemResultRecorder(pathToFile)
 
         val run = TestSupport.getTestExecution(javaClass.methods[0], 100, 110, 120)
 
@@ -25,10 +23,10 @@ class FileSystemIOTest {
         writer.appendTrendResult(TestSupport.getTestExecution(javaClass.methods[0], 130, 115, 105))
         writer.flush()
 
-        val reader = FileSystemResultReader(pathToFile)
-        var runs = reader.getReferenceExecutions(run, 100)
+        val reader = FileSystemResultRecorder(pathToFile)
+        var runs = reader.getSample(run, 100)
         assertEquals(listOf<Long>(100, 110, 120, 130, 115, 105), runs)
-        runs = reader.getReferenceExecutions(run, 4)
+        runs = reader.getSample(run, 4)
         assertEquals(listOf<Long>(100, 110, 120, 130), runs)
     }
 

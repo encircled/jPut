@@ -1,10 +1,9 @@
 package cz.encircled.jput.unit
 
-import cz.encircled.jput.JPutContext
 import cz.encircled.jput.Statistics
+import cz.encircled.jput.context.context
 import cz.encircled.jput.model.MethodConfiguration
-import cz.encircled.jput.model.PerformanceTestExecution
-
+import cz.encircled.jput.model.PerfTestExecution
 import java.lang.reflect.Method
 
 /**
@@ -12,40 +11,37 @@ import java.lang.reflect.Method
  */
 class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
 
-    override fun buildTestExecution(configuration: MethodConfiguration, method: Method): PerformanceTestExecution {
-        val run = PerformanceTestExecution()
-        run.testMethod = method.name
-        run.testClass = method.declaringClass.name
-        run.executionId = JPutContext.context.contextExecutionId
+    override fun buildTestExecution(configuration: MethodConfiguration, method: Method): PerfTestExecution {
+        val run = PerfTestExecution(mapOf("id" to context.executionId))
+        run.testId = method.declaringClass.name + "#" + method.name
         return run
     }
 
-    private fun toString(execution: PerformanceTestExecution, configuration: MethodConfiguration): String {
+    private fun toString(execution: PerfTestExecution, configuration: MethodConfiguration): String {
         val stats = String.format("[ averageTime = %d ms, maxTime = %d ms]", Statistics.averageExecutionTime(execution), Statistics.maxExecutionTime(execution))
-        return "PerformanceTestExecution{" +
-                "testMethod = " + execution.testMethod +
+        return "PerfTestExecution{" +
+                "testId= " + execution.testId +
                 ", configuration = " + configuration +
                 ", execution = " + stats +
                 '}'.toString()
     }
 
-    override fun addTestRun(execution: PerformanceTestExecution, elapsedTime: Long) {
-        execution.runs.add(elapsedTime)
+    override fun addTestExecutions(execution: PerfTestExecution, elapsedTimes: List<Long>) {
+        execution.executionResult.addAll(elapsedTimes)
     }
 
-    override fun analyzeUnitTrend(execution: PerformanceTestExecution, conf: MethodConfiguration): UnitPerformanceResult {
+    // TODO test
+    override fun analyzeUnitTrend(execution: PerfTestExecution, conf: MethodConfiguration): UnitPerformanceResult {
         val result = UnitPerformanceResult()
 
-        val runAvgTime = Statistics.averageExecutionTime(execution)
-        if (conf.averageTimeLimit in 1..(runAvgTime - 1)) {
+        result.executionAvgTime = Statistics.averageExecutionTime(execution)
+        if (result.executionAvgTime > conf.averageTimeLimit) {
             result.isAverageLimitMet = false
-            result.runAverageTime = runAvgTime
         }
 
-        val runMaxTime = Statistics.maxExecutionTime(execution)
-        if (conf.maxTimeLimit in 1..(runMaxTime - 1)) {
+        result.runMaxTime = Statistics.maxExecutionTime(execution)
+        if (result.runMaxTime > conf.maxTimeLimit) {
             result.isMaxLimitMet = false
-            result.runMaxTime = runMaxTime
         }
         //                for (Map.Entry<Long, Long> percentile : conf.percentiles.entrySet()) { TODO
         //                    long matchingCount = LongStream.of(execution.runs).filter(time -> time <= percentile.getValue()).count();
@@ -63,7 +59,7 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
     override fun buildErrorMessage(result: UnitPerformanceResult, conf: MethodConfiguration): String {
         var msg = ""
         if (!result.isAverageLimitMet) {
-            msg += String.format("\nLimit avg time = %d ms\nActual avg time = %d ms", conf.averageTimeLimit, result.runAverageTime)
+            msg += String.format("\nLimit avg time = %d ms\nActual avg time = %d ms", conf.averageTimeLimit, result.executionAvgTime)
         }
         if (!result.isMaxLimitMet) {
             if (!result.isAverageLimitMet) {

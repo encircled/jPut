@@ -1,7 +1,7 @@
 package cz.encircled.jput.unit
 
 import cz.encircled.jput.model.MethodConfiguration
-import cz.encircled.jput.model.PerformanceTestExecution
+import cz.encircled.jput.model.PerfTestExecution
 
 import java.lang.reflect.Method
 
@@ -10,14 +10,14 @@ import java.lang.reflect.Method
  */
 interface UnitPerformanceAnalyzer {
 
-    fun buildTestExecution(configuration: MethodConfiguration, method: Method): PerformanceTestExecution
+    fun buildTestExecution(configuration: MethodConfiguration, method: Method): PerfTestExecution
 
     /**
-     * @param elapsedTime - elapsed time in nanoseconds
+     * @param elapsedTimes - list of elapsed times in ms
      */
-    fun addTestRun(execution: PerformanceTestExecution, elapsedTime: Long)
+    fun addTestExecutions(execution: PerfTestExecution, elapsedTimes: List<Long>)
 
-    fun analyzeUnitTrend(execution: PerformanceTestExecution, conf: MethodConfiguration): UnitPerformanceResult
+    fun analyzeUnitTrend(execution: PerfTestExecution, conf: MethodConfiguration): UnitPerformanceResult
 
     fun buildErrorMessage(result: UnitPerformanceResult, conf: MethodConfiguration): String
 

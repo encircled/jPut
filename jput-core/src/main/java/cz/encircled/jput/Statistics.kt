@@ -1,8 +1,6 @@
 package cz.encircled.jput
 
-import cz.encircled.jput.model.PerformanceTestExecution
-import java.util.function.Supplier
-import java.util.stream.LongStream
+import cz.encircled.jput.model.PerfTestExecution
 
 /**
  * @author Vlad on 27-May-17.
@@ -17,7 +15,7 @@ object Statistics {
         return sum / input.size
     }
 
-    fun getVariance(input: List<Long>): Double {
+    fun getStandardDeviation(input: List<Long>): Double {
         val average = getAverage(input)
         var temp = 0.0
         for (a in input)
@@ -25,8 +23,8 @@ object Statistics {
         return temp / input.size
     }
 
-    fun getDeviation(input: List<Long>): Double {
-        return Math.sqrt(getVariance(input))
+    fun getVariance(input: List<Long>): Double {
+        return Math.sqrt(getStandardDeviation(input))
     }
 
     fun round(value: Double): Long {
@@ -44,12 +42,12 @@ object Statistics {
         return input.subList(0, Math.round(input.size * percentile).toInt())
     }
 
-    fun maxExecutionTime(execution: PerformanceTestExecution): Long {
-        return execution.runs.max() ?: throw IllegalStateException()
+    fun maxExecutionTime(execution: PerfTestExecution): Long {
+        return execution.executionResult.max() ?: throw IllegalStateException()
     }
 
-    fun averageExecutionTime(execution: PerformanceTestExecution): Long {
-        val avg = execution.runs.average()
+    fun averageExecutionTime(execution: PerfTestExecution): Long {
+        val avg = execution.executionResult.average()
         return if (avg == Double.NaN) throw IllegalStateException() else Math.round(avg)
     }
 
