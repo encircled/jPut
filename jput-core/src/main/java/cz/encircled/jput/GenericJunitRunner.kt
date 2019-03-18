@@ -2,7 +2,6 @@ package cz.encircled.jput
 
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.MethodConfiguration
-import cz.encircled.jput.model.MethodTrendConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.trend.TrendAnalyzer
 import cz.encircled.jput.unit.PerformanceTest
@@ -37,7 +36,7 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
             if (annotation == null || !context.isPerformanceTestEnabled) {
                 statement.evaluate()
             } else {
-                val conf = prepareConfiguration(annotation)
+                val conf = MethodConfiguration.fromAnnotation(annotation)
                 val execution = context.unitPerformanceAnalyzer.buildTestExecution(conf, frameworkMethod.method)
 
                 val result = performExecution(conf, statement)
@@ -60,13 +59,11 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
         }
 
         if (conf.trendConfiguration != null) {
-            val sampleSize = conf.trendConfiguration!!.standardSampleSize * conf.repeats
-
             // Assume that first has highest priority
-            val sample = context.resultRecorders[0].getSample(execution, sampleSize)
+            val sample = context.resultRecorders[0].getSample(execution, conf.trendConfiguration)
 
-            if (sample.size >= conf.trendConfiguration!!.standardSampleSize) {
-                val trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration!!, execution, sample)
+            if (sample.size >= conf.trendConfiguration.sampleSize) {
+                val trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration, execution, sample)
                 if (trendResult.isError) {
                     throw AssertionFailedError("Trend performance test failed" + trendAnalyzer.buildErrorMessage(trendResult, conf))
                 }
@@ -88,17 +85,6 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
             statement.evaluate()
             (System.nanoTime() - start) / 1000000L
         }
-    }
-
-    private fun prepareConfiguration(annotation: PerformanceTest): MethodConfiguration {
-        val conf = MethodConfiguration.fromAnnotation(annotation)
-        val trendAnnotation =
-                if (annotation.trends.isNotEmpty()) annotation.trends[0]
-                else null
-        if (trendAnnotation != null) {
-            conf.trendConfiguration = MethodTrendConfiguration.fromAnnotation(trendAnnotation)
-        }
-        return conf
     }
 
 }

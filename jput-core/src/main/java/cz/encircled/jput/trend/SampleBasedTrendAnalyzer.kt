@@ -19,24 +19,22 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
             sortedSample = Statistics.getPercentile(sortedSample, configuration.noisePercentile)
         }
 
-        if (configuration.measureAverageTime) {
-            val sampleAvg = Statistics.getAverage(sortedSample)
+        val sampleAvg = Statistics.getAverage(sortedSample)
 
-            val avgThreshold =
-                    if (configuration.useSampleVarianceAsThreshold)
-                        Statistics.getVariance(sortedSample)
-                    else
-                        sampleAvg * configuration.averageTimeThreshold // TODO add validation > 0
+        val avgThreshold =
+                if (configuration.useSampleVarianceAsThreshold)
+                    Statistics.getVariance(sortedSample)
+                else
+                    sampleAvg * configuration.averageTimeThreshold // TODO add validation > 0
 
-            val executionAvg = Statistics.getAverage(execution.executionResult) // TODO percentile?
-            if (executionAvg > sampleAvg + avgThreshold) {
-                val trendResult = TrendResult()
-                trendResult.isAverageMet = false
-                trendResult.runAverageTime = Statistics.round(executionAvg)
-                trendResult.deviation = Statistics.round(avgThreshold)
-                trendResult.standardAverage = Statistics.round(sampleAvg)
-                return trendResult
-            }
+        val executionAvg = Statistics.getAverage(execution.executionResult) // TODO percentile?
+        if (executionAvg > sampleAvg + avgThreshold) {
+            val trendResult = TrendResult()
+            trendResult.isAverageMet = false
+            trendResult.runAverageTime = Statistics.round(executionAvg)
+            trendResult.deviation = Statistics.round(avgThreshold)
+            trendResult.standardAverage = Statistics.round(sampleAvg)
+            return trendResult
         }
 
         return TrendResult()

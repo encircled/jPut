@@ -8,20 +8,24 @@ import java.util.*
  *
  * @author Vlad on 20-May-17.
  */
-data class MethodConfiguration(val warmUp: Int,
+data class MethodConfiguration(
+        val warmUp: Int,
 
-                               /**
-                                * Test execution repeats count
-                                */
-                               val repeats: Int,
+        /**
+         * Test execution repeats count
+         */
+        val repeats: Int,
 
         // TODO use 100 percentile instead?
-                               val maxTimeLimit: Long,
-                               val averageTimeLimit: Long,
-                               var percentiles: Map<Long, Double> = HashMap(1)) {
+        val maxTimeLimit: Long,
+        val averageTimeLimit: Long,
 
+        val trendConfiguration: MethodTrendConfiguration? = null,
 
-    var trendConfiguration: MethodTrendConfiguration? = null
+        var percentiles: Map<Long, Double> = HashMap(1)
+
+) {
+
 
     fun valid(): MethodConfiguration {
         if (warmUp < 0L) {
@@ -54,15 +58,20 @@ data class MethodConfiguration(val warmUp: Int,
     companion object {
 
         fun fromAnnotation(conf: PerformanceTest): MethodConfiguration {
+            val trendConfig =
+                    if (conf.trends.isNotEmpty()) MethodTrendConfiguration.fromAnnotation(conf.trends[0])
+                    else null
+
             val percentiles = conf.percentiles
             if (percentiles.size % 2 != 0) {
                 throw IllegalStateException("Percentiles parameter count must be even")
             }
 
-            val methodConfiguration = MethodConfiguration(conf.warmUp, conf.repeats, conf.maxTimeLimit, conf.averageTimeLimit)
+            val methodConfiguration = MethodConfiguration(conf.warmUp, conf.repeats, conf.maxTimeLimit,
+                    conf.averageTimeLimit, trendConfig)
 
             for (i in 0 until percentiles.size - 1) {
-                //            methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]); TODO
+                // methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]); TODO
             }
 
             return methodConfiguration.valid()

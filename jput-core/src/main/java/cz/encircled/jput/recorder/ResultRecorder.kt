@@ -1,6 +1,10 @@
 package cz.encircled.jput.recorder
 
+import cz.encircled.jput.context.JPutContext
+import cz.encircled.jput.context.getProperty
+import cz.encircled.jput.model.MethodTrendConfiguration
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.trend.SelectionStrategy
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -9,7 +13,32 @@ import java.util.*
  */
 interface ResultRecorder {
 
-    fun getSample(execution: PerfTestExecution, sampleSize: Int): List<Long>
+    fun getSample(execution: PerfTestExecution, config: MethodTrendConfiguration): List<Long>
+
+    /**
+     * Select sub list from samples according to the given [strategy]
+     */
+    fun <T> subList(input: List<T>, size: Int, strategy: SelectionStrategy): List<T> {
+        return if (input.size > size) {
+            when (strategy) {
+                SelectionStrategy.USE_FIRST -> input.subList(0, size)
+                SelectionStrategy.USE_LATEST -> input.subList(input.size - size, input.size)
+                else -> throw UnsupportedOperationException()
+            }
+        } else {
+            input
+        }
+    }
+
+    /**
+     * Get user-defined environment parameters, which should be persisted with test results
+     */
+    fun getUserDefinedEnvParams(): Map<String, String> {
+        val value = getProperty(JPutContext.PROP_ENV_PARAMS, "")
+        return value.split(",")
+                .map { it.split(":") }
+                .associateBy({ it[0] }, { it[1] })
+    }
 
     /**
      * Append the new execution result

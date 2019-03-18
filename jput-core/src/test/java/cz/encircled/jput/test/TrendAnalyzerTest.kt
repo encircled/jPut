@@ -25,7 +25,7 @@ class TrendAnalyzerTest {
 
     @Test
     fun testPositiveAverageByVariance() {
-        val conf = MethodTrendConfiguration().setUseAverageTimeVariance(true)
+        val conf = MethodTrendConfiguration(3, useSampleVarianceAsThreshold = true)
         val testRun = TestSupport.getTestExecution(100)
         assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(100, 100, 100)))
         assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(300, 310, 330)))
@@ -36,17 +36,17 @@ class TrendAnalyzerTest {
 
     @Test
     fun testNegativeByVariance() {
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(MethodTrendConfiguration().setUseAverageTimeVariance(true),
+        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(MethodTrendConfiguration(4, useSampleVarianceAsThreshold = true),
                 TestSupport.getTestExecution(150), listOf(100, 96, 99, 99)))
 
         // Avg 98.5, var - 1.5
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(MethodTrendConfiguration().setUseAverageTimeVariance(true),
+        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(MethodTrendConfiguration(4, useSampleVarianceAsThreshold = true),
                 TestSupport.getTestExecution(101), listOf(100, 96, 99, 99)))
     }
 
     @Test
     fun testPositiveAverageByThreshold() {
-        val conf = MethodTrendConfiguration().setAverageTimeThreshold(0.1)
+        val conf = MethodTrendConfiguration(3, averageTimeThreshold = 0.1)
         val testRun = TestSupport.getTestExecution(100)
 
         assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(100, 100, 100)))
@@ -58,13 +58,14 @@ class TrendAnalyzerTest {
 
     @Test
     fun testNegativeAverageByThreshold() {
-        val conf = MethodTrendConfiguration().setAverageTimeThreshold(0.1)
+        val conf = MethodTrendConfiguration(3, averageTimeThreshold = 0.1)
 
         assertAvgNotValid(trendAnalyzer.analyzeTestTrend(conf,
                 TestSupport.getTestExecution(150), listOf(100, 100, 100)))
 
+        val conf2 = MethodTrendConfiguration(2, averageTimeThreshold = 0.1)
         // Avg 100, threshold - 10%
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(conf,
+        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(conf2,
                 TestSupport.getTestExecution(111), listOf(95, 105)))
     }
 

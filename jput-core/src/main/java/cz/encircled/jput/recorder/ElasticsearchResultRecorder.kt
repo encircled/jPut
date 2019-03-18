@@ -1,6 +1,9 @@
 package cz.encircled.jput.recorder
 
+import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import cz.encircled.jput.context.getProperty
+import cz.encircled.jput.model.MethodTrendConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest
@@ -17,7 +20,7 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
         createIndexIfNeeded()
     }
 
-    override fun getSample(execution: PerfTestExecution, sampleSize: Int): List<Long> {
+    override fun getSample(execution: PerfTestExecution, config: MethodTrendConfiguration): List<Long> {
         val sourceBuilder = SearchSourceBuilder()
         sourceBuilder.query(QueryBuilders.matchQuery("testId", execution.testId!!))
 
@@ -25,8 +28,9 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
                 .source(sourceBuilder)
 
         val searchResponse = client.search(request, RequestOptions.DEFAULT)
-        return searchResponse.hits.hits
-                .take(sampleSize)
+        val sample = subList(searchResponse.hits.hits.toList(), config.sampleSize, config.sampleSelectionStrategy)
+
+        return sample
                 .map {
                     val runs = it.sourceAsMap["runs"]
                     runs as List<*>
@@ -39,14 +43,19 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
     }
 
     override fun doFlush(data: List<PerfTestExecution>) {
+        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "default")
+
         data.forEach {
-            val jsonMap = mapOf(
+            val jsonMap = mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.testId,
                     "runs" to it.executionResult
             )
+
+            jsonMap.putAll(getUserDefinedEnvParams())
+
             val indexRequest = Requests.indexRequest("jput")
-                    .type("perf")
+                    .type(type)
                     .source(jsonMap)
 
             client.index(indexRequest, RequestOptions.DEFAULT)
