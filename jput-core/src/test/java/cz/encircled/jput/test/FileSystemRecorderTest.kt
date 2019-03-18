@@ -57,7 +57,7 @@ class FileSystemRecorderTest {
     }
 
     private fun getWriter(): Pair<String, FileSystemResultRecorder> {
-        val pathToFile = System.getProperty("java.recorder.tmpdir") + "jput-test.data"
+        val pathToFile = System.getProperty("java.io.tmpdir") + "jput-test.data"
         File(pathToFile).delete()
 
         val writer = FileSystemResultRecorder(pathToFile)
