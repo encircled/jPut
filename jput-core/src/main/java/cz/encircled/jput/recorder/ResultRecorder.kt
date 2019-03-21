@@ -35,6 +35,8 @@ interface ResultRecorder {
      */
     fun getUserDefinedEnvParams(): Map<String, String> {
         val value = getProperty(JPutContext.PROP_ENV_PARAMS, "")
+        if (value.isEmpty()) return mapOf()
+
         return value.split(",")
                 .map { it.split(":") }
                 .associateBy({ it[0] }, { it[1] })
@@ -75,6 +77,7 @@ abstract class ThreadsafeResultRecorder : ResultRecorder {
     }
 
     override fun flush() {
+        log.info("Do flush execution results")
         synchronized(flushMutex) {
             var copy: List<PerfTestExecution>
             synchronized(stack) {

@@ -62,9 +62,12 @@ constructor(clazz: Class<*>) : GenericJunitRunner by (GenericJunitRunnerImpl()),
         }
     }
 
+    // TODO not working?
     override fun withAfterTestExecutionCallbacks(frameworkMethod: FrameworkMethod, testInstance: Any, statement: Statement): Statement {
         testContextManager.registerTestExecutionListeners(object : TestExecutionListener {
             override fun afterTestClass(testContext: TestContext) {
+                log.info("Custom after tests")
+
                 context.destroy()
             }
         })

@@ -40,8 +40,9 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
                 val execution = context.unitPerformanceAnalyzer.buildTestExecution(conf, frameworkMethod.method)
 
                 val result = performExecution(conf, statement)
-                performAnalysis(context.unitPerformanceAnalyzer, execution, conf, context.trendAnalyzer)
                 context.unitPerformanceAnalyzer.addTestExecutions(execution, result)
+                performAnalysis(context.unitPerformanceAnalyzer, execution, conf, context.trendAnalyzer)
+                context.resultRecorders.forEach { it.flush() } // TODO
             }
         } catch (e: AssumptionViolatedException) {
             eachNotifier.addFailedAssumption(e)

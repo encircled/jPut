@@ -10,6 +10,7 @@ import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
+import org.slf4j.LoggerFactory
 
 lateinit var context: JPutContext
 
@@ -34,6 +35,8 @@ class JPutContext {
 
     var resultRecorders: List<ResultRecorder> = listOf()
 
+    val log = LoggerFactory.getLogger(JPutContext::class.java)
+
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         executionId = System.currentTimeMillis()
@@ -49,14 +52,18 @@ class JPutContext {
             val port = getProperty(PROP_ELASTIC_PORT, 80)
             val scheme = getProperty(PROP_ELASTIC_SCHEME, "http")
 
+            log.info("JPut using Elasticsearch $host")
+
             val client = RestHighLevelClient(RestClient.builder(HttpHost(host, port, scheme)))
             addResultRecorder(ElasticsearchResultRecorder(client))
         }
 
         if (getProperty(PROP_STORAGE_FILE_ENABLED, false)) {
+
             val default = System.getProperty("java.recorder.tmpdir") + "jput-test.data"
             val pathToFile = getProperty(PROP_PATH_TO_STORAGE_FILE, default)
 
+            log.info("JPut using Filesystem $pathToFile")
             addResultRecorder(FileSystemResultRecorder(pathToFile))
         }
     }

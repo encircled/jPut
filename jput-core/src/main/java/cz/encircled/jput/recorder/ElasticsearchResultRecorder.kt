@@ -13,8 +13,11 @@ import org.elasticsearch.client.Requests
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.builder.SearchSourceBuilder
+import org.slf4j.LoggerFactory
 
 class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : ThreadsafeResultRecorder() {
+
+    val log = LoggerFactory.getLogger(ElasticsearchResultRecorder::class.java)
 
     init {
         createIndexIfNeeded()
@@ -43,6 +46,8 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
     }
 
     override fun doFlush(data: List<PerfTestExecution>) {
+        log.info("Do flush to Elasticsearch: $data")
+
         val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "default")
 
         data.forEach {
@@ -59,9 +64,10 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
                     .source(jsonMap)
 
             client.index(indexRequest, RequestOptions.DEFAULT)
+
         }
 
-
+        log.info("Flush to Elasticsearch done")
     }
 
     override fun destroy() {
