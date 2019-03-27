@@ -2,7 +2,7 @@ package cz.encircled.jput.test
 
 import cz.encircled.jput.JPutJUnitRunner
 import cz.encircled.jput.context.JPutContext
-import cz.encircled.jput.model.MethodTrendConfiguration
+import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
@@ -26,13 +26,13 @@ class FileSystemRecorderTest {
         writer.appendTrendResult(TestSupport.getTestExecution(javaClass.methods[0], 130, 115, 105))
         writer.flush()
 
-        val config = MethodTrendConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
+        val config = TrendTestConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
 
         val reader = FileSystemResultRecorder(pathToFile)
         var runs = reader.getSample(run, config)
         assertEquals(listOf<Long>(100, 110, 120, 130, 115, 105), runs)
 
-        val config2 = MethodTrendConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
+        val config2 = TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
         runs = reader.getSample(run, config2)
         assertEquals(listOf<Long>(100, 110, 120, 130), runs)
     }

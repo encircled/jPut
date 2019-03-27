@@ -2,9 +2,10 @@ package cz.encircled.jput.recorder
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.context.getProperty
-import cz.encircled.jput.model.MethodTrendConfiguration
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.model.TrendTestConfiguration
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest
 import org.elasticsearch.action.search.SearchRequest
@@ -14,6 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.LoggerFactory
+import java.util.*
 
 class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : ThreadsafeResultRecorder() {
 
@@ -23,12 +25,18 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
         createIndexIfNeeded()
     }
 
-    override fun getSample(execution: PerfTestExecution, config: MethodTrendConfiguration): List<Long> {
-        val sourceBuilder = SearchSourceBuilder()
-        sourceBuilder.query(QueryBuilders.matchQuery("testId", execution.testId!!))
+    override fun getSample(execution: PerfTestExecution, config: TrendTestConfiguration): List<Long> {
+        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "default")
 
-        val request = SearchRequest("jput").types("perf")
-                .source(sourceBuilder)
+        val queryBuilder = QueryBuilders.boolQuery()
+                .filter(QueryBuilders.matchQuery("testId", execution.testId!!))
+
+        getCollectionProperty(JPutContext.PROP_ELASTIC_ENV_IDENTIFIERS).forEach {
+            queryBuilder.filter(QueryBuilders.matchQuery(it, getProperty(it, "")))
+        }
+
+        val request = SearchRequest("jput").types(type)
+                .source(SearchSourceBuilder().query(queryBuilder))
 
         val searchResponse = client.search(request, RequestOptions.DEFAULT)
         val sample = subList(searchResponse.hits.hits.toList(), config.sampleSize, config.sampleSelectionStrategy)
@@ -54,7 +62,8 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
             val jsonMap = mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.testId,
-                    "runs" to it.executionResult
+                    "runs" to it.executionResult,
+                    "@timestamp" to Date()
             )
 
             jsonMap.putAll(getUserDefinedEnvParams())

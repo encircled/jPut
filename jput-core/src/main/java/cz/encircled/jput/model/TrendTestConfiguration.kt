@@ -6,7 +6,7 @@ import cz.encircled.jput.trend.SelectionStrategy
 /**
  * @author Vlad on 27-May-17.
  */
-data class MethodTrendConfiguration(
+data class TrendTestConfiguration(
 
         /**
          * Sample size which will be used for trend analysis
@@ -18,7 +18,7 @@ data class MethodTrendConfiguration(
          *
          * Performance trend test will fail if average execution time is greater than sample average time plus given threshold
          */
-        val averageTimeThreshold: Double = 0.toDouble(),
+        val averageTimeThreshold: Double = 0.0,
 
         /**
          * if true - use the sample variance as an average time threshold
@@ -41,8 +41,8 @@ data class MethodTrendConfiguration(
 
     companion object {
 
-        fun fromAnnotation(conf: PerformanceTrend): MethodTrendConfiguration =
-                MethodTrendConfiguration(
+        fun fromAnnotation(conf: PerformanceTrend): TrendTestConfiguration =
+                TrendTestConfiguration(
                         conf.sampleSize,
                         conf.averageTimeThreshold,
                         conf.useSampleVarianceAsThreshold,

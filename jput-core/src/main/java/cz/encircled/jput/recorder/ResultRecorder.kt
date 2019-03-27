@@ -1,9 +1,9 @@
 package cz.encircled.jput.recorder
 
 import cz.encircled.jput.context.JPutContext
-import cz.encircled.jput.context.getProperty
-import cz.encircled.jput.model.MethodTrendConfiguration
+import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.trend.SelectionStrategy
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -13,7 +13,7 @@ import java.util.*
  */
 interface ResultRecorder {
 
-    fun getSample(execution: PerfTestExecution, config: MethodTrendConfiguration): List<Long>
+    fun getSample(execution: PerfTestExecution, config: TrendTestConfiguration): List<Long>
 
     /**
      * Select sub list from samples according to the given [strategy]
@@ -34,10 +34,7 @@ interface ResultRecorder {
      * Get user-defined environment parameters, which should be persisted with test results
      */
     fun getUserDefinedEnvParams(): Map<String, String> {
-        val value = getProperty(JPutContext.PROP_ENV_PARAMS, "")
-        if (value.isEmpty()) return mapOf()
-
-        return value.split(",")
+        return getCollectionProperty(JPutContext.PROP_ENV_PARAMS)
                 .map { it.split(":") }
                 .associateBy({ it[0] }, { it[1] })
     }

@@ -19,12 +19,8 @@ class StatisticsTest {
 
     @Test
     fun testVariance() {
-        Assert.assertEquals(1.0, Statistics.getStandardDeviation(listOf(1, 3)), 0.0)
-    }
-
-    @Test
-    fun testDeviation() {
-        Assert.assertEquals(2.0, Statistics.getVariance(listOf(1, 5)), 0.0)
+        Assert.assertEquals(4.0, Statistics.getVariance(listOf(1, 5)), 0.0)
+        Assert.assertEquals(1.25, Statistics.getVariance(listOf(2, 3, 4, 5)), 0.0)
     }
 
     @Test(expected = IllegalStateException::class)

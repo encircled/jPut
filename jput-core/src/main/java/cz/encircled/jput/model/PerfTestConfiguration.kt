@@ -8,7 +8,7 @@ import java.util.*
  *
  * @author Vlad on 20-May-17.
  */
-data class MethodConfiguration(
+data class PerfTestConfiguration(
         val warmUp: Int,
 
         /**
@@ -18,16 +18,16 @@ data class MethodConfiguration(
 
         // TODO use 100 percentile instead?
         val maxTimeLimit: Long,
-        val averageTimeLimit: Long,
+        val avgTimeLimit: Long,
 
-        val trendConfiguration: MethodTrendConfiguration? = null,
+        val trendConfiguration: TrendTestConfiguration? = null,
 
         var percentiles: Map<Long, Double> = HashMap(1)
 
 ) {
 
 
-    fun valid(): MethodConfiguration {
+    fun valid(): PerfTestConfiguration {
         if (warmUp < 0L) {
             throw IllegalStateException("WarmUp count must be > 0")
         }
@@ -47,19 +47,19 @@ data class MethodConfiguration(
     }
 
     override fun toString(): String {
-        return "MethodConfiguration{" +
+        return "PerfTestConfiguration{" +
                 "warmUp=" + warmUp + " ms" +
                 ", repeats=" + repeats + " ms" +
                 ", maxTimeLimit=" + maxTimeLimit + " ms" +
-                ", averageTimeLimit=" + averageTimeLimit + " ms" +
+                ", avgTimeLimit=" + avgTimeLimit + " ms" +
                 '}'.toString()
     }
 
     companion object {
 
-        fun fromAnnotation(conf: PerformanceTest): MethodConfiguration {
+        fun fromAnnotation(conf: PerformanceTest): PerfTestConfiguration {
             val trendConfig =
-                    if (conf.trends.isNotEmpty()) MethodTrendConfiguration.fromAnnotation(conf.trends[0])
+                    if (conf.trends.isNotEmpty()) TrendTestConfiguration.fromAnnotation(conf.trends[0])
                     else null
 
             val percentiles = conf.percentiles
@@ -67,7 +67,7 @@ data class MethodConfiguration(
                 throw IllegalStateException("Percentiles parameter count must be even")
             }
 
-            val methodConfiguration = MethodConfiguration(conf.warmUp, conf.repeats, conf.maxTimeLimit,
+            val methodConfiguration = PerfTestConfiguration(conf.warmUp, conf.repeats, conf.maxTimeLimit,
                     conf.averageTimeLimit, trendConfig)
 
             for (i in 0 until percentiles.size - 1) {

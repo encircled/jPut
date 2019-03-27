@@ -5,8 +5,8 @@ package cz.encircled.jput.trend
  */
 data class TrendResult(
         var isAverageMet: Boolean = true,
-        var runAverageTime: Long = 0,
-        var standardAverage: Long = 0,
+        var executionAvgTime: Long = 0,
+        var sampleAvg: Long = 0,
         var deviation: Long = 0) {
 
     val isError: Boolean

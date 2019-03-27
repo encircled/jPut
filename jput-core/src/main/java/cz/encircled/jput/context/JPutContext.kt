@@ -101,6 +101,8 @@ class JPutContext {
 
         const val PROP_ELASTIC_TYPE = PREFIX + "storage.elastic.type"
 
+        const val PROP_ELASTIC_ENV_IDENTIFIERS = PREFIX + "storage.elastic.env.identifiers"
+
         const val PROP_STORAGE_FILE_ENABLED = PREFIX + "storage.file.enabled"
 
         const val PROP_PATH_TO_STORAGE_FILE = PREFIX + "storage.file.path"

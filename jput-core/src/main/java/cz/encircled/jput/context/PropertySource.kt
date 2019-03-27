@@ -14,6 +14,13 @@ inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
     }
 }
 
+fun getCollectionProperty(key: String): List<String> {
+    val value = getProperty(key, "")
+
+    return if (value.isEmpty()) listOf()
+    else value.split(",").map { it.trim() }
+}
+
 interface PropertySource {
 
     fun getProperty(key: String): String?

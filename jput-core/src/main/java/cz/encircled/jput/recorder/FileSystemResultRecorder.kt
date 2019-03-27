@@ -1,7 +1,7 @@
 package cz.encircled.jput.recorder
 
-import cz.encircled.jput.model.MethodTrendConfiguration
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.model.TrendTestConfiguration
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -23,7 +23,7 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
         initRuns()
     }
 
-    override fun getSample(execution: PerfTestExecution, config: MethodTrendConfiguration): List<Long> {
+    override fun getSample(execution: PerfTestExecution, config: TrendTestConfiguration): List<Long> {
         val sample = runs.getOrDefault(execution.testId, listOf())
 
         return subList(sample, config.sampleSize, config.sampleSelectionStrategy)

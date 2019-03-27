@@ -1,11 +1,9 @@
 package cz.encircled.jput
 
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.MethodConfiguration
+import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.trend.TrendAnalyzer
 import cz.encircled.jput.unit.PerformanceTest
-import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
 import org.junit.internal.runners.model.EachTestNotifier
@@ -36,12 +34,13 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
             if (annotation == null || !context.isPerformanceTestEnabled) {
                 statement.evaluate()
             } else {
-                val conf = MethodConfiguration.fromAnnotation(annotation)
+                val conf = PerfTestConfiguration.fromAnnotation(annotation)
                 val execution = context.unitPerformanceAnalyzer.buildTestExecution(conf, frameworkMethod.method)
 
                 val result = performExecution(conf, statement)
-                context.unitPerformanceAnalyzer.addTestExecutions(execution, result)
-                performAnalysis(context.unitPerformanceAnalyzer, execution, conf, context.trendAnalyzer)
+
+                execution.executionResult.addAll(result)
+                performAnalysis(execution, conf)
                 context.resultRecorders.forEach { it.flush() } // TODO
             }
         } catch (e: AssumptionViolatedException) {
@@ -53,10 +52,12 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
         }
     }
 
-    private fun performAnalysis(performanceAnalyzer: UnitPerformanceAnalyzer, execution: PerfTestExecution, conf: MethodConfiguration, trendAnalyzer: TrendAnalyzer) {
-        val result = performanceAnalyzer.analyzeUnitTrend(execution, conf)
-        if (result.isError) {
-            throw AssertionFailedError("Unit performance test failed" + performanceAnalyzer.buildErrorMessage(result, conf))
+    private fun performAnalysis(execution: PerfTestExecution, conf: PerfTestConfiguration) {
+        val unitAnalyzer = context.unitPerformanceAnalyzer
+        val trendAnalyzer = context.trendAnalyzer
+        val unitViolations = unitAnalyzer.analyzeUnitTrend(execution, conf)
+        if (unitViolations.isError) {
+            throw AssertionFailedError("Performance unit test failed.\n$unitViolations")
         }
 
         if (conf.trendConfiguration != null) {
@@ -64,9 +65,9 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
             val sample = context.resultRecorders[0].getSample(execution, conf.trendConfiguration)
 
             if (sample.size >= conf.trendConfiguration.sampleSize) {
-                val trendResult = trendAnalyzer.analyzeTestTrend(conf.trendConfiguration, execution, sample)
-                if (trendResult.isError) {
-                    throw AssertionFailedError("Trend performance test failed" + trendAnalyzer.buildErrorMessage(trendResult, conf))
+                val trendViolations = trendAnalyzer.analyzeTestTrend(conf, execution, sample)
+                if (trendViolations.isError) {
+                    throw AssertionFailedError("Performance trend test failed.\n$trendViolations")
                 }
             }
 
@@ -76,7 +77,7 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
         }
     }
 
-    private fun performExecution(conf: MethodConfiguration, statement: Statement): List<Long> {
+    private fun performExecution(conf: PerfTestConfiguration, statement: Statement): List<Long> {
         repeat(conf.warmUp) {
             statement.evaluate()
         }
