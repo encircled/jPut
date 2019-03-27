@@ -4,19 +4,21 @@ import cz.encircled.jput.Statistics
 
 
 /**
+ * Represents the execution state of a particular performance test
+ *
  * @author Vlad on 20-May-17.
  */
 data class PerfTestExecution(
 
         /**
+         * Configuration used for this execution
+         */
+        val conf: PerfTestConfiguration,
+
+        /**
          * Parameters related to the global execution
          */
         var executionParams: Map<String, Any>,
-
-        /**
-         * Identifier of the test
-         */
-        var testId: String? = null,
 
         /**
          * List of result execution times in ms

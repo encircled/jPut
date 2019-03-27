@@ -1,30 +1,31 @@
 package cz.encircled.jput.unit
 
-import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.PerfTestResult
-import java.lang.reflect.Method
+
+/**
+ * @author Vlad on 21-May-17.
+ */
+interface UnitPerformanceAnalyzer {
+
+    fun analyzeUnitTrend(execution: PerfTestExecution): PerfTestResult
+
+}
+
 
 /**
  * @author Vlad on 21-May-17.
  */
 class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
 
-    override fun buildTestExecution(configuration: PerfTestConfiguration, method: Method): PerfTestExecution {
-        val run = PerfTestExecution(mapOf("id" to context.executionId))
-        run.testId = method.declaringClass.name + "#" + method.name
-        return run
-    }
-
-    override fun analyzeUnitTrend(execution: PerfTestExecution, conf: PerfTestConfiguration): PerfTestResult {
+    override fun analyzeUnitTrend(execution: PerfTestExecution): PerfTestResult {
         val result = mutableListOf<PerfConstraintViolation>()
-        if (execution.executionAvg > conf.avgTimeLimit) {
+        if (execution.executionAvg > execution.conf.avgTimeLimit) {
             result.add(PerfConstraintViolation.UNIT_AVG)
         }
 
-        if (execution.executionMax > conf.maxTimeLimit) {
+        if (execution.executionMax > execution.conf.maxTimeLimit) {
             result.add(PerfConstraintViolation.UNIT_MAX)
         }
 
@@ -38,7 +39,7 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
         //                    }
         //                }
 
-        return PerfTestResult(execution, conf, result)
+        return PerfTestResult(execution, result)
     }
 
 }

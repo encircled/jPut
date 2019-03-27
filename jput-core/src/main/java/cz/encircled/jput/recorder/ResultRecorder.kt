@@ -3,7 +3,6 @@ package cz.encircled.jput.recorder
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.trend.SelectionStrategy
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -13,25 +12,28 @@ import java.util.*
  */
 interface ResultRecorder {
 
-    fun getSample(execution: PerfTestExecution, config: TrendTestConfiguration): List<Long>
+    /**
+     * Fetch execution times sample for the given [execution]
+     */
+    fun getSample(execution: PerfTestExecution): List<Long>
 
     /**
-     * Select sub list from samples according to the given [strategy]
+     * Select sub list of given [size] from [sample] according to the given [strategy]
      */
-    fun <T> subList(input: List<T>, size: Int, strategy: SelectionStrategy): List<T> {
-        return if (input.size > size) {
+    fun <T> subList(sample: List<T>, size: Int, strategy: SelectionStrategy): List<T> {
+        return if (sample.size > size) {
             when (strategy) {
-                SelectionStrategy.USE_FIRST -> input.subList(0, size)
-                SelectionStrategy.USE_LATEST -> input.subList(input.size - size, input.size)
+                SelectionStrategy.USE_FIRST -> sample.subList(0, size)
+                SelectionStrategy.USE_LATEST -> sample.subList(sample.size - size, sample.size)
                 else -> throw UnsupportedOperationException()
             }
         } else {
-            input
+            sample
         }
     }
 
     /**
-     * Get user-defined environment parameters, which should be persisted with test results
+     * Get user-defined environment parameters, which should be persisted along with test results
      */
     fun getUserDefinedEnvParams(): Map<String, String> {
         return getCollectionProperty(JPutContext.PROP_ENV_PARAMS)
@@ -58,6 +60,9 @@ interface ResultRecorder {
 
 }
 
+/**
+ * Primitive thread-safe abstract impl of [ResultRecorder]. Adds synchronization on append and flush.
+ */
 abstract class ThreadsafeResultRecorder : ResultRecorder {
 
     private val log = LoggerFactory.getLogger(ThreadsafeResultRecorder::class.java)

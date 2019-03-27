@@ -14,34 +14,34 @@ class UnitAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testPositiveAverage() {
-        val testRun = TestSupport.getTestExecution(99, 101)
-        val conf = PerfTestConfiguration(0, 1, 200L, 101L)
+        val conf = PerfTestConfiguration("1", 0, 1, 200L, 101L)
+        val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
-        assertValid(analyzer.analyzeUnitTrend(testRun, conf))
+        assertValid(analyzer.analyzeUnitTrend(testRun))
     }
 
     @Test
     fun testNegativeAverage() {
-        val testRun = TestSupport.getTestExecution(99, 101)
-        val conf = PerfTestConfiguration(0, 1, 200L, 99L)
+        val conf = PerfTestConfiguration("1", 0, 1, 200L, 99L)
+        val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
-        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun, conf))
+        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))
     }
 
     @Test
     fun testPositiveMax() {
-        val testRun = TestSupport.getTestExecution(99, 101)
-        val conf = PerfTestConfiguration(0, 1, 101L, 150L)
+        val conf = PerfTestConfiguration("1", 0, 1, 101L, 150L)
+        val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
-        assertValid(analyzer.analyzeUnitTrend(testRun, conf))
+        assertValid(analyzer.analyzeUnitTrend(testRun))
     }
 
     @Test
     fun testNegativeMax() {
-        val testRun = TestSupport.getTestExecution(99, 101)
-        val conf = PerfTestConfiguration(0, 1, 100L, 150L)
+        val conf = PerfTestConfiguration("1", 0, 1, 100L, 150L)
+        val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
-        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun, conf))
+        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))
     }
 
 }

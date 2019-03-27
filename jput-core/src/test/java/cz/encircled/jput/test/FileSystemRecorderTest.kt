@@ -14,26 +14,29 @@ import kotlin.test.assertEquals
  * @author Vlad on 21-May-17.
  */
 @RunWith(JPutJUnitRunner::class)
-class FileSystemRecorderTest {
+class FileSystemRecorderTest : PerfConfigForTests {
 
     @Test
     fun testWriter() {
         val (pathToFile, writer) = getWriter()
 
-        val run = TestSupport.getTestExecution(javaClass.methods[0], 100, 110, 120)
+        val config = configWithTrend(TrendTestConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
+        val configWithSampleLimit = configWithTrend(TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
+
+        val run = TestSupport.getTestExecution(config, 100, 110, 120)
+        val runWithSampleLimit = TestSupport.getTestExecution(configWithSampleLimit, 100, 110, 120)
 
         writer.appendTrendResult(run)
-        writer.appendTrendResult(TestSupport.getTestExecution(javaClass.methods[0], 130, 115, 105))
+        writer.appendTrendResult(TestSupport.getTestExecution(baseConfig(), 130, 115, 105))
         writer.flush()
 
-        val config = TrendTestConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
+        // Read previously written data
 
         val reader = FileSystemResultRecorder(pathToFile)
-        var runs = reader.getSample(run, config)
+        var runs = reader.getSample(run)
         assertEquals(listOf<Long>(100, 110, 120, 130, 115, 105), runs)
 
-        val config2 = TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST)
-        runs = reader.getSample(run, config2)
+        runs = reader.getSample(runWithSampleLimit)
         assertEquals(listOf<Long>(100, 110, 120, 130), runs)
     }
 

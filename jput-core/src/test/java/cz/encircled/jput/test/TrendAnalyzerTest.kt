@@ -17,19 +17,24 @@ class TrendAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testCollectRuns() {
-        val runs = trendAnalyzer.collectRuns(listOf(TestSupport.getTestExecution(100, 103), TestSupport.getTestExecution(102), TestSupport.getTestExecution(104)))
+        val config = baseConfig()
+        val runs = trendAnalyzer.collectRuns(listOf(
+                TestSupport.getTestExecution(config, 100, 103),
+                TestSupport.getTestExecution(config, 102),
+                TestSupport.getTestExecution(config, 104)))
+
         assertEquals(listOf<Long>(100, 103, 102, 104), runs)
     }
 
     @Test
     fun testPositiveAverageByVariance() {
         val conf = configWithTrend(TrendTestConfiguration(3, useSampleVarianceAsThreshold = true))
-        val testRun = TestSupport.getTestExecution(100)
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(100, 100, 100)))
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(300, 310, 330)))
+        val testRun = TestSupport.getTestExecution(conf, 100)
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(100, 100, 100)))
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(300, 310, 330)))
 
         // Avg 98.5, var - 1.5
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(100, 96, 99, 99)))
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(100, 96, 99, 99)))
     }
 
     @Test
@@ -37,27 +42,27 @@ class TrendAnalyzerTest : PerfConfigForTests {
         // Avg 98.5 ms, variance 2.25 ms
         val conf = configWithTrend(TrendTestConfiguration(4, useSampleVarianceAsThreshold = true))
 
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(conf, TestSupport.getTestExecution(102), listOf(100, 96, 99, 99)))
+        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(TestSupport.getTestExecution(conf, 102), listOf(100, 96, 99, 99)))
     }
 
     @Test
     fun testPositiveAverageByThreshold() {
         val conf = configWithTrend(TrendTestConfiguration(3, averageTimeThreshold = 10.0))
-        val testRun = TestSupport.getTestExecution(100)
+        val testRun = TestSupport.getTestExecution(conf, 100)
 
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(100, 100, 100)))
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, testRun, listOf(300, 310, 330)))
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(100, 100, 100)))
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(300, 310, 330)))
 
         // 100 Avg + 10 threshold
-        assertValid(trendAnalyzer.analyzeTestTrend(conf, TestSupport.getTestExecution(110), listOf(95, 105)))
+        assertValid(trendAnalyzer.analyzeTestTrend(TestSupport.getTestExecution(conf, 110), listOf(95, 105)))
     }
 
     @Test
     fun testNegativeAverageByThreshold() {
         // Avg 100, threshold - 10
         val conf = configWithTrend(TrendTestConfiguration(2, averageTimeThreshold = 10.0))
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(conf,
-                TestSupport.getTestExecution(111), listOf(95, 105)))
+        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(
+                TestSupport.getTestExecution(conf, 111), listOf(95, 105)))
     }
 
 }

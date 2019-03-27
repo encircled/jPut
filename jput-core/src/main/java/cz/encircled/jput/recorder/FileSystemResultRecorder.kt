@@ -1,7 +1,6 @@
 package cz.encircled.jput.recorder
 
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.model.TrendTestConfiguration
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -11,6 +10,8 @@ import java.nio.file.StandardOpenOption.APPEND
 import java.nio.file.StandardOpenOption.CREATE
 
 /**
+ * Filesystem-based implementation of tests execution results recorder
+ *
  * @author Vlad on 21-May-17.
  */
 class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() {
@@ -23,8 +24,9 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
         initRuns()
     }
 
-    override fun getSample(execution: PerfTestExecution, config: TrendTestConfiguration): List<Long> {
-        val sample = runs.getOrDefault(execution.testId, listOf())
+    override fun getSample(execution: PerfTestExecution): List<Long> {
+        val config = execution.conf.trendConfiguration!!
+        val sample = runs.getOrDefault(execution.conf.testId, listOf())
 
         return subList(sample, config.sampleSize, config.sampleSelectionStrategy)
     }
@@ -39,9 +41,8 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
     }
 
     private fun toFileFormat(execution: PerfTestExecution): String {
-        // TODO aggregate method runs?
         val array = execution.executionResult.joinToString(",")
-        return arrayOf(execution.executionParams["id"], array, execution.testId).joinToString(";")
+        return arrayOf(execution.executionParams["id"], array, execution.conf.testId).joinToString(";")
     }
 
     private fun initRuns() {

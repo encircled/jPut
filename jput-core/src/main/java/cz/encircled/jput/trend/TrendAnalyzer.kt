@@ -2,7 +2,6 @@ package cz.encircled.jput.trend
 
 import cz.encircled.jput.Statistics
 import cz.encircled.jput.model.PerfConstraintViolation
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.PerfTestResult
 
@@ -16,7 +15,7 @@ interface TrendAnalyzer {
      * @param execution current test execution
      * @param sample sample of execution elapsed times in ms
      */
-    fun analyzeTestTrend(configuration: PerfTestConfiguration, execution: PerfTestExecution, sample: List<Long>): PerfTestResult
+    fun analyzeTestTrend(execution: PerfTestExecution, sample: List<Long>): PerfTestResult
 
 }
 
@@ -27,8 +26,8 @@ interface TrendAnalyzer {
  */
 class SampleBasedTrendAnalyzer : TrendAnalyzer {
 
-    override fun analyzeTestTrend(configuration: PerfTestConfiguration, execution: PerfTestExecution, sample: List<Long>): PerfTestResult {
-        val trend = configuration.trendConfiguration!!
+    override fun analyzeTestTrend(execution: PerfTestExecution, sample: List<Long>): PerfTestResult {
+        val trend = execution.conf.trendConfiguration!!
         var sortedSample: List<Long> = sample.sorted()
         execution.sample.addAll(sortedSample)
 
@@ -45,8 +44,8 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
         val avgLimit = execution.sampleAvg + avgThreshold
 
         return if (execution.executionAvg > avgLimit)
-            PerfTestResult(execution, configuration, listOf(PerfConstraintViolation.TREND_AVG), mapOf("avgLimit" to avgLimit))
-        else PerfTestResult(execution, configuration)
+            PerfTestResult(execution, listOf(PerfConstraintViolation.TREND_AVG), mapOf("avgLimit" to avgLimit))
+        else PerfTestResult(execution)
     }
 
     fun collectRuns(sample: Collection<PerfTestExecution>): List<Long> =

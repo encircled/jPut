@@ -6,6 +6,7 @@ import cz.encircled.jput.trend.PerformanceTrend
 import cz.encircled.jput.trend.SelectionStrategy
 import cz.encircled.jput.unit.PerformanceTest
 import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.javaMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,9 +20,9 @@ class AnnotationConfigurationTest {
         val function = this::class.functions.find { it.name == "unitAnnotated" }!!
         val annotation = function.annotations[0] as PerformanceTest
 
-        val config = PerfTestConfiguration.fromAnnotation(annotation)
+        val config = PerfTestConfiguration.fromAnnotation(annotation, function.javaMethod!!)
 
-        assertEquals(PerfTestConfiguration(
+        assertEquals(PerfTestConfiguration("AnnotationConfigurationTest#unitAnnotated",
                 warmUp = 1, repeats = 2, maxTimeLimit = 100L, avgTimeLimit = 80L
         ), config)
     }
@@ -31,9 +32,9 @@ class AnnotationConfigurationTest {
         val function = this::class.functions.find { it.name == "trendAnnotated" }!!
         val annotation = function.annotations[0] as PerformanceTest
 
-        val config = PerfTestConfiguration.fromAnnotation(annotation)
+        val config = PerfTestConfiguration.fromAnnotation(annotation, function.javaMethod!!)
 
-        assertEquals(PerfTestConfiguration(
+        assertEquals(PerfTestConfiguration(testId = "customTestId",
                 warmUp = 1, repeats = 2, maxTimeLimit = 100L, avgTimeLimit = 80L,
                 trendConfiguration = TrendTestConfiguration(
                         sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
@@ -47,7 +48,7 @@ class AnnotationConfigurationTest {
 
     }
 
-    @PerformanceTest(warmUp = 1, repeats = 2, maxTimeLimit = 100L, averageTimeLimit = 80L,
+    @PerformanceTest(testId = "customTestId", warmUp = 1, repeats = 2, maxTimeLimit = 100L, averageTimeLimit = 80L,
             trends = [PerformanceTrend(
                     sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
                     averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true

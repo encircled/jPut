@@ -34,8 +34,8 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
             if (annotation == null || !context.isPerformanceTestEnabled) {
                 statement.evaluate()
             } else {
-                val conf = PerfTestConfiguration.fromAnnotation(annotation)
-                val execution = context.unitPerformanceAnalyzer.buildTestExecution(conf, frameworkMethod.method)
+                val conf = PerfTestConfiguration.fromAnnotation(annotation, frameworkMethod.method)
+                val execution = PerfTestExecution(conf, mapOf("id" to context.executionId))
 
                 val result = performExecution(conf, statement)
 
@@ -55,17 +55,17 @@ class GenericJunitRunnerImpl : GenericJunitRunner {
     private fun performAnalysis(execution: PerfTestExecution, conf: PerfTestConfiguration) {
         val unitAnalyzer = context.unitPerformanceAnalyzer
         val trendAnalyzer = context.trendAnalyzer
-        val unitViolations = unitAnalyzer.analyzeUnitTrend(execution, conf)
+        val unitViolations = unitAnalyzer.analyzeUnitTrend(execution)
         if (unitViolations.isError) {
             throw AssertionFailedError("Performance unit test failed.\n$unitViolations")
         }
 
         if (conf.trendConfiguration != null) {
             // Assume that first has highest priority
-            val sample = context.resultRecorders[0].getSample(execution, conf.trendConfiguration)
+            val sample = context.resultRecorders[0].getSample(execution)
 
             if (sample.size >= conf.trendConfiguration.sampleSize) {
-                val trendViolations = trendAnalyzer.analyzeTestTrend(conf, execution, sample)
+                val trendViolations = trendAnalyzer.analyzeTestTrend(execution, sample)
                 if (trendViolations.isError) {
                     throw AssertionFailedError("Performance trend test failed.\n$trendViolations")
                 }

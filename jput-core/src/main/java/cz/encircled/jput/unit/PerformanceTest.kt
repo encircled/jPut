@@ -15,6 +15,11 @@ import cz.encircled.jput.trend.PerformanceTrend
 annotation class PerformanceTest(
 
         /**
+         * Unique test id, used to distinguish different tests. Default to `testClassName#testMethodName`
+         */
+        val testId: String = "",
+
+        /**
          * Count of warm up test executions
          */
         val warmUp: Int = 0,

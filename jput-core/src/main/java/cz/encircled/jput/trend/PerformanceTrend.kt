@@ -8,12 +8,13 @@ package cz.encircled.jput.trend
 annotation class PerformanceTrend(
 
         /**
-         * Sample size which will be used for trend analysis
+         * Sample size which is used for trend analysis,
+         * i.e. only specified count of previous test executions will be used for analysis
          */
         val sampleSize: Int = 30,
 
         /**
-         * Defines the strategy for sample selection
+         * Defines the way, how the sample (a subset of results) should be chosen from the all available previous results
          */
         val sampleSelectionStrategy: SelectionStrategy,
 

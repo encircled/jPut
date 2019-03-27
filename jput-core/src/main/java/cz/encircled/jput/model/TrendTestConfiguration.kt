@@ -4,6 +4,8 @@ import cz.encircled.jput.trend.PerformanceTrend
 import cz.encircled.jput.trend.SelectionStrategy
 
 /**
+ * Represents the configuration of a single trend performance test
+ *
  * @author Vlad on 27-May-17.
  */
 data class TrendTestConfiguration(
