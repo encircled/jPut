@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/encircled/jPut.svg?branch=master)](https://travis-ci.org/encircled/jPut)
+[![codecov](https://codecov.io/gh/encircled/jPut/branch/master/graph/badge.svg)](https://codecov.io/gh/encircled/jPut)
+
 # Java Performance Unit Testing
 
 jPuts allows using junit tests for continuous performance testing.
