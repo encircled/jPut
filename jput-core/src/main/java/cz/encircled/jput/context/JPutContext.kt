@@ -11,6 +11,12 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
 import org.slf4j.LoggerFactory
+import java.text.SimpleDateFormat
+import java.util.Date
+import kotlin.collections.ArrayList
+import kotlin.collections.List
+import kotlin.collections.forEach
+import kotlin.collections.listOf
 
 lateinit var context: JPutContext
 
@@ -19,10 +25,15 @@ lateinit var context: JPutContext
  * @author Vlad on 21-May-17.
  */
 class JPutContext {
+
     /**
      * Unique ID of current tests execution
      */
-    var executionId: Long = 0
+    val executionId: String by lazy {
+        val format = getCollectionProperty(PROP_EXECUTION_ID_FORMAT, listOf("dd.MM.yy hh:mm"))
+        val date = SimpleDateFormat(format[0]).format(Date())
+        if (format.size > 1) "$date ${format[1]}" else date
+    }
 
     /**
      * Global enabled/disabled switch
@@ -39,7 +50,6 @@ class JPutContext {
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
-        executionId = System.currentTimeMillis()
         unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
         trendAnalyzer = SampleBasedTrendAnalyzer()
 
@@ -90,6 +100,8 @@ class JPutContext {
         private const val PREFIX = "jput."
 
         const val PROP_ENABLED = PREFIX + "enabled"
+
+        const val PROP_EXECUTION_ID_FORMAT = PREFIX + "execution.id.format"
 
         const val PROP_ELASTIC_ENABLED = PREFIX + "storage.elastic.enabled"
 

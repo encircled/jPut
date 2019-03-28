@@ -14,10 +14,10 @@ inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
     }
 }
 
-fun getCollectionProperty(key: String): List<String> {
+fun getCollectionProperty(key: String, defaultValue: List<String> = emptyList()): List<String> {
     val value = getProperty(key, "")
 
-    return if (value.isEmpty()) listOf()
+    return if (value.isEmpty()) defaultValue
     else value.split(",").map { it.trim() }
 }
 
