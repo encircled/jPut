@@ -11,7 +11,7 @@ interface PerfConfigForTests {
     fun baseConfig() = configWithTrend(null)
 
     fun configWithTrend(trendTestConfiguration: TrendTestConfiguration?): PerfTestConfiguration =
-            PerfTestConfiguration("1", 0, 1, 0, 0, trendTestConfiguration)
+            PerfTestConfiguration("1", 0, 1, 10, 300, 300, trendTestConfiguration)
 
     fun assertAvgNotValid(result: PerfTestResult) {
         assertTrue(result.isError, result.toString())

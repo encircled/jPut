@@ -46,8 +46,8 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
 
         return sample
                 .map {
-                    val runs = it.sourceAsMap["runs"]
-                    runs as List<*>
+                    val times = it.sourceAsMap["times"]
+                    times as List<*>
                 }
                 .flatten()
                 .map {

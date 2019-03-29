@@ -1,7 +1,6 @@
 package cz.encircled.jput.test
 
 import cz.encircled.jput.JPutJUnitRunner
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.junit.runner.RunWith
@@ -14,7 +13,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testPositiveAverage() {
-        val conf = PerfTestConfiguration("1", 0, 1, 200L, 101L)
+        val conf = baseConfig().copy(avgTimeLimit = 101L)
         val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
         assertValid(analyzer.analyzeUnitTrend(testRun))
@@ -22,7 +21,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testNegativeAverage() {
-        val conf = PerfTestConfiguration("1", 0, 1, 200L, 99L)
+        val conf = baseConfig().copy(avgTimeLimit = 99L)
         val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
         assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))
@@ -30,7 +29,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testPositiveMax() {
-        val conf = PerfTestConfiguration("1", 0, 1, 101L, 150L)
+        val conf = baseConfig().copy(maxTimeLimit = 101L)
         val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
         assertValid(analyzer.analyzeUnitTrend(testRun))
@@ -38,7 +37,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
 
     @Test
     fun testNegativeMax() {
-        val conf = PerfTestConfiguration("1", 0, 1, 100L, 150L)
+        val conf = baseConfig().copy(maxTimeLimit = 100L)
         val testRun = TestSupport.getTestExecution(conf, 99, 101)
 
         assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))

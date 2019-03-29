@@ -30,6 +30,11 @@ annotation class PerformanceTest(
         val repeats: Int = 1,
 
         /**
+         * Delay between test repeats, in ms
+         */
+        val delay: Long = 50L,
+
+        /**
          * Upper limit for test execution time in milliseconds
          */
         val maxTimeLimit: Long = 0L,

@@ -1,7 +1,6 @@
 package cz.encircled.jput.test
 
-import cz.encircled.jput.context.JPutContext
-import cz.encircled.jput.context.context
+import cz.encircled.jput.context.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.test.Test
@@ -22,6 +21,35 @@ class ContextTest {
         System.setProperty(JPutContext.PROP_EXECUTION_ID_FORMAT, "dd-MM-yyyy, my format")
         context = JPutContext()
         assertEquals("$date my format", context.executionId)
+    }
+
+    @Test
+    fun testGetProperty() {
+        System.setProperty("testGetProperty", "true")
+
+        context = JPutContext()
+        assertEquals("true", getProperty("testGetProperty", "def"))
+        assertEquals("def", getProperty("testGetProperty2", "def"))
+
+        assertEquals(true, getProperty("testGetProperty", false))
+        assertEquals(false, getProperty("testGetProperty2", false))
+
+        System.setProperty("testGetProperty", "true,false")
+        assertEquals(listOf("true", "false"), getCollectionProperty("testGetProperty", listOf("true")))
+        assertEquals(listOf("true"), getCollectionProperty("testGetProperty2", listOf("true")))
+    }
+
+    @Test
+    fun testCustomPropertySource() {
+        context = JPutContext()
+        assertEquals("", getProperty("not_exists", ""))
+
+        context.addPropertySource(object : PropertySource {
+            override fun getProperty(key: String): String? {
+                return if (key == "not_exists") "custom" else null
+            }
+        })
+        assertEquals("custom", getProperty("not_exists", ""))
     }
 
 }

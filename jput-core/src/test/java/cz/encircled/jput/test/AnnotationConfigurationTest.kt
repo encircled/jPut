@@ -23,7 +23,7 @@ class AnnotationConfigurationTest {
         val config = PerfTestConfiguration.fromAnnotation(annotation, function.javaMethod!!)
 
         assertEquals(PerfTestConfiguration("AnnotationConfigurationTest#unitAnnotated",
-                warmUp = 1, repeats = 2, maxTimeLimit = 100L, avgTimeLimit = 80L
+                warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L
         ), config)
     }
 
@@ -35,7 +35,7 @@ class AnnotationConfigurationTest {
         val config = PerfTestConfiguration.fromAnnotation(annotation, function.javaMethod!!)
 
         assertEquals(PerfTestConfiguration(testId = "customTestId",
-                warmUp = 1, repeats = 2, maxTimeLimit = 100L, avgTimeLimit = 80L,
+                warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L,
                 trendConfiguration = TrendTestConfiguration(
                         sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
                         averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true
@@ -43,7 +43,7 @@ class AnnotationConfigurationTest {
         ), config)
     }
 
-    @PerformanceTest(warmUp = 1, repeats = 2, maxTimeLimit = 100L, averageTimeLimit = 80L)
+    @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L)
     fun unitAnnotated() {
 
     }

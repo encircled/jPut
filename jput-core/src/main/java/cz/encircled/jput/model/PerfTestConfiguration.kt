@@ -27,6 +27,11 @@ data class PerfTestConfiguration(
         val repeats: Int,
 
         /**
+         * Delay between test repeats, in ms
+         */
+        val delay: Long,
+
+        /**
          * Upper limit for test execution time in milliseconds
          */
         val maxTimeLimit: Long,
@@ -95,7 +100,7 @@ data class PerfTestConfiguration(
                     if (conf.testId.isEmpty()) "${method.declaringClass.simpleName}#${method.name}"
                     else conf.testId
 
-            val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats,
+            val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
                     conf.maxTimeLimit, conf.averageTimeLimit, trendConfig)
 
             for (i in 0 until percentiles.size - 1) {
