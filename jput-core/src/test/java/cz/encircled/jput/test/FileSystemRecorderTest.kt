@@ -60,11 +60,10 @@ class FileSystemRecorderTest : PerfConfigForTests {
     }
 
     private fun getWriter(): Pair<String, FileSystemResultRecorder> {
-        val pathToFile = System.getProperty("java.io.tmpdir") + "jput-test.data"
-        File(pathToFile).delete()
+        val temp = File.createTempFile("jput-test", "")
 
-        val writer = FileSystemResultRecorder(pathToFile)
-        return Pair(pathToFile, writer)
+        val writer = FileSystemResultRecorder(temp.path)
+        return Pair(temp.path, writer)
     }
 
 }
