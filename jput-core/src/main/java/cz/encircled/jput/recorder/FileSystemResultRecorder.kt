@@ -47,6 +47,11 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
 
     private fun initRuns() {
         try {
+            val file = target.toFile()
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+
             val strings = Files.readAllLines(target, StandardCharsets.UTF_8)
             strings.forEach { s ->
                 val split = s.split(";").dropLastWhile { it.isEmpty() }
