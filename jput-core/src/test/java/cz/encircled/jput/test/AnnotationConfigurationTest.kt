@@ -48,7 +48,7 @@ class AnnotationConfigurationTest {
 
     }
 
-    @PerformanceTest(testId = "customTestId", warmUp = 1, repeats = 2, maxTimeLimit = 100L, averageTimeLimit = 80L,
+    @PerformanceTest(testId = "customTestId", warmUp = 1, repeats = 2, delay = 100L, maxTimeLimit = 100L, averageTimeLimit = 80L,
             trends = [PerformanceTrend(
                     sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
                     averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true
