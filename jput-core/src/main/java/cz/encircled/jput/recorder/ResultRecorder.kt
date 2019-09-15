@@ -81,10 +81,10 @@ abstract class ThreadsafeResultRecorder : ResultRecorder {
     override fun flush() {
         log.info("Do flush execution results")
         synchronized(flushMutex) {
-            var copy: List<PerfTestExecution>
-            synchronized(stack) {
-                copy = ArrayList(stack)
+            val copy = synchronized(stack) {
+                val c = ArrayList(stack)
                 stack.clear()
+                c
             }
             doFlush(copy)
         }

@@ -39,6 +39,13 @@ class ContextTest {
         assertEquals(listOf("true"), getCollectionProperty("testGetProperty2", listOf("true")))
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun testMissingProperty() {
+        context = JPutContext()
+
+        getProperty<String>("doeNotExist")
+    }
+
     @Test
     fun testCustomPropertySource() {
         context = JPutContext()

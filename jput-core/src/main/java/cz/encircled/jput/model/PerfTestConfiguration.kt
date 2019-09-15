@@ -51,25 +51,15 @@ data class PerfTestConfiguration(
 ) {
 
     fun valid(): PerfTestConfiguration {
-        if (warmUp < 0L) {
-            throw IllegalStateException("WarmUp count must be > 0")
-        }
-        if (repeats < 1L) {
-            throw IllegalStateException("Repeats count must be > 1")
-        }
-        if (trendConfiguration != null) {
-            if (trendConfiguration.sampleSize < 1) {
-                throw IllegalStateException("Sample size must be > 0")
-            }
+        check(warmUp >= 0L) { "WarmUp count must be > 0" }
+        check(repeats >= 1L) { "Repeats count must be > 1" }
+        check(trendConfiguration == null || trendConfiguration.sampleSize >= 1) {
+            "Sample size must be > 0"
         }
 
         for (percentile in percentiles.keys) {
-            if (percentile < 1) {
-                throw IllegalStateException("Percentile value must be > 0")
-            }
-            if (percentile > 100) {
-                throw IllegalStateException("Percentile value must be < 100")
-            }
+            check(percentile >= 1) { "Percentile value must be > 0" }
+            check(percentile <= 100) { "Percentile value must be < 100" }
         }
 
         return this
@@ -92,9 +82,7 @@ data class PerfTestConfiguration(
                     else null
 
             val percentiles = conf.percentiles
-            if (percentiles.size % 2 != 0) {
-                throw IllegalStateException("Percentiles parameter count must be even")
-            }
+            check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }
 
             val testId =
                     if (conf.testId.isEmpty()) "${method.declaringClass.simpleName}#${method.name}"

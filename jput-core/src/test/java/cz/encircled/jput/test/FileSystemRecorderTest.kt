@@ -1,9 +1,9 @@
 package cz.encircled.jput.test
 
-import cz.encircled.jput.JPutJUnitRunner
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.recorder.FileSystemResultRecorder
+import cz.encircled.jput.runner.JPutJUnit4Runner
 import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
 import java.io.File
@@ -13,21 +13,23 @@ import kotlin.test.assertEquals
 /**
  * @author Vlad on 21-May-17.
  */
-@RunWith(JPutJUnitRunner::class)
+@RunWith(JPutJUnit4Runner::class)
 class FileSystemRecorderTest : PerfConfigForTests {
 
+
+
     @Test
-    fun testWriter() {
+    fun testWriteResults_FSResultRecorder() {
         val (pathToFile, writer) = getWriter()
 
         val config = configWithTrend(TrendTestConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
         val configWithSampleLimit = configWithTrend(TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
 
-        val run = TestSupport.getTestExecution(config, 100, 110, 120)
-        val runWithSampleLimit = TestSupport.getTestExecution(configWithSampleLimit, 100, 110, 120)
+        val run = getTestExecution(config, 100, 110, 120)
+        val runWithSampleLimit = getTestExecution(configWithSampleLimit, 100, 110, 120)
 
         writer.appendTrendResult(run)
-        writer.appendTrendResult(TestSupport.getTestExecution(baseConfig(), 130, 115, 105))
+        writer.appendTrendResult(getTestExecution(baseConfig(), 130, 115, 105))
         writer.flush()
 
         // Read previously written data

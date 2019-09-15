@@ -21,11 +21,11 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
 
     override fun analyzeUnitTrend(execution: PerfTestExecution): PerfTestResult {
         val result = mutableListOf<PerfConstraintViolation>()
-        if (execution.executionAvg > execution.conf.avgTimeLimit) {
+        if (execution.conf.avgTimeLimit > 0 && execution.executionAvg > execution.conf.avgTimeLimit) {
             result.add(PerfConstraintViolation.UNIT_AVG)
         }
 
-        if (execution.executionMax > execution.conf.maxTimeLimit) {
+        if (execution.conf.maxTimeLimit > 0 && execution.executionMax > execution.conf.maxTimeLimit) {
             result.add(PerfConstraintViolation.UNIT_MAX)
         }
 

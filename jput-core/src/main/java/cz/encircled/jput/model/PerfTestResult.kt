@@ -1,8 +1,8 @@
 package cz.encircled.jput.model
 
 /**
- * Represents the validation result of a performance test.
- * If a test violates some of it's performance constraints, it will be added to [violations] field.
+ * Represents the execution result of a performance test.
+ * If a test violates any of it's performance constraints, it will be added to the [violations] field.
  *
  * Field [params] may contain additional params, which may be required by error message builder later on
  */

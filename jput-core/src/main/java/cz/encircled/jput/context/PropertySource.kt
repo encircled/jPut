@@ -8,8 +8,8 @@ inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
     if (value.isNullOrBlank()) return defaultValue ?: throw IllegalStateException("JPut property [$key] is mandatory")
 
     return when (T::class) {
-        Boolean::class -> value.toBoolean() as T
-        Int::class -> value.toInt() as T
+        Boolean::class -> value!!.toBoolean() as T
+        Int::class -> value!!.toInt() as T
         else -> value as T
     }
 }

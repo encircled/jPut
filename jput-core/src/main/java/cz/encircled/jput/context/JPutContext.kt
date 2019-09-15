@@ -3,6 +3,7 @@ package cz.encircled.jput.context
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
+import cz.encircled.jput.runner.Junit4TestExecutor
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer
@@ -12,11 +13,8 @@ import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestHighLevelClient
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.List
-import kotlin.collections.forEach
-import kotlin.collections.listOf
 
 lateinit var context: JPutContext
 
@@ -43,6 +41,7 @@ class JPutContext {
     var propertySources: List<PropertySource> = listOf(SystemPropertySource())
     lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
     lateinit var trendAnalyzer: TrendAnalyzer
+    lateinit var junit4TestExecutor: Junit4TestExecutor
 
     var resultRecorders: List<ResultRecorder> = listOf()
 
@@ -52,6 +51,7 @@ class JPutContext {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
         trendAnalyzer = SampleBasedTrendAnalyzer()
+        junit4TestExecutor = Junit4TestExecutor()
 
         initRecorders()
     }

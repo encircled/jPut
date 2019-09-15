@@ -5,10 +5,8 @@ package cz.encircled.jput
  */
 object JPutCommons {
 
-    fun validatePercentile(percentile: Double) {
-        if (percentile <= 0.0 || percentile > 1.0) {
-            throw IllegalStateException("Wrong percentile [$percentile], must be [0 < Q <= 1]")
-        }
+    fun validatePercentile(rank: Double) {
+        check(!(rank <= 0.0 || rank > 1.0)) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
     }
 
 }
