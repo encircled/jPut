@@ -1,0 +1,47 @@
+{
+  "took": 2,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 2,
+      "relation": "eq"
+    },
+    "max_score": 1.0,
+    "hits": [
+      {
+        "_index": "jput",
+        "_type": "jput",
+        "_id": "nD7XNW0B6FmlTdSNyTgV",
+        "_score": 1.0,
+        "_source": {
+          "executionId": "15.09.19 06:53",
+          "testId": "1",
+          "times": [
+            95
+          ],
+          "@timestamp": "2019-09-15T16:53:16.840Z"
+        }
+      },
+      {
+        "_index": "jput",
+        "_type": "jput",
+        "_id": "nT7YNW0B6FmlTdSNNTha",
+        "_score": 1.0,
+        "_source": {
+          "executionId": "15.09.19 06:53",
+          "testId": "1",
+          "times": [
+            105
+          ],
+          "@timestamp": "2019-09-15T16:53:44.874Z"
+        }
+      }
+    ]
+  }
+}

@@ -5,13 +5,12 @@ import cz.encircled.jput.context.context
 import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.context.getProperty
 import cz.encircled.jput.model.PerfTestExecution
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest
+import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.Requests
-import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.rest.RestStatus
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -19,17 +18,14 @@ import java.util.*
 /**
  * Elasticsearch-based implementation of tests execution results recorder
  */
-class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : ThreadsafeResultRecorder() {
+class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : ThreadsafeResultRecorder() {
 
-    val log = LoggerFactory.getLogger(ElasticsearchResultRecorder::class.java)
+    private val log = LoggerFactory.getLogger(ElasticsearchResultRecorder::class.java)
 
-    init {
-        createIndexIfNeeded()
-    }
+    private val indexName by lazy { getProperty(JPutContext.PROP_ELASTIC_INDEX, "jput") }
 
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val conf = execution.conf.trendConfiguration!!
-        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "default")
 
         val queryBuilder = QueryBuilders.boolQuery()
                 .filter(QueryBuilders.matchQuery("testId", execution.conf.testId))
@@ -38,10 +34,16 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
             queryBuilder.filter(QueryBuilders.matchQuery(it, getProperty(it, "")))
         }
 
-        val request = SearchRequest("jput").types(type)
-                .source(SearchSourceBuilder().query(queryBuilder))
+        val request = SearchRequest(indexName).source(SearchSourceBuilder().query(queryBuilder))
 
-        val searchResponse = client.search(request, RequestOptions.DEFAULT)
+        val searchResponse = try {
+            client.search(request, RequestOptions.DEFAULT)
+        } catch (e: ElasticsearchStatusException) {
+            if (e.status() == RestStatus.NOT_FOUND) {
+                return emptyList()
+            }
+            throw e
+        }
         val sample = subList(searchResponse.hits.hits.toList(), conf.sampleSize, conf.sampleSelectionStrategy)
 
         return sample
@@ -59,8 +61,6 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
     override fun doFlush(data: List<PerfTestExecution>) {
         log.info("Do flush to Elasticsearch: $data")
 
-        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "jput")
-
         data.forEach {
             val jsonMap = mutableMapOf(
                     "executionId" to context.executionId,
@@ -71,12 +71,11 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
 
             jsonMap.putAll(getUserDefinedEnvParams())
 
-            val indexRequest = Requests.indexRequest("jput")
-                    .type(type)
+            val indexRequest = Requests.indexRequest(indexName)
+                    .type("jput")
                     .source(jsonMap)
 
             client.index(indexRequest, RequestOptions.DEFAULT)
-
         }
 
         log.info("Flush to Elasticsearch done")
@@ -90,14 +89,13 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
         }
     }
 
-    private fun createIndexIfNeeded() {
+    // TODO check, probably not needed
+    /*private fun createIndexIfNeeded() {
         val exists = client.indices().exists(GetIndexRequest().indices("jput"), RequestOptions.DEFAULT)
         if (!exists) {
             val createRequest = CreateIndexRequest("jput")
             client.indices().create(createRequest, RequestOptions.DEFAULT)
         }
-
-    }
-
+    }*/
 
 }

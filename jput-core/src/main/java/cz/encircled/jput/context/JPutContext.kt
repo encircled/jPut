@@ -1,6 +1,7 @@
 package cz.encircled.jput.context
 
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
@@ -11,7 +12,6 @@ import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import org.elasticsearch.client.RestHighLevelClient
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.util.*
@@ -88,7 +88,7 @@ class JPutContext {
 
             log.info("JPut is using Elasticsearch recorder: $host")
 
-            val client = RestHighLevelClient(RestClient.builder(HttpHost(host, port, scheme)))
+            val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost(host, port, scheme)))
             resultRecorders.add(ElasticsearchResultRecorder(client))
         }
     }
@@ -124,7 +124,7 @@ class JPutContext {
 
         const val PROP_ELASTIC_SCHEME = PREFIX + "storage.elastic.scheme"
 
-        const val PROP_ELASTIC_TYPE = PREFIX + "storage.elastic.type"
+        const val PROP_ELASTIC_INDEX = PREFIX + "storage.elastic.index"
 
         const val PROP_ELASTIC_ENV_IDENTIFIERS = PREFIX + "storage.elastic.env.identifiers"
 
