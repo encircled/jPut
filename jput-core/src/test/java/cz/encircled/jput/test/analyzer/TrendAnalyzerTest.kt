@@ -77,4 +77,13 @@ class TrendAnalyzerTest : ShortcutsForTests {
         assertNotValid(PerfConstraintViolation.TREND_AVG, result)
     }
 
+    @Test
+    fun testNoisePercentileApplied() {
+        // Avg 100 if 0.9 percentile, threshold - 10
+        val conf = configWithTrend(TrendTestConfiguration(10, averageTimeThreshold = 10.0, noisePercentile = 0.9))
+        val result = trendAnalyzer.analyzeTestTrend(getTestExecution(conf, 111), listOf(95, 105, 95, 105, 95, 105, 95, 105, 95, 1000))
+
+        assertNotValid(PerfConstraintViolation.TREND_AVG, result)
+    }
+
 }

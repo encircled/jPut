@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory
 interface TrendAnalyzer {
 
     /**
+     * [sample] represents times of previous executions in ms, which is used for trend analysis
      *
      * @param execution current test execution
-     * @param sample sample of execution elapsed times in ms
      */
     fun analyzeTestTrend(execution: PerfTestExecution, sample: List<Long>): List<PerfConstraintViolation>
 
@@ -30,12 +30,9 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
 
     override fun analyzeTestTrend(execution: PerfTestExecution, sample: List<Long>): List<PerfConstraintViolation> {
         val trend = execution.conf.trendConfiguration!!
-        var sortedSample: List<Long> = sample.sorted()
-        execution.sample.addAll(sortedSample)
-
-        if (trend.noisePercentile > 0) {
-            sortedSample = Statistics.getPercentile(sortedSample, trend.noisePercentile)
-        }
+        val sortedSample = if (trend.noisePercentile > 0) {
+            Statistics.getPercentile(sample.sorted(), trend.noisePercentile)
+        } else sample.sorted()
 
         val avgThreshold =
                 if (trend.useSampleVarianceAsThreshold) Statistics.getVariance(sortedSample)
@@ -46,7 +43,7 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
             return emptyList()
         }
 
-        val avgLimit = execution.sampleAvg + avgThreshold
+        val avgLimit = Statistics.getAverage(sortedSample) + avgThreshold
         execution.executionParams["avgLimit"] = avgLimit
 
         return if (execution.executionAvg > avgLimit) listOf(PerfConstraintViolation.TREND_AVG)

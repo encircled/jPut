@@ -26,11 +26,6 @@ data class PerfTestExecution(
         val executionResult: MutableList<Long> = mutableListOf(),
 
         /**
-         * Sample execution times in ms, which is used for trend analysis
-         */
-        val sample: MutableList<Long> = mutableListOf(),
-
-        /**
          * Validation result is set after executions
          */
         var result: PerfTestResult? = null
@@ -45,10 +40,6 @@ data class PerfTestExecution(
 
     val executionAvg: Long by lazy {
         Statistics.round(Statistics.getAverage(executionResult))
-    }
-
-    val sampleAvg: Long by lazy {
-        Statistics.round(Statistics.getAverage(sample))
     }
 
     val executionMax: Long by lazy { executionResult.max()!! }
