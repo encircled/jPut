@@ -18,19 +18,30 @@ data class PerfTestExecution(
         /**
          * Parameters related to the global execution
          */
-        var executionParams: Map<String, Any>,
+        val executionParams: MutableMap<String, Any>,
 
         /**
          * List of result execution times in ms
          */
-        var executionResult: MutableList<Long> = mutableListOf(),
+        val executionResult: MutableList<Long> = mutableListOf(),
 
         /**
          * Sample execution times in ms, which is used for trend analysis
          */
-        var sample: MutableList<Long> = mutableListOf()
+        val sample: MutableList<Long> = mutableListOf(),
+
+        /**
+         * Validation result is set after executions
+         */
+        var result: PerfTestResult? = null
 
 ) {
+
+    /**
+     * Holds start time of current execution
+     */
+    var currentExecutionStart : Long = 0L
+        private set
 
     val executionAvg: Long by lazy {
         Statistics.round(Statistics.getAverage(executionResult))
@@ -41,6 +52,18 @@ data class PerfTestExecution(
     }
 
     val executionMax: Long by lazy { executionResult.max()!! }
+
+    /**
+     * Starts new execution, returns start time (nanoseconds)
+     */
+    fun startNextExecution(): Long {
+        currentExecutionStart = System.nanoTime()
+        return currentExecutionStart
+    }
+
+    fun finishExecution() {
+        executionResult.add((System.nanoTime() - currentExecutionStart) / 1000000L)
+    }
 
 }
 

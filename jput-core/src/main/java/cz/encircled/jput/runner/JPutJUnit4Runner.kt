@@ -4,6 +4,7 @@ import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.unit.PerformanceTest
+import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
 import org.junit.internal.runners.model.EachTestNotifier
 import org.junit.runner.Description
@@ -24,7 +25,12 @@ class Junit4TestExecutor : BaseTestExecutor() {
                 statement.evaluate()
             } else {
                 val conf = PerfTestConfiguration.fromAnnotation(annotation, method.method)
-                executeTest(conf) { statement.evaluate() }
+
+                val execution = executeTest(conf) { statement.evaluate() }
+
+                if (execution.result!!.isError) {
+                    throw AssertionFailedError("Performance test failed.\n${execution.result!!.violations}")
+                }
             }
         } catch (e: AssumptionViolatedException) {
             eachNotifier.addFailedAssumption(e)

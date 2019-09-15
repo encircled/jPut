@@ -1,5 +1,6 @@
 package cz.encircled.jput.context
 
+import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
@@ -14,7 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient
 import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.ConcurrentHashMap
 
 lateinit var context: JPutContext
 
@@ -23,6 +24,8 @@ lateinit var context: JPutContext
  * @author Vlad on 21-May-17.
  */
 class JPutContext {
+
+    private val log = LoggerFactory.getLogger(JPutContext::class.java)
 
     /**
      * Unique ID of current tests execution
@@ -38,14 +41,23 @@ class JPutContext {
      */
     var isPerformanceTestEnabled = true
 
-    var propertySources: List<PropertySource> = listOf(SystemPropertySource())
+    var propertySources = mutableListOf<PropertySource>(SystemPropertySource())
+
+    /**
+     * Test results recorders
+     */
+    val resultRecorders = mutableListOf<ResultRecorder>()
+
+    /**
+     * customTestId -> defaultTestId
+     */
+    val customTestIds = mutableMapOf<String, String>()
+
+    val testExecutions : MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
+
     lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
     lateinit var trendAnalyzer: TrendAnalyzer
     lateinit var junit4TestExecutor: Junit4TestExecutor
-
-    var resultRecorders: List<ResultRecorder> = listOf()
-
-    val log = LoggerFactory.getLogger(JPutContext::class.java)
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
@@ -53,46 +65,47 @@ class JPutContext {
         trendAnalyzer = SampleBasedTrendAnalyzer()
         junit4TestExecutor = Junit4TestExecutor()
 
-        initRecorders()
+        initECSRecorder()
+        initFileSystemRecorder()
     }
 
-    private fun initRecorders() {
+    private fun initFileSystemRecorder() {
+        if (getProperty(PROP_STORAGE_FILE_ENABLED, false)) {
+
+            val default = System.getProperty("java.io.tmpdir") + "jput-test.data"
+            val pathToFile = getProperty(PROP_PATH_TO_STORAGE_FILE, default)
+
+            log.info("JPut is using Filesystem recorder: $pathToFile")
+            resultRecorders.add(FileSystemResultRecorder(pathToFile))
+        }
+    }
+
+    private fun initECSRecorder() {
         if (getProperty(PROP_ELASTIC_ENABLED, false)) {
             val host = getProperty<String>(PROP_ELASTIC_HOST)
             val port = getProperty(PROP_ELASTIC_PORT, 80)
             val scheme = getProperty(PROP_ELASTIC_SCHEME, "http")
 
-            log.info("JPut using Elasticsearch $host")
+            log.info("JPut is using Elasticsearch recorder: $host")
 
             val client = RestHighLevelClient(RestClient.builder(HttpHost(host, port, scheme)))
-            addResultRecorder(ElasticsearchResultRecorder(client))
-        }
-
-        if (getProperty(PROP_STORAGE_FILE_ENABLED, false)) {
-
-            val default = System.getProperty("java.recorder.tmpdir") + "jput-test.data"
-            val pathToFile = getProperty(PROP_PATH_TO_STORAGE_FILE, default)
-
-            log.info("JPut using Filesystem $pathToFile")
-            addResultRecorder(FileSystemResultRecorder(pathToFile))
+            resultRecorders.add(ElasticsearchResultRecorder(client))
         }
     }
 
     fun destroy() {
         resultRecorders.forEach {
-            it.flush()
-            it.destroy()
+            try {
+                it.flush()
+                it.destroy()
+            } catch (e: Exception) {
+                log.warn("Failed to close the recorder", e)
+            }
         }
     }
 
     fun addPropertySource(source: PropertySource) {
-        propertySources = listOf(SystemPropertySource(), source)
-    }
-
-    private fun addResultRecorder(resultRecorder: ResultRecorder) {
-        val temp = ArrayList(resultRecorders)
-        temp.add(resultRecorder)
-        resultRecorders = temp
+        propertySources.add(source)
     }
 
     companion object {

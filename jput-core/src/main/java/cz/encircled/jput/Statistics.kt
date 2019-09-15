@@ -27,9 +27,13 @@ object Statistics {
      * @return values below `percentile`
      */
     fun getPercentile(input: List<Long>, rank: Double): List<Long> {
-        JPutCommons.validatePercentile(rank)
+        validatePercentile(rank)
 
         return input.subList(0, round(input.size * rank).toInt())
+    }
+
+    private fun validatePercentile(rank: Double) {
+        check(!(rank <= 0.0 || rank > 1.0)) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
     }
 
 }

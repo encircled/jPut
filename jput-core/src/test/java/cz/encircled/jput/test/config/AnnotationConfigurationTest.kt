@@ -1,5 +1,7 @@
-package cz.encircled.jput.test
+package cz.encircled.jput.test.config
 
+import cz.encircled.jput.context.JPutContext
+import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.trend.PerformanceTrend
@@ -9,6 +11,7 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * @author Vlad on 28-May-17.
@@ -29,6 +32,9 @@ class AnnotationConfigurationTest {
 
     @Test
     fun testTrendConfFromAnnotation() {
+        context = JPutContext()
+        context.init()
+
         val function = this::class.functions.find { it.name == "trendAnnotated" }!!
         val annotation = function.annotations[0] as PerformanceTest
 
@@ -41,6 +47,9 @@ class AnnotationConfigurationTest {
                         averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true
                 )
         ), config)
+
+        // Verify that custom ID is registered
+        assertTrue(context.customTestIds.containsKey("customTestId"))
     }
 
     @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L)

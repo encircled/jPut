@@ -1,19 +1,16 @@
 package cz.encircled.jput.test
 
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.model.PerfTestResult
 import cz.encircled.jput.model.TrendTestConfiguration
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-interface PerfConfigForTests {
+interface ShortcutsForTests {
 
     fun getTestExecution(config: PerfTestConfiguration, vararg times: Long): PerfTestExecution {
-        val run = PerfTestExecution(config, mapOf("id" to context.executionId))
-        run.executionResult = times.toMutableList()
-        return run
+        return PerfTestExecution(config, mutableMapOf("id" to context.executionId), times.toMutableList())
     }
 
     fun baseConfig() = configWithTrend(null)
@@ -22,12 +19,12 @@ interface PerfConfigForTests {
             PerfTestConfiguration("1", 0, 1, 10, 300, 300,
                     trendTestConfiguration)
 
-    fun assertAvgNotValid(result: PerfTestResult) {
-        assertTrue(result.isError, result.toString())
+    fun assertNotValid(expected: PerfConstraintViolation, violations: List<PerfConstraintViolation>) {
+        assertTrue(violations.contains(expected), "Expected to be $expected, actual is [$violations]")
     }
 
-    fun assertValid(result: PerfTestResult) {
-        assertFalse(result.isError, result.toString())
+    fun assertValid(violations: List<PerfConstraintViolation>) {
+        assertTrue(violations.isEmpty(), "Actual is [$violations]")
     }
 
 }

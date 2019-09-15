@@ -49,14 +49,16 @@ class ContextTest {
     @Test
     fun testCustomPropertySource() {
         context = JPutContext()
-        assertEquals("", getProperty("not_exists", ""))
+        val testKey = "not_exists"
+
+        assertEquals("", getProperty(testKey, ""))
 
         context.addPropertySource(object : PropertySource {
             override fun getProperty(key: String): String? {
-                return if (key == "not_exists") "custom" else null
+                return if (key == testKey) "custom" else null
             }
         })
-        assertEquals("custom", getProperty("not_exists", ""))
+        assertEquals("custom", getProperty(testKey, ""))
     }
 
 }

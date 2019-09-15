@@ -1,7 +1,9 @@
-package cz.encircled.jput.test
+package cz.encircled.jput.test.analyzer
 
+import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.test.ShortcutsForTests
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,7 +13,7 @@ import kotlin.test.assertEquals
  * @author Vlad on 27-May-17.
  */
 @RunWith(JPutJUnit4Runner::class)
-class TrendAnalyzerTest : PerfConfigForTests {
+class TrendAnalyzerTest : ShortcutsForTests {
 
     private val trendAnalyzer = SampleBasedTrendAnalyzer()
 
@@ -42,7 +44,8 @@ class TrendAnalyzerTest : PerfConfigForTests {
         // Avg 98.5 ms, variance 2.25 ms
         val conf = configWithTrend(TrendTestConfiguration(4, useSampleVarianceAsThreshold = true))
 
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(getTestExecution(conf, 102), listOf(100, 96, 99, 99)))
+        val result = trendAnalyzer.analyzeTestTrend(getTestExecution(conf, 102), listOf(100, 96, 99, 99))
+        assertNotValid(PerfConstraintViolation.TREND_AVG, result)
     }
 
     @Test
@@ -61,8 +64,9 @@ class TrendAnalyzerTest : PerfConfigForTests {
     fun testNegativeAverageByThreshold() {
         // Avg 100, threshold - 10
         val conf = configWithTrend(TrendTestConfiguration(2, averageTimeThreshold = 10.0))
-        assertAvgNotValid(trendAnalyzer.analyzeTestTrend(
-                getTestExecution(conf, 111), listOf(95, 105)))
+        val result = trendAnalyzer.analyzeTestTrend(getTestExecution(conf, 111), listOf(95, 105))
+
+        assertNotValid(PerfConstraintViolation.TREND_AVG, result)
     }
 
 }

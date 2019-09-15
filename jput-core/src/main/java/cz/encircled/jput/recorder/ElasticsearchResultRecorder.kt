@@ -59,7 +59,7 @@ class ElasticsearchResultRecorder(private val client: RestHighLevelClient) : Thr
     override fun doFlush(data: List<PerfTestExecution>) {
         log.info("Do flush to Elasticsearch: $data")
 
-        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "default")
+        val type = getProperty(JPutContext.PROP_ELASTIC_TYPE, "jput")
 
         data.forEach {
             val jsonMap = mutableMapOf(

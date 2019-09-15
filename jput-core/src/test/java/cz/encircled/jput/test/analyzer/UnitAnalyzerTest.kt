@@ -1,13 +1,15 @@
-package cz.encircled.jput.test
+package cz.encircled.jput.test.analyzer
 
+import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.test.ShortcutsForTests
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.junit.runner.RunWith
 import kotlin.test.Test
 
 @RunWith(JPutJUnit4Runner::class)
-class UnitAnalyzerTest : PerfConfigForTests {
+class UnitAnalyzerTest : ShortcutsForTests {
 
     private val analyzer: UnitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
 
@@ -32,7 +34,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
         val conf = baseConfig().copy(avgTimeLimit = 99L)
         val testRun = getTestExecution(conf, 99, 101)
 
-        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))
+        assertNotValid(PerfConstraintViolation.UNIT_AVG, analyzer.analyzeUnitTrend(testRun))
     }
 
     @Test
@@ -56,7 +58,7 @@ class UnitAnalyzerTest : PerfConfigForTests {
         val conf = baseConfig().copy(maxTimeLimit = 100L)
         val testRun = getTestExecution(conf, 99, 101)
 
-        assertAvgNotValid(analyzer.analyzeUnitTrend(testRun))
+        assertNotValid(PerfConstraintViolation.UNIT_MAX, analyzer.analyzeUnitTrend(testRun))
     }
 
 }

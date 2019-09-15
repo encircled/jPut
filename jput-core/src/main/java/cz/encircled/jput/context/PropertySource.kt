@@ -8,8 +8,8 @@ inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
     if (value.isNullOrBlank()) return defaultValue ?: throw IllegalStateException("JPut property [$key] is mandatory")
 
     return when (T::class) {
-        Boolean::class -> value!!.toBoolean() as T
-        Int::class -> value!!.toInt() as T
+        Boolean::class -> value.toBoolean() as T
+        Int::class -> value.toInt() as T
         else -> value as T
     }
 }
@@ -21,14 +21,20 @@ fun getCollectionProperty(key: String, defaultValue: List<String> = emptyList())
     else value.split(",").map { it.trim() }
 }
 
+/**
+ * Property sources for settings
+ */
 interface PropertySource {
 
     fun getProperty(key: String): String?
 
 }
 
+/**
+ * Uses System.property and System.env as a sources
+ */
 class SystemPropertySource : PropertySource {
 
-    override fun getProperty(key: String): String? = System.getProperty(key)
+    override fun getProperty(key: String): String? = System.getProperty(key) ?: System.getenv()[key]
 
 }

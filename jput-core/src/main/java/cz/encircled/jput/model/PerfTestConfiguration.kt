@@ -1,5 +1,6 @@
 package cz.encircled.jput.model
 
+import cz.encircled.jput.context.context
 import cz.encircled.jput.unit.PerformanceTest
 import java.lang.reflect.Method
 import java.util.*
@@ -76,24 +77,27 @@ data class PerfTestConfiguration(
 
     companion object {
 
+        fun defaultTestId(method: Method) : String = "${method.declaringClass.simpleName}#${method.name}"
+
         fun fromAnnotation(conf: PerformanceTest, method: Method): PerfTestConfiguration {
             val trendConfig =
                     if (conf.trends.isNotEmpty()) TrendTestConfiguration.fromAnnotation(conf.trends[0])
                     else null
 
-            val percentiles = conf.percentiles
-            check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }
-
-            val testId =
-                    if (conf.testId.isEmpty()) "${method.declaringClass.simpleName}#${method.name}"
-                    else conf.testId
+            val testId = if (conf.testId.isBlank()) defaultTestId(method)
+            else {
+                context.customTestIds[conf.testId] = defaultTestId(method)
+                conf.testId
+            }
 
             val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
                     conf.maxTimeLimit, conf.averageTimeLimit, trendConfig)
 
+            /*TODO val percentiles = conf.percentiles
+            check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }
             for (i in 0 until percentiles.size - 1) {
-                // methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]); TODO
-            }
+                methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]);
+            } */
 
             return methodConfiguration.valid()
         }

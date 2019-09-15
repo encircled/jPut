@@ -1,5 +1,6 @@
 package cz.encircled.jput.spring.test
 
+import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.spring.JPutSpringRunner
 import cz.encircled.jput.unit.PerformanceTest
 import org.junit.Test
@@ -15,7 +16,7 @@ import org.springframework.test.context.TestPropertySource
  */
 @ContextConfiguration(classes = [Conf::class])
 @RunWith(JPutSpringRunner::class)
-@TestPropertySource(properties = ["jput.storage.elastic.enabled:false",
+@TestPropertySource(properties = ["jput.storage.elastic.enabled:false", "${JPutContext.PROP_STORAGE_FILE_ENABLED}:true",
     "jput.storage.elastic.host:localhost"])
 class SpringIntegrationTest {
 
