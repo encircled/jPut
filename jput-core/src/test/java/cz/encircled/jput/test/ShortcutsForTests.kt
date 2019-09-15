@@ -20,11 +20,11 @@ interface ShortcutsForTests {
                     trendTestConfiguration)
 
     fun assertNotValid(expected: PerfConstraintViolation, violations: List<PerfConstraintViolation>) {
-        assertTrue(violations.contains(expected), "Expected to be $expected, actual is [$violations]")
+        assertTrue(violations.contains(expected), "Expected to be $expected, actual is $violations")
     }
 
     fun assertValid(violations: List<PerfConstraintViolation>) {
-        assertTrue(violations.isEmpty(), "Actual is [$violations]")
+        assertTrue(violations.isEmpty(), "Actual is $violations")
     }
 
 }

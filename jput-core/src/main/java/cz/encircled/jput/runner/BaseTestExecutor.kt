@@ -19,16 +19,14 @@ open class BaseTestExecutor {
 
         performExecution(execution, statement)
 
-        try {
-            execution.result = analyzeExecutionResults(execution, config)
-            return execution
-        } finally {
-            // TODO error throws must be reworked and throw by runners instead
-            writeResults(execution)
-        }
+        execution.result = analyzeExecutionResults(execution, config)
+
+        writeResults(execution)
+
+        return execution
     }
 
-    private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration) : PerfTestResult {
+    private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): PerfTestResult {
         val result = mutableListOf<PerfConstraintViolation>()
         val unitViolations = context.unitPerformanceAnalyzer.analyzeUnitTrend(execution)
         result.addAll(unitViolations)
@@ -65,6 +63,8 @@ open class BaseTestExecutor {
             execution.startNextExecution()
             statement.invoke()
             execution.finishExecution()
+
+            if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
         }
 
     }

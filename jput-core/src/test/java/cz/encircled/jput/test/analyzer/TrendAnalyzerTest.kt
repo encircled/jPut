@@ -61,6 +61,14 @@ class TrendAnalyzerTest : ShortcutsForTests {
     }
 
     @Test
+    fun testValidWhenAverageNotSet() {
+        val conf = configWithTrend(TrendTestConfiguration(3, averageTimeThreshold = 0.0))
+        val testRun = getTestExecution(conf, 500)
+
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(100, 100, 100)))
+    }
+
+    @Test
     fun testNegativeAverageByThreshold() {
         // Avg 100, threshold - 10
         val conf = configWithTrend(TrendTestConfiguration(2, averageTimeThreshold = 10.0))

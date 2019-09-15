@@ -3,10 +3,7 @@ package cz.encircled.jput.unit
 import cz.encircled.jput.trend.PerformanceTrend
 
 /**
- * TODO
- * - delay between executions
- *
- * Mark the test as a performance test, allowing to assert test execution time and analyze execution time trends
+ * Mark the test as a JPut performance test, allowing to assert test execution time and analyze execution time trends
  *
  * @author Vlad on 20-May-17.
  */

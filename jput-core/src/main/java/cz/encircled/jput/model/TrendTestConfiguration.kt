@@ -37,7 +37,7 @@ data class TrendTestConfiguration(
         /**
          * Only result from given percentile are counted for trend tests, thus ignoring highest deviations
          */
-        val noisePercentile: Double = 0.toDouble()
+        val noisePercentile: Double = 0.0
 
 ) {
 
