@@ -21,6 +21,7 @@ import org.junit.BeforeClass
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * @author Vlad on 15-Sep-19.
@@ -30,8 +31,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
     @AfterTest
     fun after() {
         wireMockServer.resetRequests()
-        val misses = wireMockServer.findNearMissesForUnmatchedRequests()
-        println(misses)
     }
 
     @Test
@@ -48,6 +47,22 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         assertEquals(listOf(95L, 105L), ecs.getSample(execution))
 
         wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/_search.*"), true)))
+    }
+
+    @Test
+    fun testGetSampleWhenIndexNotExist() = testWithProps(JPutContext.PROP_ELASTIC_INDEX to "new") {
+        context = JPutContext()
+        context.init()
+
+        val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
+        val ecs = ElasticsearchResultRecorder(client)
+
+        val execution = getTestExecution(configWithTrend(TrendTestConfiguration(
+                sampleSize = 5
+        )))
+        assertTrue(ecs.getSample(execution).isEmpty())
+
+        wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/new/_search.*"), true)))
     }
 
     @Test
@@ -68,6 +83,14 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         ecs.flush()
 
         wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/jput.*"), true)))
+    }
+
+    @Test
+    fun testDestroy() {
+        val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("not_exist", port, "http")))
+        val ecs = ElasticsearchResultRecorder(client)
+        // Should not fail
+        ecs.destroy()
     }
 
     companion object {

@@ -23,13 +23,13 @@ annotation class PerformanceTrend(
          *
          * Performance trend test will fail if average execution time is greater than sample average time plus given threshold
          */
-        val averageTimeThreshold: Double = -1.0,
+        val averageTimeThreshold: Double = 0.0,
 
         /**
-         * if true - use the sample variance as an average time threshold
+         * if true - use the sample standard deviation as an average time threshold
          *
-         * Performance trend test will fail if average execution time is greater than sample average time plus its variance
+         * Performance trend test will fail if average execution time is greater than sample average time + threshold
          */
-        val useSampleVarianceAsThreshold: Boolean = false
+        val useStandardDeviationAsThreshold: Boolean = false
 
 )

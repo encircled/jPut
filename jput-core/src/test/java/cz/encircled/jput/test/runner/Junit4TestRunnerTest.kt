@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
  */
 @RunWith(JPutJUnit4Runner::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class Junit4TestExecutorTest : ShortcutsForTests {
+class Junit4TestRunnerTest : ShortcutsForTests {
 
     companion object {
         @JvmStatic

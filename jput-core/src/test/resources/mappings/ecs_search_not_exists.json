@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/new/_search.*"
+  },
+  "response": {
+    "status": 404,
+    "bodyFileName": "ecs_search_not_exists_response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

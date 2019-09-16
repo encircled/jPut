@@ -13,8 +13,6 @@ import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 lateinit var context: JPutContext
@@ -31,9 +29,7 @@ class JPutContext {
      * Unique ID of current tests execution
      */
     val executionId: String by lazy {
-        val format = getCollectionProperty(PROP_EXECUTION_ID_FORMAT, listOf("dd.MM.yy hh:mm"))
-        val date = SimpleDateFormat(format[0]).format(Date())
-        if (format.size > 1) "$date ${format[1]}" else date
+        System.currentTimeMillis().toString()
     }
 
     /**
@@ -53,7 +49,7 @@ class JPutContext {
      */
     val customTestIds = mutableMapOf<String, String>()
 
-    val testExecutions : MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
+    val testExecutions: MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
 
     lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
     lateinit var trendAnalyzer: TrendAnalyzer
@@ -97,6 +93,10 @@ class JPutContext {
         resultRecorders.forEach {
             try {
                 it.flush()
+            } catch (e: Exception) {
+                log.warn("Failed to flush results", e)
+            }
+            try {
                 it.destroy()
             } catch (e: Exception) {
                 log.warn("Failed to close the recorder", e)
@@ -113,8 +113,6 @@ class JPutContext {
         private const val PREFIX = "jput."
 
         const val PROP_ENABLED = PREFIX + "enabled"
-
-        const val PROP_EXECUTION_ID_FORMAT = PREFIX + "execution.id.format"
 
         const val PROP_ELASTIC_ENABLED = PREFIX + "storage.elastic.enabled"
 

@@ -1,6 +1,8 @@
 package cz.encircled.jput.test
 
-import cz.encircled.jput.Statistics
+import cz.encircled.jput.deviation
+import cz.encircled.jput.percentile
+import cz.encircled.jput.variance
 import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -11,37 +13,37 @@ import kotlin.test.assertEquals
 class StatisticsTest {
 
     @Test
-    fun testAverage() {
-        Assert.assertEquals(2.0, Statistics.getAverage(listOf(1, 3)), 0.0)
-        Assert.assertEquals(6.0, Statistics.getAverage(listOf(4, 6, 8)), 0.0)
-        Assert.assertEquals(98.5, Statistics.getAverage(listOf(100, 96, 99, 99)), 0.0)
+    fun testVariance() {
+        Assert.assertEquals(4.0, listOf(1L, 5).variance(), 0.0)
+        Assert.assertEquals(1.25, listOf(2L, 3, 4, 5).variance(), 0.0)
+        Assert.assertEquals(200.0, listOf(50L, 60, 70, 80, 90).variance(), 0.0)
     }
 
     @Test
-    fun testVariance() {
-        Assert.assertEquals(4.0, Statistics.getVariance(listOf(1, 5)), 0.0)
-        Assert.assertEquals(1.25, Statistics.getVariance(listOf(2, 3, 4, 5)), 0.0)
+    fun testDeviation() {
+        Assert.assertEquals(2.0, listOf(1L, 5).deviation(), 0.0)
     }
 
     @Test(expected = IllegalStateException::class)
     fun testArrayPercentileValid() {
-        Statistics.getPercentile(listOf(1, 10), 1.01)
+        listOf(1L, 10).percentile(1.01)
     }
 
     @Test(expected = IllegalStateException::class)
     fun testArrayPercentileValidLower() {
-        Statistics.getPercentile(listOf(1, 10), -0.1)
+        listOf(1L, 10).percentile(-0.1)
     }
 
     @Test
     fun testArrayPercentile() {
-        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9), Statistics.getPercentile(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 0.9))
+        val res = listOf(1L, 2, 3, 4, 5, 6, 7, 8, 9, 10).percentile(0.9)
+        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9), res)
     }
 
     @Test
     fun testArrayPercentileRound() {
-        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9), Statistics.getPercentile(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 0.94))
-        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), Statistics.getPercentile(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 0.95))
+        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9), listOf(1L, 2, 3, 4, 5, 6, 7, 8, 9, 10).percentile(0.94))
+        assertEquals(listOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), listOf(1L, 2, 3, 4, 5, 6, 7, 8, 9, 10).percentile(0.95))
     }
 
 }

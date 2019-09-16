@@ -1,8 +1,9 @@
 package cz.encircled.jput.trend
 
-import cz.encircled.jput.Statistics
+import cz.encircled.jput.deviation
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.percentile
 import org.slf4j.LoggerFactory
 
 /**
@@ -31,19 +32,21 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
     override fun analyzeTestTrend(execution: PerfTestExecution, sample: List<Long>): List<PerfConstraintViolation> {
         val trend = execution.conf.trendConfiguration!!
         val sortedSample = if (trend.noisePercentile > 0) {
-            Statistics.getPercentile(sample.sorted(), trend.noisePercentile)
+            sample.sorted().percentile(trend.noisePercentile)
         } else sample.sorted()
 
-        val avgThreshold =
-                if (trend.useSampleVarianceAsThreshold) Statistics.getVariance(sortedSample)
-                else trend.averageTimeThreshold
+        val avgThreshold = if (trend.useStandardDeviationAsThreshold) {
+            trend.averageTimeThreshold + sortedSample.deviation()
+        } else trend.averageTimeThreshold
 
-        if (avgThreshold == 0.0) {
+        if (avgThreshold <= 0.0) {
             log.warn("Average time threshold is not set, skipping performance trend test")
             return emptyList()
+        } else {
+            log.warn("Average time threshold is $avgThreshold, sample $sortedSample")
         }
 
-        val avgLimit = Statistics.getAverage(sortedSample) + avgThreshold
+        val avgLimit = sortedSample.average() + avgThreshold
         execution.executionParams["avgLimit"] = avgLimit
 
         return if (execution.executionAvg > avgLimit) listOf(PerfConstraintViolation.TREND_AVG)

@@ -29,8 +29,8 @@ class TrendAnalyzerTest : ShortcutsForTests {
     }
 
     @Test
-    fun testPositiveAverageByVariance() {
-        val conf = configWithTrend(TrendTestConfiguration(3, useSampleVarianceAsThreshold = true))
+    fun testPositiveAverageByDeviation() {
+        val conf = configWithTrend(TrendTestConfiguration(3, useStandardDeviationAsThreshold = true))
         val testRun = getTestExecution(conf, 100)
         assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(100, 100, 100)))
         assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(300, 310, 330)))
@@ -40,9 +40,23 @@ class TrendAnalyzerTest : ShortcutsForTests {
     }
 
     @Test
+    fun testPositiveDeviationAndStatic() {
+        val conf = configWithTrend(TrendTestConfiguration(3, averageTimeThreshold = 5.0, useStandardDeviationAsThreshold = true))
+        val testRun = getTestExecution(conf, 105)
+        assertValid(trendAnalyzer.analyzeTestTrend(testRun, listOf(90, 100)))
+    }
+
+    @Test
+    fun testNegativeDeviationAndStatic() {
+        val conf = configWithTrend(TrendTestConfiguration(3, averageTimeThreshold = 4.0, useStandardDeviationAsThreshold = true))
+        val testRun = getTestExecution(conf, 105)
+        assertNotValid(PerfConstraintViolation.TREND_AVG, trendAnalyzer.analyzeTestTrend(testRun, listOf(90, 100)))
+    }
+
+    @Test
     fun testNegativeByVariance() {
         // Avg 98.5 ms, variance 2.25 ms
-        val conf = configWithTrend(TrendTestConfiguration(4, useSampleVarianceAsThreshold = true))
+        val conf = configWithTrend(TrendTestConfiguration(4, useStandardDeviationAsThreshold = true))
 
         val result = trendAnalyzer.analyzeTestTrend(getTestExecution(conf, 102), listOf(100, 96, 99, 99))
         assertNotValid(PerfConstraintViolation.TREND_AVG, result)

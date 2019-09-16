@@ -25,6 +25,21 @@ class UserHelpersJPutTest : ShortcutsForTests {
         assertTrue(execution.currentExecutionStart > originalStartTime)
     }
 
+    @Test
+    fun testMarkPerformanceTestStartWithCustomTestId() {
+        context = JPutContext()
+        context.init()
+
+        val execution = getTestExecution(baseConfig())
+        val originalStartTime = execution.startNextExecution()
+
+        context.customTestIds["UserHelpersJPutTest#testMarkPerformanceTestStartWithCustomTestId"] = "customId"
+        context.testExecutions["customId"] = execution
+        JPut.markPerformanceTestStart()
+
+        assertTrue(execution.currentExecutionStart > originalStartTime)
+    }
+
     /**
      * Simulate running it from non-JPut function
      */

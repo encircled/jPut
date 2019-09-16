@@ -14,7 +14,7 @@ For unit testing, jPut uses average and max execution time metrics.
 
 ### Performance trend testing
 
-JPut supports persisting the execution statistics, which allows to trace the changes in performance in time. 
+JPut supports persisting the execution statistics, which allows to trace the changes of performance in time. 
 It can be used for verifying, that performance of your application did not degrade after a particular change in the code.
 Also, it might be used together with Elasticsearch and Kibana for visualizing the performance trends in time.
 
@@ -34,7 +34,9 @@ A JUnit test method must be marked with `@PerformanceTest` in order to enable th
     * *sampleSize* - sample size which is used for trend analysis, i.e. only specified count of previous test executions will be used for analysis
     * *sampleSelectionStrategy* - defines the way, how the sample (a subset of results) should be chosen from the all available previous results
     * *averageTimeThreshold* - static average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus given threshold
-    * *useSampleVarianceAsThreshold* - if true - use the sample variance as an average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus its variance
+    * *useStandardDeviationAsThreshold* - if true - use the sample standard deviation as an average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus threshold
+
+*useStandardDeviationAsThreshold* can be used together with *averageTimeThreshold*, result threshold will be the sum of both
 
 #### Examples
 
@@ -54,7 +56,7 @@ In this particular case boundaries are: average time within sample average time 
 ```java
 @Test
 @PerformanceTest(warmUp = 2, repeats = 20, maxTimeLimit = 100, 
-    trends = PerformanceTrend(useSampleVarianceAsThreshold = true))
+    trends = PerformanceTrend(useStandardDeviationAsThreshold = true))
 public void myUnitAndTrendTest() {
     
 }

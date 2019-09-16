@@ -2,38 +2,32 @@ package cz.encircled.jput
 
 import kotlin.math.pow
 import kotlin.math.roundToLong
+import kotlin.math.sqrt
 
+fun List<Long>.deviation(): Double = sqrt(variance())
+
+fun List<Long>.variance(): Double {
+    return if (isEmpty()) 0.0
+    else {
+        val average = average()
+        var temp = 0.0
+        for (a in this) temp += (a - average).pow(2.0)
+        temp / size
+    }
+}
+
+fun round(value: Double) = value.roundToLong()
 
 /**
- * @author Vlad on 27-May-17.
+ * @param rank target percentile
+ * @return values below `percentile`
  */
-object Statistics {
+fun List<Long>.percentile(rank: Double): List<Long> {
+    validatePercentile(rank)
 
-    fun getAverage(input: List<Long>) = input.average()
+    return subList(0, round(size * rank).toInt())
+}
 
-    fun getVariance(input: List<Long>): Double {
-        val average = getAverage(input)
-        var temp = 0.0
-        for (a in input)
-            temp += (a - average).pow(2.0)
-        return temp / input.size
-    }
-
-    fun round(value: Double) = value.roundToLong()
-
-    /**
-     * @param input      **ordered** array
-     * @param rank target percentile
-     * @return values below `percentile`
-     */
-    fun getPercentile(input: List<Long>, rank: Double): List<Long> {
-        validatePercentile(rank)
-
-        return input.subList(0, round(input.size * rank).toInt())
-    }
-
-    private fun validatePercentile(rank: Double) {
-        check(!(rank <= 0.0 || rank > 1.0)) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
-    }
-
+private fun validatePercentile(rank: Double) {
+    check(!(rank <= 0.0 || rank > 1.0)) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
 }

@@ -1,6 +1,6 @@
 package cz.encircled.jput.model
 
-import cz.encircled.jput.Statistics
+import kotlin.math.roundToLong
 
 
 /**
@@ -39,7 +39,7 @@ data class PerfTestExecution(
         private set
 
     val executionAvg: Long by lazy {
-        Statistics.round(Statistics.getAverage(executionResult))
+        executionResult.average().roundToLong()
     }
 
     val executionMax: Long by lazy { executionResult.max()!! }

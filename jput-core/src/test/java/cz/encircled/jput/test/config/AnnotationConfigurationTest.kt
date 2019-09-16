@@ -11,7 +11,6 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 /**
  * @author Vlad on 28-May-17.
@@ -44,12 +43,13 @@ class AnnotationConfigurationTest {
                 warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L,
                 trendConfiguration = TrendTestConfiguration(
                         sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
-                        averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true
+                        averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true
                 )
         ), config)
 
         // Verify that custom ID is registered
-        assertTrue(context.customTestIds.containsKey("customTestId"))
+        val id = PerfTestConfiguration.defaultTestId(function.javaMethod!!)
+        assertEquals("customTestId", context.customTestIds[id])
     }
 
     @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L)
@@ -60,7 +60,7 @@ class AnnotationConfigurationTest {
     @PerformanceTest(testId = "customTestId", warmUp = 1, repeats = 2, delay = 100L, maxTimeLimit = 100L, averageTimeLimit = 80L,
             trends = [PerformanceTrend(
                     sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
-                    averageTimeThreshold = 40.0, useSampleVarianceAsThreshold = true
+                    averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true
             )])
     fun trendAnnotated() {
 

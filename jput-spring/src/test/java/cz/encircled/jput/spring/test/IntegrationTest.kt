@@ -1,5 +1,6 @@
 package cz.encircled.jput.spring.test
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.spring.JPutSpringRunner
 import cz.encircled.jput.unit.PerformanceTest
@@ -23,6 +24,7 @@ class SpringIntegrationTest {
     @PerformanceTest(maxTimeLimit = 5000L)
     @Test
     fun baseTest() {
+        JPut.markPerformanceTestStart()
         Thread.sleep(4000)
         println("Hi there")
     }

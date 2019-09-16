@@ -27,7 +27,7 @@ data class TrendTestConfiguration(
          *
          * Performance trend test will fail if average execution time is greater than sample average time plus its variance
          */
-        val useSampleVarianceAsThreshold: Boolean = false,
+        val useStandardDeviationAsThreshold: Boolean = false,
 
         /**
          * Defines the strategy for sample selection
@@ -47,7 +47,7 @@ data class TrendTestConfiguration(
                 TrendTestConfiguration(
                         conf.sampleSize,
                         conf.averageTimeThreshold,
-                        conf.useSampleVarianceAsThreshold,
+                        conf.useStandardDeviationAsThreshold,
                         conf.sampleSelectionStrategy
                 )
 

@@ -86,7 +86,7 @@ data class PerfTestConfiguration(
 
             val testId = if (conf.testId.isBlank()) defaultTestId(method)
             else {
-                context.customTestIds[conf.testId] = defaultTestId(method)
+                context.customTestIds[defaultTestId(method)] = conf.testId
                 conf.testId
             }
 

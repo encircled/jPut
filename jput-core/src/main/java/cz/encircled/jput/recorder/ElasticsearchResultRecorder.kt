@@ -89,13 +89,4 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
         }
     }
 
-    // TODO check, probably not needed
-    /*private fun createIndexIfNeeded() {
-        val exists = client.indices().exists(GetIndexRequest().indices("jput"), RequestOptions.DEFAULT)
-        if (!exists) {
-            val createRequest = CreateIndexRequest("jput")
-            client.indices().create(createRequest, RequestOptions.DEFAULT)
-        }
-    }*/
-
 }

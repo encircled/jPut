@@ -9,6 +9,24 @@ import kotlin.test.assertTrue
 
 interface ShortcutsForTests {
 
+    /**
+     * Set properties before test, invoke test, rollback property values
+     */
+    fun testWithProps(vararg props: Pair<String, String>, testFun: () -> Unit) {
+        val originalProps = mutableMapOf<String, String?>()
+        props.forEach {
+            originalProps[it.first] = System.getProperty(it.second)
+            System.setProperty(it.first, it.second)
+        }
+        try {
+            testFun.invoke()
+        } finally {
+            originalProps.forEach {
+                System.setProperty(it.key, it.value ?: "")
+            }
+        }
+    }
+
     fun getTestExecution(config: PerfTestConfiguration, vararg times: Long): PerfTestExecution {
         return PerfTestExecution(config, mutableMapOf("id" to context.executionId), times.toMutableList())
     }
