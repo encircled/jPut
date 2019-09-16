@@ -6,10 +6,7 @@ import cz.encircled.jput.context.context
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
-import org.junit.runners.model.Statement
 import org.slf4j.LoggerFactory
-import org.springframework.test.context.TestContext
-import org.springframework.test.context.TestExecutionListener
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 /**
@@ -39,7 +36,11 @@ constructor(clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
         })
         context.init()
 
-        super.run(notifier)
+        try {
+            super.run(notifier)
+        } finally {
+            context.destroy()
+        }
     }
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
@@ -52,13 +53,5 @@ constructor(clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
         }
     }
 
-    override fun withAfterTestExecutionCallbacks(frameworkMethod: FrameworkMethod, testInstance: Any, statement: Statement): Statement {
-        testContextManager.registerTestExecutionListeners(object : TestExecutionListener {
-            override fun afterTestClass(testContext: TestContext) {
-                context.destroy()
-            }
-        })
-        return super.withAfterTestExecutionCallbacks(frameworkMethod, testInstance, statement)
-    }
 }
 

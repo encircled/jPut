@@ -48,7 +48,11 @@ class JPutJUnit4Runner(clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
     override fun run(notifier: RunNotifier?) {
         context = JPutContext()
         context.init()
-        super.run(notifier)
+        try {
+            super.run(notifier)
+        } finally {
+            context.destroy()
+        }
     }
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
@@ -60,5 +64,6 @@ class JPutJUnit4Runner(clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
             context.junit4TestExecutor.executeTest(method, notifier, description, methodBlock(method))
         }
     }
+
 
 }

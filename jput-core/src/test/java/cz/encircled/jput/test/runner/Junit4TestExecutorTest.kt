@@ -1,6 +1,7 @@
 package cz.encircled.jput.test.runner
 
 import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.test.ShortcutsForTests
 import cz.encircled.jput.unit.PerformanceTest
 import org.junit.FixMethodOrder
 import org.junit.Ignore
@@ -11,11 +12,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 /**
- * Vefiry that [JPutJUnit4Runner] is executing [PerformanceTest]
+ * Verify that [JPutJUnit4Runner] is executing [PerformanceTest]
  */
 @RunWith(JPutJUnit4Runner::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class Junit4TestExecutorTest {
+class Junit4TestExecutorTest : ShortcutsForTests {
 
     companion object {
         @JvmStatic
