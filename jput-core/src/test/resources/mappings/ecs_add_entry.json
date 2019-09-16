@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "POST",
-    "urlPattern": "http://localhost:9200/jput/jput\\?.*"
+    "urlPattern": "/jput/jput.*"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "ecs_search_response.json",
+    "bodyFileName": "ecs_add_entry_response.json",
     "headers": {
       "Content-Type": "application/json"
     }

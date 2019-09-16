@@ -10,7 +10,7 @@ import java.lang.reflect.Method
  *
  * @author encir on 15-Sep-19.
  */
-public object JPut {
+object JPut {
 
     private val log = LoggerFactory.getLogger(JPut::class.java)
 

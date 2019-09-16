@@ -1,6 +1,8 @@
 package cz.encircled.jput.test
 
 import cz.encircled.jput.context.*
+import cz.encircled.jput.recorder.ElasticsearchResultRecorder
+import cz.encircled.jput.recorder.FileSystemResultRecorder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.test.Test
@@ -59,6 +61,59 @@ class ContextTest {
             }
         })
         assertEquals("custom", getProperty(testKey, ""))
+    }
+
+    @Test
+    fun testFileSystemRecorderInitialized() {
+        val path = System.getProperty("java.io.tmpdir") + "test.test"
+
+        val props = mapOf(
+                JPutContext.PROP_STORAGE_FILE_ENABLED to "true",
+                JPutContext.PROP_PATH_TO_STORAGE_FILE to path
+        )
+
+        testWithProperties(props) {
+            context = JPutContext()
+            context.init()
+            assertEquals(1, context.resultRecorders.size)
+            val recorder = context.resultRecorders[0]
+            assertTrue(recorder is FileSystemResultRecorder)
+            assertEquals(path, recorder.target.toString())
+        }
+    }
+
+    @Test
+    fun testElasticsearchRecorderInitialized() {
+        val props = mapOf(
+                JPutContext.PROP_ELASTIC_ENABLED to "true",
+                JPutContext.PROP_ELASTIC_HOST to "true"
+        )
+
+        testWithProperties(props) {
+            context = JPutContext()
+            context.init()
+            assertEquals(1, context.resultRecorders.size)
+            val recorder = context.resultRecorders[0]
+            assertTrue(recorder is ElasticsearchResultRecorder)
+        }
+    }
+
+    /**
+     * Set properties before test, invoke test, rollback property values
+     */
+    private fun testWithProperties(props: Map<String, String>, testFun: () -> Unit) {
+        val originalProps = mutableMapOf<String, String?>()
+        props.entries.forEach {
+            originalProps[it.key] = System.getProperty(it.key)
+            System.setProperty(it.key, it.value)
+        }
+        try {
+            testFun.invoke()
+        } finally {
+            originalProps.forEach {
+                System.setProperty(it.key, it.value ?: "")
+            }
+        }
     }
 
 }

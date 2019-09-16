@@ -1,2 +1,14 @@
 {
+  "_index": "pif-2019.09.13",
+  "_type": "flb_type",
+  "_id": "fnvfOG0BK5rZMZ6I7ZRc",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 0,
+  "_primary_term": 1
 }

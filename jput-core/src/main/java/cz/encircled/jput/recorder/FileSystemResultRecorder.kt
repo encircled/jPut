@@ -16,7 +16,7 @@ import java.nio.file.StandardOpenOption.CREATE
  */
 class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() {
 
-    private val target: Path = Paths.get(pathToFile)
+    val target: Path = Paths.get(pathToFile)
 
     private var runs: MutableMap<String, List<Long>> = mutableMapOf()
 

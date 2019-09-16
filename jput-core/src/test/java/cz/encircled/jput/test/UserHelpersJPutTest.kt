@@ -25,4 +25,16 @@ class UserHelpersJPutTest : ShortcutsForTests {
         assertTrue(execution.currentExecutionStart > originalStartTime)
     }
 
+    /**
+     * Simulate running it from non-JPut function
+     */
+    @Test
+    fun testMarkPerformanceTestStartFromOutside() {
+        context = JPutContext()
+        context.init()
+
+        // should not fail
+        JPut.markPerformanceTestStart()
+    }
+
 }

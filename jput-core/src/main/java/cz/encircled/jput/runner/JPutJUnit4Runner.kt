@@ -52,10 +52,11 @@ class JPutJUnit4Runner(clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
     }
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
+        val description = describeChild(method)
+
         if (this.isIgnored(method)) run {
             notifier.fireTestIgnored(description)
         } else {
-            val description = describeChild(method)
             context.junit4TestExecutor.executeTest(method, notifier, description, methodBlock(method))
         }
     }
