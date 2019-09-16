@@ -43,7 +43,7 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
             log.warn("Average time threshold is not set, skipping performance trend test")
             return emptyList()
         } else {
-            log.warn("Average time threshold is $avgThreshold, sample $sortedSample")
+            log.info("Average time threshold is $avgThreshold")
         }
 
         val avgLimit = sortedSample.average() + avgThreshold
