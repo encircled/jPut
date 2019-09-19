@@ -1,7 +1,7 @@
 package cz.encircled.jput.test
 
-import cz.encircled.jput.JPutReporter
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.reporter.JPutReporter
 
 class TestReporter : JPutReporter {
 

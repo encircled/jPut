@@ -1,4 +1,4 @@
-package cz.encircled.jput
+package cz.encircled.jput.reporter
 
 import cz.encircled.jput.model.PerfTestExecution
 

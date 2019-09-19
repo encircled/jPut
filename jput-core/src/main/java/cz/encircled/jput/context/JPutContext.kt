@@ -1,11 +1,11 @@
 package cz.encircled.jput.context
 
-import cz.encircled.jput.JPutReporter
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
+import cz.encircled.jput.reporter.JPutReporter
 import cz.encircled.jput.runner.Junit4TestExecutor
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
