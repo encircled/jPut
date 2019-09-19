@@ -23,7 +23,7 @@ class JPutSpringRunner
  * @see .createTestContextManager
  */
 @Throws(InitializationError::class)
-constructor(clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
+constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
     val log = LoggerFactory.getLogger(JPutSpringRunner::class.java)
 
@@ -35,11 +35,12 @@ constructor(clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
             }
         })
         context.init()
-
+        context.resultReporter?.beforeClass(clazz)
         try {
             super.run(notifier)
         } finally {
             context.destroy()
+            context.resultReporter?.afterClass(clazz)
         }
     }
 

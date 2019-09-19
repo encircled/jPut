@@ -54,6 +54,11 @@ class ContextTest : ShortcutsForTests {
     }
 
     @Test
+    fun testClasspathPropertySource() {
+        assertTrue(ClasspathFilePropertySource().getProperty(JPutContext.PROP_REPORTER_CLASS)!!.isNotBlank())
+    }
+
+    @Test
     fun testFileSystemRecorderInitialized() {
         val path = System.getProperty("java.io.tmpdir") + "test.test"
 

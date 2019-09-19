@@ -1,5 +1,6 @@
 package cz.encircled.jput.context
 
+import cz.encircled.jput.JPutReporter
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
@@ -37,7 +38,7 @@ class JPutContext {
      */
     var isPerformanceTestEnabled = true
 
-    var propertySources = mutableListOf<PropertySource>(SystemPropertySource())
+    var propertySources = mutableListOf(SystemPropertySource(), ClasspathFilePropertySource())
 
     /**
      * Test results recorders
@@ -54,12 +55,18 @@ class JPutContext {
     lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
     lateinit var trendAnalyzer: TrendAnalyzer
     lateinit var junit4TestExecutor: Junit4TestExecutor
+    var resultReporter: JPutReporter? = null
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
         trendAnalyzer = SampleBasedTrendAnalyzer()
         junit4TestExecutor = Junit4TestExecutor()
+
+        resultReporter = getProperty(PROP_REPORTER_CLASS, "").let {
+            if (it.isEmpty()) null
+            else Class.forName(it).getConstructor().newInstance() as JPutReporter
+        }
 
         initECSRecorder()
         initFileSystemRecorder()
@@ -113,6 +120,8 @@ class JPutContext {
         private const val PREFIX = "jput."
 
         const val PROP_ENABLED = PREFIX + "enabled"
+
+        const val PROP_REPORTER_CLASS = PREFIX + "reporter.class"
 
         const val PROP_ELASTIC_ENABLED = PREFIX + "storage.elastic.enabled"
 

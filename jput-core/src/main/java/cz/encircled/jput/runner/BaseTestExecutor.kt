@@ -17,11 +17,14 @@ open class BaseTestExecutor {
     fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId))
 
+        context.resultReporter?.beforeTest(execution)
+
         performExecution(execution, statement)
 
         execution.result = analyzeExecutionResults(execution, config)
 
         writeResults(execution)
+        context.resultReporter?.afterTest(execution)
 
         return execution
     }

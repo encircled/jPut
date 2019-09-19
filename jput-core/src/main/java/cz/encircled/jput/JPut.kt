@@ -6,6 +6,11 @@ import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
 /**
+ * TODO list:
+ * - Allure support?
+ * - Load test? 1000 req/s
+ * - Delete old entries
+ *
  * Helper functions for JPut users to control the perf tests execution
  *
  * @author encir on 15-Sep-19.

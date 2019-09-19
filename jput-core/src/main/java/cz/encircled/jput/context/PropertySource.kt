@@ -1,5 +1,8 @@
 package cz.encircled.jput.context
 
+import java.util.*
+
+
 inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
     val value = context.propertySources
             .mapNotNull { it.getProperty(key) }
@@ -36,5 +39,19 @@ interface PropertySource {
 class SystemPropertySource : PropertySource {
 
     override fun getProperty(key: String): String? = System.getProperty(key) ?: System.getenv()[key]
+
+}
+
+class ClasspathFilePropertySource : PropertySource {
+
+    private val prop = Properties()
+
+    init {
+        this.javaClass.classLoader.getResourceAsStream("jput.properties").use {
+            if (it != null) prop.load(it)
+        }
+    }
+
+    override fun getProperty(key: String): String? = prop.getProperty(key)
 
 }

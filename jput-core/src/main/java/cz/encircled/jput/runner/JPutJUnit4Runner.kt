@@ -47,17 +47,20 @@ class Junit4TestExecutor : BaseTestExecutor() {
 
 }
 
-class JPutJUnit4Runner(clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
+class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
 
     override fun run(notifier: RunNotifier?) {
         context = JPutContext()
         context.init()
+        context.resultReporter?.beforeClass(clazz)
         try {
             super.run(notifier)
         } finally {
             context.destroy()
+            context.resultReporter?.afterClass(clazz)
         }
     }
+
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
         val description = describeChild(method)
