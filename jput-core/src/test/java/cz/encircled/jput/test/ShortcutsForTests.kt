@@ -34,7 +34,7 @@ interface ShortcutsForTests {
     fun baseConfig() = configWithTrend(null)
 
     fun configWithTrend(trendTestConfiguration: TrendTestConfiguration?): PerfTestConfiguration =
-            PerfTestConfiguration("1", 0, 1, 10, 300, 300,
+            PerfTestConfiguration("1", 0, 1, 10, 300, 300, 1,
                     trendTestConfiguration)
 
     fun assertNotValid(expected: PerfConstraintViolation, violations: List<PerfConstraintViolation>) {

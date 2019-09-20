@@ -44,6 +44,11 @@ annotation class PerformanceTest(
         val percentiles: LongArray = [],
 
         /**
+         * Tests will run in parallel if threads count is greater than 1
+         */
+        val threads: Int = 1,
+
+        /**
          * Performance trend analyzing
          */
         val trends: Array<PerformanceTrend> = []

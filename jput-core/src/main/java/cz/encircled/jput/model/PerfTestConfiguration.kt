@@ -42,6 +42,8 @@ data class PerfTestConfiguration(
          */
         val avgTimeLimit: Long,
 
+        val threads: Int,
+
         /**
          * Performance trend analyzing
          */
@@ -91,7 +93,7 @@ data class PerfTestConfiguration(
             }
 
             val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
-                    conf.maxTimeLimit, conf.averageTimeLimit, trendConfig)
+                    conf.maxTimeLimit, conf.averageTimeLimit, conf.threads, trendConfig)
 
             /*TODO val percentiles = conf.percentiles
             check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }

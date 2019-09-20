@@ -6,6 +6,8 @@ import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.PerfTestResult
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
+
 
 /**
  * Executes particular piece of code (junit test, or any other function) and runs performance and trend assertions.
@@ -58,17 +60,21 @@ open class BaseTestExecutor {
     private fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
         context.testExecutions[execution.conf.testId] = execution
 
-        repeat(execution.conf.warmUp) {
-            statement.invoke()
-        }
+        val executor = Executors.newFixedThreadPool(execution.conf.threads)
 
-        repeat(execution.conf.repeats) {
-            execution.startNextExecution()
-            statement.invoke()
-            execution.finishExecution()
+        (1..execution.conf.warmUp).map {
+            executor.submit(statement)
+        }.map { it.get() }
 
-            if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
-        }
+        (1..execution.conf.repeats).map {
+            executor.submit {
+                execution.startNextExecution()
+                statement.invoke()
+                execution.finishExecution()
+
+                if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
+            }
+        }.map { it.get() }
 
     }
 
