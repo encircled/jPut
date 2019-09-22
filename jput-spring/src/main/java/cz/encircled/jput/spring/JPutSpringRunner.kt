@@ -45,7 +45,7 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
             super.run(notifier)
         } finally {
             context.destroy()
-            context.resultReporter?.afterClass(clazz)
+            context.resultReporters.forEach { it.afterClass(clazz) }
         }
     }
 

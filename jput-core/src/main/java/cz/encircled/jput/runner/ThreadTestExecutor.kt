@@ -19,7 +19,7 @@ open class ThreadTestExecutor {
     fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId))
 
-        context.resultReporter?.beforeTest(execution)
+        context.resultReporters.forEach { it.beforeTest(execution) }
 
         context.testExecutions[execution.conf.testId] = execution
         performExecution(execution, statement)
@@ -27,7 +27,7 @@ open class ThreadTestExecutor {
         execution.result = analyzeExecutionResults(execution, config)
 
         writeResults(execution)
-        context.resultReporter?.afterTest(execution)
+        context.resultReporters.forEach { it.afterTest(execution) }
 
         return execution
     }

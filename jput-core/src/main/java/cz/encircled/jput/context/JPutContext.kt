@@ -59,19 +59,17 @@ class JPutContext {
      */
     var currentSuite: Class<*>? = null
 
-    /**
-     * Support multiple
-     */
-    var resultReporter: JPutReporter? = null
+    var resultReporters = mutableListOf<JPutReporter>()
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
         trendAnalyzer = SampleBasedTrendAnalyzer()
 
-        resultReporter = getProperty(PROP_REPORTER_CLASS, "").let {
-            if (it.isEmpty()) null
-            else Class.forName(it).getConstructor().newInstance() as JPutReporter
+        getProperty(PROP_REPORTER_CLASS, "").let {
+            if (it.isNotEmpty()) {
+                resultReporters.add(Class.forName(it).getConstructor().newInstance() as JPutReporter)
+            }
         }
 
         initECSRecorder()

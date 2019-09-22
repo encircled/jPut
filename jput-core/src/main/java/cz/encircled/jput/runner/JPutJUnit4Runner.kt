@@ -21,7 +21,7 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
             super.run(notifier)
         } finally {
             context.destroy()
-            context.resultReporter?.afterClass(clazz)
+            context.resultReporters.forEach { it.afterClass(clazz) }
         }
     }
 

@@ -50,7 +50,7 @@ class Junit4TestRunnerTest : ShortcutsForTests {
     fun z_verify() {
         assertEquals(4, testCounter)
         assertFalse(ignoredTestCalled)
-        val reporter = context.resultReporter
+        val reporter = context.resultReporters[0]
         assertTrue(reporter is TestReporter)
 
         // AfterClass is not called yet... TODO

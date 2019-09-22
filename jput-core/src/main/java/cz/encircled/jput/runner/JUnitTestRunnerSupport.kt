@@ -15,7 +15,7 @@ class JUnitTestRunnerSupport(private val clazz: Class<*>) {
 
     fun prepareRunner(runner: ParentRunner<*>) {
         context.init()
-        context.resultReporter?.beforeClass(clazz)
+        context.resultReporters.forEach { it.beforeClass(clazz) }
 
         // TODO should be extracted as a separate config class later
         val suite = clazz.getAnnotation(PerformanceSuite::class.java)
