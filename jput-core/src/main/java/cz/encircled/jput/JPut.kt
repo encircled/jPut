@@ -9,9 +9,7 @@ import java.lang.reflect.Method
 /**
  * TODO list:
  * - Return result from junit test to store response status code etc
- * - Console reporter?
  * - markPerformanceTestFinish?
- * - Load test? 1000 req/s
  * - Delete old entries
  * - Flat map elapsed times
  * - Timeout when max time is not set

@@ -4,7 +4,6 @@ import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.model.PerfTestResult
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
@@ -24,7 +23,7 @@ open class ThreadTestExecutor {
         context.testExecutions[execution.conf.testId] = execution
         performExecution(execution, statement)
 
-        execution.result = analyzeExecutionResults(execution, config)
+        execution.violations.addAll(analyzeExecutionResults(execution, config))
 
         writeResults(execution)
         context.resultReporters.forEach { it.afterTest(execution) }
@@ -32,7 +31,7 @@ open class ThreadTestExecutor {
         return execution
     }
 
-    private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): PerfTestResult {
+    private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): List<PerfConstraintViolation> {
         val result = mutableListOf<PerfConstraintViolation>()
         val unitViolations = context.unitPerformanceAnalyzer.analyzeUnitTrend(execution)
         result.addAll(unitViolations)
@@ -49,7 +48,7 @@ open class ThreadTestExecutor {
             }
         }
 
-        return PerfTestResult(result)
+        return result
     }
 
     private fun writeResults(execution: PerfTestExecution) {

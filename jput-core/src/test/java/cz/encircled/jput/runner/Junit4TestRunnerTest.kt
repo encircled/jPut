@@ -1,9 +1,8 @@
-package cz.encircled.jput.test.runner
+package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.context
-import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.test.ShortcutsForTests
-import cz.encircled.jput.test.TestReporter
+import cz.encircled.jput.ShortcutsForTests
+import cz.encircled.jput.TestReporter
 import cz.encircled.jput.unit.PerformanceTest
 import org.junit.FixMethodOrder
 import org.junit.Ignore

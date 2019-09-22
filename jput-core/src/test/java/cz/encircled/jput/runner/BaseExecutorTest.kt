@@ -1,12 +1,12 @@
-package cz.encircled.jput.test.runner
+package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.ThreadTestExecutor
-import cz.encircled.jput.test.MockRecorder
-import cz.encircled.jput.test.ShortcutsForTests
+import cz.encircled.jput.MockRecorder
+import cz.encircled.jput.ShortcutsForTests
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -34,7 +34,7 @@ class BaseExecutorTest : ShortcutsForTests {
             Thread.sleep(100)
         }
 
-        assertNotValid(PerfConstraintViolation.UNIT_MAX, result.result!!.violations)
+        assertNotValid(PerfConstraintViolation.UNIT_MAX, result.violations)
     }
 
     @Test
@@ -52,7 +52,7 @@ class BaseExecutorTest : ShortcutsForTests {
             Thread.sleep(40)
         }
 
-        assertNotValid(PerfConstraintViolation.TREND_AVG, result.result!!.violations)
+        assertNotValid(PerfConstraintViolation.TREND_AVG, result.violations)
     }
 
     @Test

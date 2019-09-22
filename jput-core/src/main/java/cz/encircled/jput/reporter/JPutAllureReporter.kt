@@ -43,9 +43,9 @@ open class JPutAllureReporter : JPutReporter {
 
     override fun afterTest(execution: PerfTestExecution) {
         lifecycle.updateStep(execution.conf.testId) {
-            if (execution.result!!.isError) {
+            if (execution.violations.isNotEmpty()) {
                 it.withStatus(Status.FAILED)
-                Allure.addAttachment("Validation error", execution.result!!.violations.joinToString { v ->
+                Allure.addAttachment("Validation error", execution.violations.joinToString { v ->
                     v.messageProducer.invoke(execution)
                 })
             } else {

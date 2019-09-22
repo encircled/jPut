@@ -1,8 +1,8 @@
-package cz.encircled.jput.test.reporter
+package cz.encircled.jput.reporter
 
 import cz.encircled.jput.reporter.JPutConsoleReporter
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.test.ShortcutsForTests
+import cz.encircled.jput.ShortcutsForTests
 import org.junit.runner.RunWith
 import kotlin.test.Test
 import kotlin.test.assertTrue

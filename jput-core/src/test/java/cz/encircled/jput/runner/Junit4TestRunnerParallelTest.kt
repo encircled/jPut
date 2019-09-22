@@ -1,6 +1,5 @@
-package cz.encircled.jput.test.runner
+package cz.encircled.jput.runner
 
-import cz.encircled.jput.runner.JPutJUnit4Runner
 import cz.encircled.jput.unit.PerformanceSuite
 import org.junit.FixMethodOrder
 import org.junit.runner.RunWith

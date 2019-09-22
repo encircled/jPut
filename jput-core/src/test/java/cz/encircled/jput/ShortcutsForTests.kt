@@ -1,4 +1,4 @@
-package cz.encircled.jput.test
+package cz.encircled.jput
 
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.*

@@ -1,8 +1,8 @@
 package cz.encircled.jput.reactive
 
-import cz.encircled.jput.context.JPutContext
-import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfTestConfiguration
+import cz.encircled.jput.runner.JPutJUnit4Runner
+import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.time.Duration
@@ -16,6 +16,7 @@ import kotlin.test.assertTrue
 /**
  * @author Vlad on 21-Sep-19.
  */
+@RunWith(JPutJUnit4Runner::class)
 class ReactiveTestExecutorTest {
 
     private var increment = AtomicInteger(1)
@@ -27,10 +28,6 @@ class ReactiveTestExecutorTest {
     @BeforeTest
     fun before() {
         increment.set(1)
-
-        context = JPutContext()
-        context.init()
-        context.currentSuite = this::class.java
     }
 
     @Test(expected = RuntimeException::class)
@@ -43,8 +40,6 @@ class ReactiveTestExecutorTest {
 
     @Test(expected = IllegalStateException::class)
     fun testReactiveBodyNotSet() {
-        context = JPutContext()
-        context.init()
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBlock", isReactive = true)

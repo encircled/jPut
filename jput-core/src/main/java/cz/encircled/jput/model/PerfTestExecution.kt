@@ -4,14 +4,14 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
 data class ExecutionRepeat(
-
         val execution: PerfTestExecution? = null,
         var startTime: Long,
-        var elapsedTime: Long = 0L
+        var elapsedTime: Long = 0L,
+        var resultCode: Int? = null,
+        var error: Throwable? = null) {
 
-
-) {
     override fun toString(): String = "startTime: $startTime, elapsed: $elapsedTime"
+
 }
 
 /**
@@ -32,14 +32,14 @@ data class PerfTestExecution(
         val executionParams: MutableMap<String, Any>,
 
         /**
-         * List of result execution times in ms
+         * Repeat number to its execution
          */
         val executionResult: MutableMap<Long, ExecutionRepeat> = ConcurrentHashMap(32),
 
         /**
          * Validation result is set after executions
          */
-        var result: PerfTestResult? = null
+        val violations: MutableList<PerfConstraintViolation> = mutableListOf()
 
 ) {
 

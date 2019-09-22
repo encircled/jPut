@@ -1,4 +1,4 @@
-package cz.encircled.jput.test.recorder
+package cz.encircled.jput.recorder
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -13,7 +13,7 @@ import cz.encircled.jput.context.context
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
-import cz.encircled.jput.test.ShortcutsForTests
+import cz.encircled.jput.ShortcutsForTests
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.junit.AfterClass

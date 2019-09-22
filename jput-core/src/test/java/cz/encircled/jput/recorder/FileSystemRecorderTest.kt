@@ -1,10 +1,10 @@
-package cz.encircled.jput.test.recorder
+package cz.encircled.jput.recorder
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.test.ShortcutsForTests
+import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
 import java.io.File

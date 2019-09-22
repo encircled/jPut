@@ -1,4 +1,4 @@
-package cz.encircled.jput.test.config
+package cz.encircled.jput.config
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context

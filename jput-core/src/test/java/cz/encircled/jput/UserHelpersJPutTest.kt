@@ -1,6 +1,5 @@
-package cz.encircled.jput.test
+package cz.encircled.jput
 
-import cz.encircled.jput.JPut
 import cz.encircled.jput.context.context
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
