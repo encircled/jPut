@@ -41,7 +41,7 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
     }
 
     private fun toFileFormat(execution: PerfTestExecution): String {
-        val array = execution.executionResult.joinToString(",")
+        val array = execution.getElapsedTimes().joinToString(",")
         return arrayOf(execution.executionParams["id"], array, execution.conf.testId).joinToString(";")
     }
 

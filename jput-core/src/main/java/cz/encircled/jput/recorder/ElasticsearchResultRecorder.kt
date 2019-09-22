@@ -65,7 +65,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
             val jsonMap = mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.conf.testId,
-                    "times" to it.executionResult,
+                    "times" to it.getElapsedTimes(),
                     "@timestamp" to Date()
             )
 

@@ -2,18 +2,23 @@ package cz.encircled.jput
 
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfTestConfiguration
+import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
 /**
  * TODO list:
- * - Allure support?
+ * - Return result from junit test to store response status code etc
+ * - Console reporter?
+ * - markPerformanceTestFinish?
  * - Load test? 1000 req/s
  * - Delete old entries
+ * - Flat map elapsed times
+ * - Timeout when max time is not set
  *
  * Helper functions for JPut users to control the perf tests execution
  *
- * @author encir on 15-Sep-19.
+ * @author Vlad on 15-Sep-19.
  */
 object JPut {
 
@@ -38,19 +43,27 @@ object JPut {
      * ```
      */
     fun markPerformanceTestStart() {
-        val caller = Thread.currentThread().stackTrace[2]
+        val (caller, execution) = getCurrentExecution()
+
+        if (execution == null) {
+            log.warn("[$caller] is not a JPut test, ignoring [markPerformanceTestStart]")
+        } else {
+            execution.resetCurrentExecutionStartTime()
+        }
+    }
+
+    fun getCurrentExecution(): Pair<StackTraceElement, PerfTestExecution?> {
+        val caller = Thread.currentThread().stackTrace.first {
+            it.className == context.currentSuite!!.name
+        }
         val defaultTestId = PerfTestConfiguration.defaultTestId(toMethod(caller))
 
         val testId = context.customTestIds[defaultTestId] ?: defaultTestId
         val execution = context.testExecutions[testId]
-        if (execution == null) {
-            log.warn("[$caller] is not a JPut test, ignoring [markPerformanceTestStart]")
-        } else {
-            execution.startNextExecution()
-        }
+        return Pair(caller, execution)
     }
 
-    private fun toMethod(element: StackTraceElement): Method =
+    fun toMethod(element: StackTraceElement): Method =
             Class.forName(element.className).getDeclaredMethod(element.methodName)
 
 }

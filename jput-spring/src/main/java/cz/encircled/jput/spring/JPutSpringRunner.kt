@@ -3,6 +3,8 @@ package cz.encircled.jput.spring
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.PropertySource
 import cz.encircled.jput.context.context
+import cz.encircled.jput.runner.JUnitTestRunnerSupport
+import cz.encircled.jput.runner.Junit4TestExecutor
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
@@ -25,6 +27,8 @@ class JPutSpringRunner
 @Throws(InitializationError::class)
 constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
+    val executor = Junit4TestExecutor()
+
     val log = LoggerFactory.getLogger(JPutSpringRunner::class.java)
 
     override fun run(notifier: RunNotifier) {
@@ -34,8 +38,9 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
                 return testContextManager.testContext.applicationContext.environment.getProperty(key)
             }
         })
-        context.init()
-        context.resultReporter?.beforeClass(clazz)
+
+        JUnitTestRunnerSupport(clazz).prepareRunner(this)
+
         try {
             super.run(notifier)
         } finally {
@@ -50,7 +55,7 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
         if (isTestMethodIgnored(method)) {
             notifier.fireTestIgnored(description)
         } else {
-            context.junit4TestExecutor.executeTest(method, notifier, description, methodBlock(method))
+            executor.executeTest(method, notifier, description, methodBlock(method))
         }
     }
 

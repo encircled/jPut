@@ -1,10 +1,7 @@
 package cz.encircled.jput.test
 
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.PerfConstraintViolation
-import cz.encircled.jput.model.PerfTestConfiguration
-import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.model.TrendTestConfiguration
+import cz.encircled.jput.model.*
 import kotlin.test.assertTrue
 
 interface ShortcutsForTests {
@@ -28,14 +25,16 @@ interface ShortcutsForTests {
     }
 
     fun getTestExecution(config: PerfTestConfiguration, vararg times: Long): PerfTestExecution {
-        return PerfTestExecution(config, mutableMapOf("id" to context.executionId), times.toMutableList())
+        val repeats = times.mapIndexed { i, time -> i.toLong() to ExecutionRepeat(null, System.nanoTime(), time) }
+                .toMap().toMutableMap()
+
+        return PerfTestExecution(config, mutableMapOf("id" to context.executionId), repeats)
     }
 
     fun baseConfig() = configWithTrend(null)
 
     fun configWithTrend(trendTestConfiguration: TrendTestConfiguration?): PerfTestConfiguration =
-            PerfTestConfiguration("1", 0, 1, 10, 300, 300, 1,
-                    trendTestConfiguration)
+            PerfTestConfiguration("1", maxTimeLimit = 300, avgTimeLimit = 300, trendConfiguration = trendTestConfiguration)
 
     fun assertNotValid(expected: PerfConstraintViolation, violations: List<PerfConstraintViolation>) {
         assertTrue(violations.contains(expected), "Expected to be $expected, actual is $violations")

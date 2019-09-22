@@ -48,6 +48,8 @@ annotation class PerformanceTest(
          */
         val threads: Int = 1,
 
+        val isReactive: Boolean = false,
+
         /**
          * Performance trend analyzing
          */

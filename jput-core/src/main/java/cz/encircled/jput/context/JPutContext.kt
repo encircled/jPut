@@ -6,7 +6,6 @@ import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
 import cz.encircled.jput.reporter.JPutReporter
-import cz.encircled.jput.runner.Junit4TestExecutor
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer
@@ -54,14 +53,21 @@ class JPutContext {
 
     lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
     lateinit var trendAnalyzer: TrendAnalyzer
-    lateinit var junit4TestExecutor: Junit4TestExecutor
+
+    /**
+     * Currently running suite class, should be set by Runner
+     */
+    var currentSuite: Class<*>? = null
+
+    /**
+     * Support multiple
+     */
     var resultReporter: JPutReporter? = null
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
         trendAnalyzer = SampleBasedTrendAnalyzer()
-        junit4TestExecutor = Junit4TestExecutor()
 
         resultReporter = getProperty(PROP_REPORTER_CLASS, "").let {
             if (it.isEmpty()) null

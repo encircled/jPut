@@ -54,6 +54,6 @@ class SampleBasedTrendAnalyzer : TrendAnalyzer {
     }
 
     fun collectRuns(sample: Collection<PerfTestExecution>): List<Long> =
-            sample.map { it.executionResult }.flatten()
+            sample.map { it.getElapsedTimes() }.flatten()
 
 }

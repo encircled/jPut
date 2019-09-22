@@ -1,35 +1,35 @@
 package cz.encircled.jput.test
 
 import cz.encircled.jput.JPut
-import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import cz.encircled.jput.runner.JPutJUnit4Runner
+import org.junit.runner.RunWith
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
  * @author Vlad on 15-Sep-19.
  */
+@RunWith(JPutJUnit4Runner::class)
 class UserHelpersJPutTest : ShortcutsForTests {
 
     @Test
     fun testMarkPerformanceTestStart() {
-        context = JPutContext()
-        context.init()
-
         val execution = getTestExecution(baseConfig())
-        val originalStartTime = execution.startNextExecution()
+        val originalStartTime = execution.startNextExecution().startTime
 
         context.testExecutions["UserHelpersJPutTest#testMarkPerformanceTestStart"] = execution
         JPut.markPerformanceTestStart()
 
-        assertTrue(execution.currentExecutionStart > originalStartTime)
+        assertEquals(1, execution.executionResult.size)
+
+        val repeat = execution.executionResult.values.toList()[0]
+        assertTrue(repeat.startTime > originalStartTime)
     }
 
     @Test
     fun testMarkPerformanceTestStartWithCustomTestId() {
-        context = JPutContext()
-        context.init()
-
         val execution = getTestExecution(baseConfig())
         val originalStartTime = execution.startNextExecution()
 
@@ -37,7 +37,8 @@ class UserHelpersJPutTest : ShortcutsForTests {
         context.testExecutions["customId"] = execution
         JPut.markPerformanceTestStart()
 
-        assertTrue(execution.currentExecutionStart > originalStartTime)
+        // TODO
+//        assertTrue(execution.currentExecutionStart.get() > originalStartTime)
     }
 
     /**
@@ -45,9 +46,6 @@ class UserHelpersJPutTest : ShortcutsForTests {
      */
     @Test
     fun testMarkPerformanceTestStartFromOutside() {
-        context = JPutContext()
-        context.init()
-
         // should not fail
         JPut.markPerformanceTestStart()
     }

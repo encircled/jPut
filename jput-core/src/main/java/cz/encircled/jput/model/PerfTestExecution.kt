@@ -1,7 +1,18 @@
 package cz.encircled.jput.model
 
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
+data class ExecutionRepeat(
+
+        val execution: PerfTestExecution? = null,
+        var startTime: Long,
+        var elapsedTime: Long = 0L
+
+
+) {
+    override fun toString(): String = "startTime: $startTime, elapsed: $elapsedTime"
+}
 
 /**
  * Represents the execution state of a particular performance test
@@ -23,7 +34,7 @@ data class PerfTestExecution(
         /**
          * List of result execution times in ms
          */
-        val executionResult: MutableList<Long> = mutableListOf(),
+        val executionResult: MutableMap<Long, ExecutionRepeat> = ConcurrentHashMap(32),
 
         /**
          * Validation result is set after executions
@@ -35,25 +46,35 @@ data class PerfTestExecution(
     /**
      * Holds start time of current execution
      */
-    var currentExecutionStart : Long = 0L
-        private set
+
+    private var currentRepeatNum: ThreadLocal<Long> = ThreadLocal.withInitial { 1L }
 
     val executionAvg: Long by lazy {
-        executionResult.average().roundToLong()
+        getElapsedTimes().average().roundToLong()
     }
 
-    val executionMax: Long by lazy { executionResult.max()!! }
+    val executionMax: Long by lazy { getElapsedTimes().max()!! }
+
+    fun getElapsedTimes() = executionResult.values.map { it.elapsedTime }
 
     /**
      * Starts new execution, returns start time (nanoseconds)
      */
-    fun startNextExecution(): Long {
-        currentExecutionStart = System.nanoTime()
-        return currentExecutionStart
+    fun startNextExecution(): ExecutionRepeat {
+        val actual = currentRepeatNum.get()
+        val repeat = ExecutionRepeat(this, System.nanoTime())
+        executionResult[actual] = repeat
+        currentRepeatNum.set(actual.plus(1))
+        return repeat
+    }
+
+    fun resetCurrentExecutionStartTime() {
+        executionResult[currentRepeatNum.get() - 1]!!.startTime = System.nanoTime()
     }
 
     fun finishExecution() {
-        executionResult.add((System.nanoTime() - currentExecutionStart) / 1000000L)
+        val repeat = executionResult[currentRepeatNum.get() - 1]!!
+        repeat.elapsedTime = (System.nanoTime() - repeat.startTime) / 1000000L
     }
 
 }

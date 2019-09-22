@@ -12,15 +12,16 @@ import java.util.concurrent.Executors
 /**
  * Executes particular piece of code (junit test, or any other function) and runs performance and trend assertions.
  */
-open class BaseTestExecutor {
+open class ThreadTestExecutor {
 
-    private val log = LoggerFactory.getLogger(BaseTestExecutor::class.java)
+    private val log = LoggerFactory.getLogger(ThreadTestExecutor::class.java)
 
     fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId))
 
         context.resultReporter?.beforeTest(execution)
 
+        context.testExecutions[execution.conf.testId] = execution
         performExecution(execution, statement)
 
         execution.result = analyzeExecutionResults(execution, config)
@@ -57,10 +58,8 @@ open class BaseTestExecutor {
         }
     }
 
-    private fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
-        context.testExecutions[execution.conf.testId] = execution
-
-        val executor = Executors.newFixedThreadPool(execution.conf.threads)
+    open fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
+        val executor = Executors.newFixedThreadPool(execution.conf.parallelCount)
 
         (1..execution.conf.warmUp).map {
             executor.submit(statement)

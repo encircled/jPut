@@ -62,6 +62,18 @@ public void myUnitAndTrendTest() {
 }
 ```
 
+## Tests result reporter
+
+JPut provides support Allure reports. In order to enable it set property `jput.reporter.classes=cz.encircled.jput.reporter.JPutAllureReporter`.
+You can have a custom reporter by implementing an interface `JPutReporter` and setting property `jput.reporter.classes=my.custom.Reporter`.
+
 ## Spring integration
 
 Spring module provides JUnit 4 runner `@RunWith(JPutSpringRunner.class)`
+
+## JPut vs JMeter
+
+- Simple integration with existing CI pipelines thanks to using junit
+- Test implementation flexibility. You can use any jvm language and you are not limited in how to prepare test data / execute test / assert results. All in the code.
+- Re-use already existing code for your test data generation and validation
+- Out of the box support for performance trend analysis

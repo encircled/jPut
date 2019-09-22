@@ -20,29 +20,34 @@ data class PerfTestConfiguration(
         /**
          * Count of warm up test executions
          */
-        val warmUp: Int,
+        val warmUp: Int = 0,
 
         /**
          * Test execution repeats count
          */
-        val repeats: Int,
+        val repeats: Int = 1,
 
         /**
          * Delay between test repeats, in ms
          */
-        val delay: Long,
+        val delay: Long = 0L,
 
         /**
          * Upper limit for test execution time in milliseconds
          */
-        val maxTimeLimit: Long,
+        val maxTimeLimit: Long = 0L,
 
         /**
          * Upper limit for average execution time when using **repeats > 1**, in milliseconds
          */
-        val avgTimeLimit: Long,
+        val avgTimeLimit: Long = 0L,
 
-        val threads: Int,
+        /**
+         * Count of maximum parallel executions (e.g. java threads in case of base executor or coroutines/reactive executions)
+         */
+        val parallelCount: Int = 1,
+
+        val isReactive: Boolean = false,
 
         /**
          * Performance trend analyzing
@@ -93,7 +98,7 @@ data class PerfTestConfiguration(
             }
 
             val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
-                    conf.maxTimeLimit, conf.averageTimeLimit, conf.threads, trendConfig)
+                    conf.maxTimeLimit, conf.averageTimeLimit, conf.threads, conf.isReactive, trendConfig)
 
             /*TODO val percentiles = conf.percentiles
             check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }
