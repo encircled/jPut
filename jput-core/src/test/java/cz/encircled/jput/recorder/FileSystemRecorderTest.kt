@@ -1,10 +1,9 @@
 package cz.encircled.jput.recorder
 
+import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
 import java.io.File
@@ -52,8 +51,7 @@ class FileSystemRecorderTest : ShortcutsForTests {
     }
 
     @Test
-    fun testUserDefinedEnvParams() {
-        System.setProperty(JPutContext.PROP_ENV_PARAMS, "test1:1,test2:abc")
+    fun testUserDefinedEnvParams() = testWithProps(JPutContext.PROP_ENV_PARAMS to "test1:1,test2:abc") {
         val (_, writer) = getWriter()
 
         assertEquals(mapOf(

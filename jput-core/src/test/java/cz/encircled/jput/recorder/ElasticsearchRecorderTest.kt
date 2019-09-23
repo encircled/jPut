@@ -63,7 +63,7 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
     }
 
     @Test
-    fun testAddingEntries() {
+    fun testAddingEntries() = testWithProps(JPutContext.PROP_ENV_PARAMS to "test1:1,test2:abc") {
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
         val ecs = ElasticsearchResultRecorder(client)
 
@@ -81,9 +81,9 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         // TODO test user params
 
         val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":321}\n" +
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
                 "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":4321}\n"
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
 
         wireMockServer.verify(postRequestedFor(urlEqualTo("/_bulk?timeout=1m"))
                 .withRequestBody(equalTo(expected)))

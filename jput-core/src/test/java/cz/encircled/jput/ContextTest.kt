@@ -16,19 +16,16 @@ class ContextTest : ShortcutsForTests {
     }
 
     @Test
-    fun testGetProperty() {
-        System.setProperty("testGetProperty", "true")
-
+    fun testGetProperty() = testWithProps("getProp" to "true", "collectionProp" to "1,2") {
         context = JPutContext()
-        assertEquals("true", getProperty("testGetProperty", "def"))
-        assertEquals("def", getProperty("testGetProperty2", "def"))
+        assertEquals("true", getProperty("getProp", "def"))
+        assertEquals("def", getProperty("getProp2", "def"))
 
-        assertEquals(true, getProperty("testGetProperty", false))
-        assertEquals(false, getProperty("testGetProperty2", false))
+        assertEquals(true, getProperty("getProp", false))
+        assertEquals(false, getProperty("getProp2", false))
 
-        System.setProperty("testGetProperty", "true,false")
-        assertEquals(listOf("true", "false"), getCollectionProperty("testGetProperty", listOf("true")))
-        assertEquals(listOf("true"), getCollectionProperty("testGetProperty2", listOf("true")))
+        assertEquals(listOf("1", "2"), getCollectionProperty("collectionProp", listOf("true")))
+        assertEquals(listOf("true"), getCollectionProperty("collectionProp2", listOf("true")))
     }
 
     @Test(expected = IllegalStateException::class)
