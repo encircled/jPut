@@ -9,6 +9,7 @@ import io.qameta.allure.model.StepResult
 import io.qameta.allure.model.TestResult
 import io.qameta.allure.util.ResultsUtils
 
+// TODO ID of class must be different from IDs of tests
 open class JPutAllureReporter : JPutReporter {
 
     private val lifecycle: AllureLifecycle = Allure.getLifecycle()
@@ -51,7 +52,7 @@ open class JPutAllureReporter : JPutReporter {
             } else {
                 it.withStatus(Status.PASSED)
             }
-            val metrics = "avg ${execution.executionAvg}ms, max ${execution.executionMax}ms, " +
+            val metrics = "avg: ${execution.executionAvg}ms, max: ${execution.executionMax}ms, " +
                     "50%: ${execution.executionPercentile(0.5)}ms, " +
                     "90%: ${execution.executionPercentile(0.9)}ms, " +
                     "95%: ${execution.executionPercentile(0.95)}ms, " +

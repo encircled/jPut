@@ -78,8 +78,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         ecs.appendTrendResult(execution)
         ecs.flush()
 
-        // TODO test user params
-
         val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
                 "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
                 "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
