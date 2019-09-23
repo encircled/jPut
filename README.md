@@ -73,6 +73,7 @@ Spring module provides JUnit 4 runner `@RunWith(JPutSpringRunner.class)`
 
 ## JPut vs JMeter
 
+- Create huge load from just one machine with Reactive test executor
 - Simple integration with existing CI pipelines thanks to using junit
 - Test implementation flexibility. You can use any jvm language and you are not limited in how to prepare test data / execute test / assert results. All in the code.
 - Re-use already existing code for your test data generation and validation
