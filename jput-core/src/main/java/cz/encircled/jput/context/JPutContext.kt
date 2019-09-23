@@ -5,6 +5,7 @@ import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
+import cz.encircled.jput.reporter.JPutConsoleReporter
 import cz.encircled.jput.reporter.JPutReporter
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
@@ -59,7 +60,7 @@ class JPutContext {
      */
     var currentSuite: Class<*>? = null
 
-    var resultReporters = mutableListOf<JPutReporter>()
+    var resultReporters = mutableListOf<JPutReporter>(JPutConsoleReporter())
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
@@ -115,8 +116,8 @@ class JPutContext {
         }
     }
 
-    fun addPropertySource(source: PropertySource) {
-        propertySources.add(source)
+    fun addPropertySource(source: PropertySource, index: Int = 0) {
+        propertySources.add(index, source)
     }
 
     companion object {

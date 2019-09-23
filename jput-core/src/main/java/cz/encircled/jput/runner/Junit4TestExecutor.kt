@@ -18,8 +18,18 @@ import org.junit.runners.model.Statement
  */
 class Junit4TestExecutor {
 
-    // TODO pick executor
-    val executor: ThreadTestExecutor = ThreadTestExecutor()
+
+    var executor: ThreadTestExecutor = ThreadTestExecutor()
+
+    init {
+        // TODO pick executor in a better way?
+        try {
+            val reactive = Class.forName("cz.encircled.jput.reactive.ReactiveTestExecutor")
+            executor = reactive.getConstructor().newInstance() as ThreadTestExecutor
+        } catch (e: ClassNotFoundException) {
+            // OK
+        }
+    }
 
     fun executeTest(method: FrameworkMethod, notifier: RunNotifier, description: Description, statement: Statement) {
         val eachNotifier = EachTestNotifier(notifier, description)

@@ -1,14 +1,23 @@
 {
-  "_index": "pif-2019.09.13",
-  "_type": "flb_type",
-  "_id": "fnvfOG0BK5rZMZ6I7ZRc",
-  "_version": 1,
-  "result": "created",
-  "_shards": {
-    "total": 1,
-    "successful": 1,
-    "failed": 0
-  },
-  "_seq_no": 0,
-  "_primary_term": 1
+  "took": 30,
+  "errors": false,
+  "items": [
+    {
+      "index": {
+        "_index": "jput",
+        "_type": "_doc",
+        "_id": "1",
+        "_version": 1,
+        "result": "created",
+        "_shards": {
+          "total": 1,
+          "successful": 1,
+          "failed": 0
+        },
+        "status": 201,
+        "_seq_no": 0,
+        "_primary_term": 1
+      }
+    }
+  ]
 }

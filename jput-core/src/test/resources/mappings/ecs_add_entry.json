@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPattern": "/jput/jput.*"
+    "urlPattern": "/_bulk.*"
   },
   "response": {
     "status": 200,

@@ -12,8 +12,8 @@ import org.elasticsearch.client.Requests
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.rest.RestStatus
 import org.elasticsearch.search.builder.SearchSourceBuilder
+import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
-import java.util.*
 
 /**
  * Elasticsearch-based implementation of tests execution results recorder
@@ -47,11 +47,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
         val sample = subList(searchResponse.hits.hits.toList(), conf.sampleSize, conf.sampleSelectionStrategy)
 
         return sample
-                .map {
-                    val times = it.sourceAsMap["times"]
-                    times as List<*>
-                }
-                .flatten()
+                .map { it.sourceAsMap["elapsed"] }
                 .map {
                     if (it is Int) it.toLong()
                     else it as Long
@@ -59,26 +55,34 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
     }
 
     override fun doFlush(data: List<PerfTestExecution>) {
-        log.info("Do flush to Elasticsearch: $data")
+        log.info("Flush to Elasticsearch: ${data.size} test results")
 
-        data.forEach {
-            val jsonMap = mutableMapOf(
-                    "executionId" to context.executionId,
-                    "testId" to it.conf.testId,
-                    "times" to it.getElapsedTimes(),
-                    "@timestamp" to Date()
-            )
+        val bulk = Requests.bulkRequest()
+        val userDefined = getUserDefinedEnvParams()
 
-            jsonMap.putAll(getUserDefinedEnvParams())
+        data.flatMap(::convertToECSDocument).forEach {
+            it.putAll(userDefined)
 
-            val indexRequest = Requests.indexRequest(indexName)
+            bulk.add(Requests.indexRequest(indexName)
                     .type("jput")
-                    .source(jsonMap)
-
-            client.index(indexRequest, RequestOptions.DEFAULT)
+                    .source(it))
         }
 
-        log.info("Flush to Elasticsearch done")
+        client.bulk(bulk, RequestOptions.DEFAULT)
+
+        log.info("Successfully flushed to Elasticsearch")
+    }
+
+    private fun convertToECSDocument(it: PerfTestExecution): List<MutableMap<String, Any>> {
+        DateTime(1L)
+        return it.executionResult.values.map { repeat ->
+            mutableMapOf(
+                    "executionId" to context.executionId,
+                    "testId" to it.conf.testId,
+                    "start" to DateTime((repeat.startTime / 1000000)).toString(),
+                    "elapsed" to repeat.elapsedTime
+            )
+        }
     }
 
     override fun destroy() {

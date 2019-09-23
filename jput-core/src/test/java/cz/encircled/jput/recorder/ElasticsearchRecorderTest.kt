@@ -1,23 +1,25 @@
 package cz.encircled.jput.recorder
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.matching.RegexPattern
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import com.github.tomakehurst.wiremock.matching.UrlPattern
+import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.ExecutionRepeat
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.recorder.ElasticsearchClientWrapper
-import cz.encircled.jput.recorder.ElasticsearchResultRecorder
-import cz.encircled.jput.ShortcutsForTests
+import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
+import org.joda.time.DateTime
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import org.junit.runner.RunWith
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,6 +28,7 @@ import kotlin.test.assertTrue
 /**
  * @author Vlad on 15-Sep-19.
  */
+@RunWith(JPutJUnit4Runner::class)
 open class ElasticsearchRecorderTest : ShortcutsForTests {
 
     @AfterTest
@@ -35,9 +38,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
 
     @Test
     fun testGetSample() {
-        context = JPutContext()
-        context.init()
-
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
         val ecs = ElasticsearchResultRecorder(client)
 
@@ -51,9 +51,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
 
     @Test
     fun testGetSampleWhenIndexNotExist() = testWithProps(JPutContext.PROP_ELASTIC_INDEX to "new") {
-        context = JPutContext()
-        context.init()
-
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
         val ecs = ElasticsearchResultRecorder(client)
 
@@ -67,9 +64,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
 
     @Test
     fun testAddingEntries() {
-        context = JPutContext()
-        context.init()
-
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
         val ecs = ElasticsearchResultRecorder(client)
 
@@ -77,12 +71,23 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
                 sampleSize = 5
         )))
 
-        execution.startNextExecution()
-        execution.finishExecution()
+        val nowMs = System.nanoTime()
+        val now = DateTime(nowMs / 1000000L).toString()
+
+        execution.executionResult[1] = ExecutionRepeat(execution, nowMs, 321L)
+        execution.executionResult[2] = ExecutionRepeat(execution, nowMs, 4321L)
         ecs.appendTrendResult(execution)
         ecs.flush()
 
-        wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/jput.*"), true)))
+        // TODO test user params
+
+        val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":321}\n" +
+                "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":4321}\n"
+
+        wireMockServer.verify(postRequestedFor(urlEqualTo("/_bulk?timeout=1m"))
+                .withRequestBody(equalTo(expected)))
     }
 
     @Test
@@ -105,7 +110,7 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         @JvmStatic
         fun beforeClass() {
             wireMockServer.start()
-            WireMock.configureFor(port)
+            configureFor(port)
         }
 
         @AfterClass

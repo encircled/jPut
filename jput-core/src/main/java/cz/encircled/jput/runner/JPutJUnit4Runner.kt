@@ -11,7 +11,7 @@ import org.junit.runners.model.FrameworkMethod
  */
 class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
 
-    val executor = Junit4TestExecutor()
+    var executor = Junit4TestExecutor()
 
     override fun run(notifier: RunNotifier?) {
         context = JPutContext()

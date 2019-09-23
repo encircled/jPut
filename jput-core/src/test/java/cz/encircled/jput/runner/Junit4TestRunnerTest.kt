@@ -1,8 +1,8 @@
 package cz.encircled.jput.runner
 
-import cz.encircled.jput.context.context
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.TestReporter
+import cz.encircled.jput.context.context
 import cz.encircled.jput.unit.PerformanceTest
 import org.junit.FixMethodOrder
 import org.junit.Ignore
@@ -49,7 +49,7 @@ class Junit4TestRunnerTest : ShortcutsForTests {
     fun z_verify() {
         assertEquals(4, testCounter)
         assertFalse(ignoredTestCalled)
-        val reporter = context.resultReporters[0]
+        val reporter = context.resultReporters[1]
         assertTrue(reporter is TestReporter)
 
         // AfterClass is not called yet... TODO

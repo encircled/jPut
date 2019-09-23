@@ -1,5 +1,6 @@
 package cz.encircled.jput.model
 
+import cz.encircled.jput.percentile
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
@@ -54,6 +55,9 @@ data class PerfTestExecution(
     }
 
     val executionMax: Long by lazy { getElapsedTimes().max()!! }
+
+    fun executionPercentile(rank: Double): Long =
+            getElapsedTimes().percentile(rank).max()!!
 
     fun getElapsedTimes() = executionResult.values.map { it.elapsedTime }
 

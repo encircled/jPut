@@ -22,9 +22,8 @@
         "_source": {
           "executionId": "15.09.19 06:53",
           "testId": "1",
-          "times": [
-            95
-          ],
+          "start": "123",
+          "elapsed": 95,
           "@timestamp": "2019-09-15T16:53:16.840Z"
         }
       },
@@ -36,9 +35,8 @@
         "_source": {
           "executionId": "15.09.19 06:53",
           "testId": "1",
-          "times": [
-            105
-          ],
+          "start": "1234",
+          "elapsed": 105,
           "@timestamp": "2019-09-15T16:53:44.874Z"
         }
       }

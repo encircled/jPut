@@ -51,7 +51,12 @@ open class JPutAllureReporter : JPutReporter {
             } else {
                 it.withStatus(Status.PASSED)
             }
-            Allure.addAttachment("Execution times", "avg ${execution.executionAvg}ms, max ${execution.executionMax}ms")
+            val metrics = "avg ${execution.executionAvg}ms, max ${execution.executionMax}ms, " +
+                    "50%: ${execution.executionPercentile(0.5)}ms, " +
+                    "90%: ${execution.executionPercentile(0.9)}ms, " +
+                    "95%: ${execution.executionPercentile(0.95)}ms, " +
+                    "99%: ${execution.executionPercentile(0.99)}ms"
+            Allure.addAttachment("Execution times", metrics)
         }
         lifecycle.stopStep(execution.conf.testId)
     }
