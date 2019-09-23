@@ -4,7 +4,6 @@ import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.runner.ThreadTestExecutor
 import cz.encircled.jput.MockRecorder
 import cz.encircled.jput.ShortcutsForTests
 import kotlin.test.AfterTest
@@ -30,7 +29,7 @@ class BaseExecutorTest : ShortcutsForTests {
 
     @Test
     fun testUnitAnalyzerIsRun() {
-        val result = ThreadTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
+        val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
             Thread.sleep(100)
         }
 
@@ -48,7 +47,7 @@ class BaseExecutorTest : ShortcutsForTests {
                 averageTimeThreshold = 5.0
         ))
 
-        val result = ThreadTestExecutor().executeTest(config) {
+        val result = ThreadBasedTestExecutor().executeTest(config) {
             Thread.sleep(40)
         }
 
@@ -60,7 +59,7 @@ class BaseExecutorTest : ShortcutsForTests {
         val recorder = MockRecorder()
         context.resultRecorders.add(recorder)
 
-        ThreadTestExecutor().executeTest(baseConfig().copy(testId = "recorderTest")) {
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(testId = "recorderTest")) {
         }
 
         assertEquals(1, recorder.executions.size)

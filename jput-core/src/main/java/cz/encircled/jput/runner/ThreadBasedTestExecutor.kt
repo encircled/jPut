@@ -11,9 +11,9 @@ import java.util.concurrent.Executors
 /**
  * Executes particular piece of code (junit test, or any other function) and runs performance and trend assertions.
  */
-open class ThreadTestExecutor {
+open class ThreadBasedTestExecutor {
 
-    private val log = LoggerFactory.getLogger(ThreadTestExecutor::class.java)
+    private val log = LoggerFactory.getLogger(ThreadBasedTestExecutor::class.java)
 
     fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId))

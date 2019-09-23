@@ -2,6 +2,7 @@ package cz.encircled.jput.spring.test
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.context.JPutContext
+import cz.encircled.jput.context.context
 import cz.encircled.jput.spring.JPutSpringRunner
 import cz.encircled.jput.unit.PerformanceTest
 import org.junit.Test
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
+import kotlin.test.assertEquals
 
 
 /**
@@ -27,6 +29,11 @@ class SpringIntegrationTest {
         JPut.markPerformanceTestStart()
         Thread.sleep(4000)
         println("Hi there")
+    }
+
+    @Test
+    fun testCurrentSuiteIsSet() {
+        assertEquals(this::class.java, context.currentSuite)
     }
 
 }

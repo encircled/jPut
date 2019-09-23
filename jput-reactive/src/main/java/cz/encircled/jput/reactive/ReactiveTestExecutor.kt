@@ -2,7 +2,7 @@ package cz.encircled.jput.reactive
 
 import cz.encircled.jput.model.ExecutionRepeat
 import cz.encircled.jput.model.PerfTestExecution
-import cz.encircled.jput.runner.ThreadTestExecutor
+import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import java.util.concurrent.CountDownLatch
@@ -15,7 +15,7 @@ fun Mono<*>.jputTest() = JPutReactive.reactiveTestBody(this)
 /**
  * @author Vlad on 21-Sep-19.
  */
-class ReactiveTestExecutor : ThreadTestExecutor() {
+class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
     // TODO delay
     override fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
@@ -49,7 +49,7 @@ class ReactiveTestExecutor : ThreadTestExecutor() {
                             Pair(b, repeat)
                         }
                     }.doOnNext {
-                        it.second.elapsedTime = (System.nanoTime() - it.second.startTime) / 1000000
+                        it.second.elapsedTime = (System.nanoTime() - it.second.startTime) / 1000000L
                         countDown.countDown()
                     }.subscribe()
 

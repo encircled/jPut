@@ -1,14 +1,31 @@
 package cz.encircled.jput.model
 
 import cz.encircled.jput.percentile
+import org.joda.time.DateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
 data class ExecutionRepeat(
+
+        /**
+         * Parent execution
+         */
         val execution: PerfTestExecution? = null,
+
+        /**
+         * Start time in nanoseconds
+         */
         var startTime: Long,
+
+        /**
+         * Elapsed time in ms
+         */
         var elapsedTime: Long = 0L,
+
+        var startDate: DateTime = DateTime.now(),
+
         var resultCode: Int? = null,
+
         var error: Throwable? = null) {
 
     override fun toString(): String = "startTime: $startTime, elapsed: $elapsedTime"

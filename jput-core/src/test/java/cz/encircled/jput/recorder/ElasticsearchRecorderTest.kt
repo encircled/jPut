@@ -71,11 +71,10 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
                 sampleSize = 5
         )))
 
-        val nowMs = System.nanoTime()
-        val now = DateTime(nowMs / 1000000L).toString()
+        val now = DateTime.now()
 
-        execution.executionResult[1] = ExecutionRepeat(execution, nowMs, 321L)
-        execution.executionResult[2] = ExecutionRepeat(execution, nowMs, 4321L)
+        execution.executionResult[1] = ExecutionRepeat(execution, 0L, 321L, now)
+        execution.executionResult[2] = ExecutionRepeat(execution, 0L, 4321L, now)
         ecs.appendTrendResult(execution)
         ecs.flush()
 

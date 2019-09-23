@@ -79,7 +79,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
             mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.conf.testId,
-                    "start" to DateTime((repeat.startTime / 1000000)).toString(),
+                    "start" to repeat.startDate.toString(),
                     "elapsed" to repeat.elapsedTime
             )
         }
