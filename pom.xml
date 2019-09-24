@@ -5,7 +5,7 @@
     <groupId>cz.encircled</groupId>
     <artifactId>jput</artifactId>
     <packaging>pom</packaging>
-    <version>0.13-SNAPSHOT</version>
+    <version>0.13</version>
 
     <name>jPut</name>
     <description>Java Performance Unit Testing</description>
@@ -14,7 +14,7 @@
     <scm>
         <connection>scm:git:https://github.com/encircled/jPut.git</connection>
         <url>https://github.com/encircled/jPut.git</url>
-        <tag>HEAD</tag>
+        <tag>jput-0.13</tag>
     </scm>
 
     <licenses>
