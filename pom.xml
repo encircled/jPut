@@ -5,7 +5,7 @@
     <groupId>cz.encircled</groupId>
     <artifactId>jput</artifactId>
     <packaging>pom</packaging>
-    <version>0.13-SNAPSHOT</version>
+    <version>0.14-SNAPSHOT</version>
 
     <name>jPut</name>
     <description>Java Performance Unit Testing</description>
