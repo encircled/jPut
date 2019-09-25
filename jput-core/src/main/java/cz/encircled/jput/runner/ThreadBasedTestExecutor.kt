@@ -16,7 +16,7 @@ open class ThreadBasedTestExecutor {
     private val log = LoggerFactory.getLogger(ThreadBasedTestExecutor::class.java)
 
     fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
-        val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId))
+        val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), System.nanoTime())
 
         context.resultReporters.forEach { it.beforeTest(execution) }
 

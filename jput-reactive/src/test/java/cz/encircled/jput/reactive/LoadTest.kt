@@ -16,7 +16,7 @@ class LoadTest {
 
     private val client: WebClient = WebClient
             .builder()
-            .baseUrl("http://load.pif.test.eit.zone/")
+            .baseUrl("http://load.pif.test.eit.zone/api/customer")
             .build()
 
     companion object {

@@ -16,7 +16,6 @@ import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import org.joda.time.DateTime
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.runner.RunWith
@@ -71,17 +70,15 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
                 sampleSize = 5
         )))
 
-        val now = DateTime.now()
-
-        execution.executionResult[1] = ExecutionRepeat(execution, 0L, 321L, now)
-        execution.executionResult[2] = ExecutionRepeat(execution, 0L, 4321L, now)
+        execution.executionResult[1] = ExecutionRepeat(execution, 321000000L, 321L)
+        execution.executionResult[2] = ExecutionRepeat(execution, 4321000000L, 4321L)
         ecs.appendTrendResult(execution)
         ecs.flush()
 
         val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"0\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
                 "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"$now\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"0\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
 
         wireMockServer.verify(postRequestedFor(urlEqualTo("/_bulk?timeout=1m"))
                 .withRequestBody(equalTo(expected)))

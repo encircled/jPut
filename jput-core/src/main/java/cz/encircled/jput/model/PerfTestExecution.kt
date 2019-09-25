@@ -1,7 +1,6 @@
 package cz.encircled.jput.model
 
 import cz.encircled.jput.percentile
-import org.joda.time.DateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
@@ -10,25 +9,26 @@ data class ExecutionRepeat(
         /**
          * Parent execution
          */
-        val execution: PerfTestExecution? = null,
+        val execution: PerfTestExecution,
 
         /**
-         * Start time in nanoseconds
+         * Start time in nanoseconds relative to execution start time (i.e. this particular repeat start minus parent execution start)
          */
-        var startTime: Long,
+        var relativeStartTime: Long,
 
         /**
          * Elapsed time in ms
          */
         var elapsedTime: Long = 0L,
 
-        var startDate: DateTime = DateTime.now(),
-
         var resultCode: Int? = null,
 
         var error: Throwable? = null) {
 
-    override fun toString(): String = "startTime: $startTime, elapsed: $elapsedTime"
+    val startTime: Long
+        get() = execution.startTime + relativeStartTime
+
+    override fun toString(): String = "startTime: ${startTime}, elapsed: $elapsedTime"
 
 }
 
@@ -48,6 +48,11 @@ data class PerfTestExecution(
          * Parameters related to the global execution
          */
         val executionParams: MutableMap<String, Any>,
+
+        /**
+         * Start time of this execution in nanoseconds
+         */
+        val startTime: Long,
 
         /**
          * Repeat number to its execution
@@ -83,14 +88,14 @@ data class PerfTestExecution(
      */
     fun startNextExecution(): ExecutionRepeat {
         val actual = currentRepeatNum.get()
-        val repeat = ExecutionRepeat(this, System.nanoTime())
+        val repeat = ExecutionRepeat(this, System.nanoTime() - this.startTime)
         executionResult[actual] = repeat
         currentRepeatNum.set(actual.plus(1))
         return repeat
     }
 
     fun resetCurrentExecutionStartTime() {
-        executionResult[currentRepeatNum.get() - 1]!!.startTime = System.nanoTime()
+        executionResult[currentRepeatNum.get() - 1]!!.relativeStartTime = System.nanoTime() - startTime
     }
 
     fun finishExecution() {

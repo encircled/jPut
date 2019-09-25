@@ -13,6 +13,7 @@ import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.rest.RestStatus
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.slf4j.LoggerFactory
 
 /**
@@ -79,7 +80,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
             mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.conf.testId,
-                    "start" to repeat.startDate.toString(),
+                    "start" to DateTime(repeat.relativeStartTime / 1000000L, DateTimeZone.UTC).toDate(),
                     "elapsed" to repeat.elapsedTime
             )
         }

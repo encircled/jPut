@@ -25,10 +25,15 @@ interface ShortcutsForTests {
     }
 
     fun getTestExecution(config: PerfTestConfiguration, vararg times: Long): PerfTestExecution {
-        val repeats = times.mapIndexed { i, time -> i.toLong() to ExecutionRepeat(null, System.nanoTime(), time) }
+        val startTime = System.nanoTime()
+        val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), startTime)
+
+        val repeats = times.mapIndexed { i, time -> i.toLong() to ExecutionRepeat(execution, 1000000L, time) }
                 .toMap().toMutableMap()
 
-        return PerfTestExecution(config, mutableMapOf("id" to context.executionId), repeats)
+        execution.executionResult.putAll(repeats)
+
+        return execution
     }
 
     fun baseConfig() = configWithTrend(null)
