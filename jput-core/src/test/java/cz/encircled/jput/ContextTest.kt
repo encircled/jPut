@@ -1,6 +1,8 @@
 package cz.encircled.jput
 
 import cz.encircled.jput.context.*
+import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import kotlin.test.Test
@@ -82,6 +84,25 @@ class ContextTest : ShortcutsForTests {
             val recorder = context.resultRecorders[0]
             assertTrue(recorder is ElasticsearchResultRecorder)
         }
+    }
+
+    @Test
+    fun testViolationsErrorMessage() {
+        context = JPutContext()
+        context.init()
+
+        val execution = getTestExecution(baseConfig())
+        execution.executionResult[1] = ExecutionRepeat(execution, 0L, 500L)
+        assertEquals(listOf(), execution.violationsErrorMessage)
+
+        execution.executionParams["avgLimit"] = 300L
+
+        execution.violations.addAll(listOf(PerfConstraintViolation.UNIT_MAX, PerfConstraintViolation.UNIT_AVG, PerfConstraintViolation.TREND_AVG))
+        assertEquals(listOf(
+                "Limit max time = 300 ms, actual max time = 500 ms",
+                "Limit avg time = 300 ms, actual avg time = 500 ms",
+                "Limit avg time = 300 ms, actual avg time = 500 ms"
+        ), execution.violationsErrorMessage)
     }
 
 }

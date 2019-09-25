@@ -76,9 +76,9 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         ecs.flush()
 
         val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"0\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"1970-01-01T00:00:00.321Z\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
                 "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"0\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
+                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"1970-01-01T00:00:04.321Z\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
 
         wireMockServer.verify(postRequestedFor(urlEqualTo("/_bulk?timeout=1m"))
                 .withRequestBody(equalTo(expected)))

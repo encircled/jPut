@@ -72,6 +72,11 @@ data class PerfTestExecution(
 
     private var currentRepeatNum: ThreadLocal<Long> = ThreadLocal.withInitial { 1L }
 
+    val violationsErrorMessage: List<String>
+        get() = violations.map {
+            it.messageProducer.invoke(this)
+        }
+
     val executionAvg: Long by lazy {
         getElapsedTimes().average().roundToLong()
     }

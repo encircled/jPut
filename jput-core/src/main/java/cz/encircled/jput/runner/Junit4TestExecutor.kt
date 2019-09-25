@@ -45,11 +45,7 @@ class Junit4TestExecutor {
                 val execution = executor.executeTest(conf) { statement.evaluate() }
 
                 if (execution.violations.isNotEmpty()) {
-                    // TODO no tests for messages
-                    val violations = execution.violations.map {
-                        it.messageProducer.invoke(execution)
-                    }
-                    throw AssertionFailedError("Performance test failed.\n$violations")
+                    throw AssertionFailedError("Performance test failed.\n${execution.violationsErrorMessage}")
                 }
             }
         } catch (e: AssumptionViolatedException) {
