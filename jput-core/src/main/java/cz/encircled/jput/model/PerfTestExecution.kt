@@ -14,7 +14,7 @@ data class ExecutionRepeat(
         /**
          * Start time in nanoseconds relative to execution start time (i.e. this particular repeat start minus parent execution start)
          */
-        var relativeStartTime: Long,
+        var relativeStartTime: Long = System.nanoTime() - execution.startTime,
 
         /**
          * Elapsed time in ms
@@ -93,7 +93,7 @@ data class PerfTestExecution(
      */
     fun startNextExecution(): ExecutionRepeat {
         val actual = currentRepeatNum.get()
-        val repeat = ExecutionRepeat(this, System.nanoTime() - this.startTime)
+        val repeat = ExecutionRepeat(this)
         executionResult[actual] = repeat
         currentRepeatNum.set(actual.plus(1))
         return repeat

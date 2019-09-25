@@ -42,7 +42,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
             chunk.toFlux()
                     .flatMap {
-                        val repeat = ExecutionRepeat(execution, System.nanoTime())
+                        val repeat = ExecutionRepeat(execution)
                         execution.executionResult[it.toLong()] = repeat
 
                         body.map { b ->
