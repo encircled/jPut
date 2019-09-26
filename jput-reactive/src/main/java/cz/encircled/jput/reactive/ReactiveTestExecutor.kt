@@ -1,6 +1,6 @@
 package cz.encircled.jput.reactive
 
-import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import reactor.core.publisher.Mono
@@ -24,7 +24,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
         // Invoke test statement which should just create a Mono/Flux and store it in params
         statement.invoke()
         val body = execution.executionParams["__executor"] as Mono<*>?
-                ?: throw IllegalStateException("Reactive function is not set, please use JPutReactive#reactiveTestBody")
+                ?: throw IllegalStateException("Reactive function is not set for execution $execution, please use JPutReactive#reactiveTestBody")
 
         (1..execution.conf.warmUp).chunked(execution.conf.parallelCount).forEach { chunk ->
             val countDown = CountDownLatch(chunk.size)
@@ -42,7 +42,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
             chunk.toFlux()
                     .flatMap {
-                        val repeat = ExecutionRepeat(execution)
+                        val repeat = ExecutionRun(execution)
                         execution.executionResult[it.toLong()] = repeat
 
                         body.map { b ->

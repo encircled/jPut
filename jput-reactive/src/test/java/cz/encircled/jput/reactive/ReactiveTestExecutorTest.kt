@@ -5,6 +5,7 @@ import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import java.io.IOException
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
@@ -30,11 +31,11 @@ class ReactiveTestExecutorTest {
         increment.set(1)
     }
 
-    @Test(expected = RuntimeException::class)
+    @Test(expected = IOException::class)
     fun testRuntimeExceptionRethrown() {
         val executor = ReactiveTestExecutor()
 
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveError", isReactive = true)
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRuntimeExceptionRethrown", isReactive = true)
         executor.executeTest(conf) { reactiveError() }
     }
 
@@ -65,7 +66,7 @@ class ReactiveTestExecutorTest {
     fun testReactiveExecutorCorrectChunks() {
         val executor = ReactiveTestExecutor()
 
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBodyWithDelay", repeats = 4, parallelCount = 2, isReactive = true)
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
         val executeTest = executor.executeTest(conf, ::reactiveBodyWithDelay)
 
         // Assert chunk in paralleled
@@ -111,7 +112,7 @@ class ReactiveTestExecutorTest {
 
     private fun reactiveError() {
         Mono.just("1").map {
-            throw RuntimeException("Test exception!")
+            throw IOException("Test exception!")
         }.jputTest()
     }
 

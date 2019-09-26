@@ -1,7 +1,7 @@
 package cz.encircled.jput.reporter
 
 import cz.encircled.jput.ShortcutsForTests
-import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.AfterClass
@@ -43,8 +43,8 @@ class AllureReporterTest : ShortcutsForTests {
         failedExecution.violations.add(PerfConstraintViolation.UNIT_MAX)
 
         (1..100).forEach {
-            execution.executionResult[it.toLong()] = ExecutionRepeat(execution, 0L, it.toLong())
-            failedExecution.executionResult[it.toLong()] = ExecutionRepeat(failedExecution, 0L, it.toLong())
+            execution.executionResult[it.toLong()] = ExecutionRun(execution, 0L, it.toLong())
+            failedExecution.executionResult[it.toLong()] = ExecutionRun(failedExecution, 0L, it.toLong())
         }
 
         reporter.beforeClass(this::class.java)

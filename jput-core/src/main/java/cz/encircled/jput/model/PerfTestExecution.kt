@@ -2,9 +2,23 @@ package cz.encircled.jput.model
 
 import cz.encircled.jput.percentile
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToLong
 
-data class ExecutionRepeat(
+data class ExecutionRunResultDetails(
+
+        val resultCode: Int? = null,
+
+        val error: Throwable? = null,
+
+        var errorMessage: String? = error?.message
+
+)
+
+/**
+ * Each test (i.e. [PerfTestExecution]) may have multiple repeats, this class represent a single repeat/run
+ */
+data class ExecutionRun(
 
         /**
          * Parent execution
@@ -21,9 +35,7 @@ data class ExecutionRepeat(
          */
         var elapsedTime: Long = 0L,
 
-        var resultCode: Int? = null,
-
-        var error: Throwable? = null) {
+        var resultDetails: ExecutionRunResultDetails? = null) {
 
     val startTime: Long
         get() = execution.startTime + relativeStartTime
@@ -57,7 +69,7 @@ data class PerfTestExecution(
         /**
          * Repeat number to its execution
          */
-        val executionResult: MutableMap<Long, ExecutionRepeat> = ConcurrentHashMap(32),
+        val executionResult: MutableMap<Long, ExecutionRun> = ConcurrentHashMap(32),
 
         /**
          * Validation result is set after executions
@@ -70,7 +82,9 @@ data class PerfTestExecution(
      * Holds start time of current execution
      */
 
-    private var currentRepeatNum: ThreadLocal<Long> = ThreadLocal.withInitial { 1L }
+    private var currentRunNum: ThreadLocal<Long> = ThreadLocal.withInitial { 1L }
+
+    private val increment = AtomicLong()
 
     val violationsErrorMessage: List<String>
         get() = violations.map {
@@ -91,20 +105,22 @@ data class PerfTestExecution(
     /**
      * Starts new execution, returns start time (nanoseconds)
      */
-    fun startNextExecution(): ExecutionRepeat {
-        val actual = currentRepeatNum.get()
-        val repeat = ExecutionRepeat(this)
+    fun startNextExecution(): ExecutionRun {
+        val actual = increment.getAndIncrement()
+        val repeat = ExecutionRun(this)
         executionResult[actual] = repeat
-        currentRepeatNum.set(actual.plus(1))
+        currentRunNum.set(actual)
         return repeat
     }
 
     fun resetCurrentExecutionStartTime() {
-        executionResult[currentRepeatNum.get() - 1]!!.relativeStartTime = System.nanoTime() - startTime
+        getCurrentRun().relativeStartTime = System.nanoTime() - startTime
     }
 
+    fun getCurrentRun() = executionResult[currentRunNum.get()]!!
+
     fun finishExecution() {
-        val repeat = executionResult[currentRepeatNum.get() - 1]!!
+        val repeat = executionResult[currentRunNum.get()]!!
         repeat.elapsedTime = (System.nanoTime() - repeat.startTime) / 1000000L
     }
 

@@ -1,7 +1,7 @@
 package cz.encircled.jput.reporter
 
 import cz.encircled.jput.ShortcutsForTests
-import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import kotlin.test.Test
@@ -25,7 +25,7 @@ class ConsoleReporterTest : ShortcutsForTests {
             val execution = getTestExecution(baseConfig().copy(testId = "ConsoleReporterTest"))
 
             (1..100).forEach {
-                execution.executionResult[it.toLong()] = ExecutionRepeat(execution, 0L, it.toLong())
+                execution.executionResult[it.toLong()] = ExecutionRun(execution, 0L, it.toLong())
             }
 
             reporter.beforeClass(this::class.java)

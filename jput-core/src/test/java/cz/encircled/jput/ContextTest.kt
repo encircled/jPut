@@ -1,7 +1,7 @@
 package cz.encircled.jput
 
 import cz.encircled.jput.context.*
-import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
@@ -92,7 +92,7 @@ class ContextTest : ShortcutsForTests {
         context.init()
 
         val execution = getTestExecution(baseConfig())
-        execution.executionResult[1] = ExecutionRepeat(execution, 0L, 500L)
+        execution.executionResult[1] = ExecutionRun(execution, 0L, 500L)
         assertEquals(listOf(), execution.violationsErrorMessage)
 
         execution.executionParams["avgLimit"] = 300L

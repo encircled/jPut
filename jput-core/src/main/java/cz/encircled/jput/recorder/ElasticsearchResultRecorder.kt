@@ -75,7 +75,6 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
     }
 
     private fun convertToECSDocument(it: PerfTestExecution): List<MutableMap<String, Any>> {
-        DateTime(1L)
         return it.executionResult.values.map { repeat ->
             mutableMapOf(
                     "executionId" to context.executionId,

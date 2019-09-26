@@ -28,7 +28,7 @@ interface ShortcutsForTests {
         val startTime = System.nanoTime()
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), startTime)
 
-        val repeats = times.mapIndexed { i, time -> i.toLong() to ExecutionRepeat(execution, 1000000L, time) }
+        val repeats = times.mapIndexed { i, time -> i.toLong() to ExecutionRun(execution, 1000000L, time) }
                 .toMap().toMutableMap()
 
         execution.executionResult.putAll(repeats)

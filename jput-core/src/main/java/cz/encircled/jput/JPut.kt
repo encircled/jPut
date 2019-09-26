@@ -1,6 +1,7 @@
 package cz.encircled.jput
 
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
@@ -13,6 +14,7 @@ import java.lang.reflect.Method
  * - Delete old entries
  * - Flat map elapsed times
  * - Timeout when max time is not set
+ * - Delay between threads (rump-up)
  *
  * Helper functions for JPut users to control the perf tests execution
  *
@@ -39,29 +41,54 @@ object JPut {
      *     ...
      * }
      * ```
+     *
+     * Anonymous functions are not supported yet!
      */
     fun markPerformanceTestStart() {
-        val (caller, execution) = getCurrentExecution()
+        val execution = getCurrentExecution()
 
         if (execution == null) {
-            log.warn("[$caller] is not a JPut test, ignoring [markPerformanceTestStart]")
+            log.warn("Ignoring [markPerformanceTestStart] since it is called from non JPut test")
         } else {
             execution.resetCurrentExecutionStartTime()
         }
     }
 
-    fun getCurrentExecution(): Pair<StackTraceElement, PerfTestExecution?> {
-        val caller = Thread.currentThread().stackTrace.first {
-            it.className == context.currentSuite!!.name
-        }
-        val defaultTestId = PerfTestConfiguration.defaultTestId(toMethod(caller))
+    /**
+     * Anonymous functions are not supported yet!
+     */
+    fun setPerformanceTestResult(result: ExecutionRunResultDetails) {
+        val execution = getCurrentExecution()
 
-        val testId = context.customTestIds[defaultTestId] ?: defaultTestId
-        val execution = context.testExecutions[testId]
-        return Pair(caller, execution)
+        if (execution == null) {
+            log.warn("Ignoring [setPerformanceTestResult] since it is called from non JPut test")
+        } else {
+            execution.getCurrentRun().resultDetails = result
+        }
     }
 
-    fun toMethod(element: StackTraceElement): Method =
-            Class.forName(element.className).getDeclaredMethod(element.methodName)
+    fun getCurrentExecution(): PerfTestExecution? {
+        val elem = Thread.currentThread().stackTrace.reversed().filter {
+            it.className == context.currentSuite!!.name
+        }.firstOrNull {
+            getExecutionForStacktrace(it) != null
+        }
+
+        return if (elem != null) getExecutionForStacktrace(elem) else null
+    }
+
+    private fun getExecutionForStacktrace(it: StackTraceElement): PerfTestExecution? {
+        val method = toMethod(it) ?: return null
+        val defaultTestId = PerfTestConfiguration.defaultTestId(method)
+
+        val testId = context.customTestIds[defaultTestId] ?: defaultTestId
+        return context.testExecutions[testId]
+    }
+
+    fun toMethod(element: StackTraceElement): Method? {
+        return Class.forName(element.className).declaredMethods.firstOrNull {
+            it.name == element.methodName
+        }
+    }
 
 }

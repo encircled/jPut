@@ -11,7 +11,7 @@ import com.github.tomakehurst.wiremock.matching.UrlPattern
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.ExecutionRepeat
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
@@ -70,8 +70,8 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
                 sampleSize = 5
         )))
 
-        execution.executionResult[1] = ExecutionRepeat(execution, 321000000L, 321L)
-        execution.executionResult[2] = ExecutionRepeat(execution, 4321000000L, 4321L)
+        execution.executionResult[1] = ExecutionRun(execution, 321000000L, 321L)
+        execution.executionResult[2] = ExecutionRun(execution, 4321000000L, 4321L)
         ecs.appendTrendResult(execution)
         ecs.flush()
 

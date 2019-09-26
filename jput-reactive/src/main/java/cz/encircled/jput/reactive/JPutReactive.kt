@@ -11,11 +11,12 @@ object JPutReactive {
 
     private val log = LoggerFactory.getLogger(JPutReactive::class.java)
 
+    // TODO consider just adding test ID
     fun reactiveTestBody(body: Mono<*>) {
-        val (caller, execution) = JPut.getCurrentExecution()
+        val execution = JPut.getCurrentExecution()
 
         if (execution == null) {
-            log.warn("[$caller] is not a JPut test, ignoring [markPerformanceTestStart]")
+            log.warn("Ignoring [reactiveTestBody] since it is called from non JPut test")
         } else {
             execution.executionParams["__executor"] = body
         }
