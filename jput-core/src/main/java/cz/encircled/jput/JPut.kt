@@ -14,7 +14,7 @@ import java.lang.reflect.Method
  * - Delete old entries
  * - Flat map elapsed times
  * - Timeout when max time is not set
- * - Delay between threads (rump-up)
+ * - Delay between threads (ramp-up)
  *
  * Helper functions for JPut users to control the perf tests execution
  *

@@ -6,6 +6,7 @@ import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -58,22 +59,26 @@ open class ThreadBasedTestExecutor {
     }
 
     open fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
-        val executor = Executors.newFixedThreadPool(execution.conf.parallelCount)
+        val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
+        val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / execution.conf.parallelCount else 0L
 
         (1..execution.conf.warmUp).map {
             executor.submit(statement)
         }.map { it.get() }
 
-        (1..execution.conf.repeats).map {
-            executor.submit {
-                execution.startNextExecution()
-                statement.invoke()
-                execution.finishExecution()
+        val repeatsPerThread = execution.conf.repeats / execution.conf.parallelCount
 
-                if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
-            }
+        (1..execution.conf.parallelCount).map { index ->
+            executor.schedule({
+                repeat(repeatsPerThread) {
+                    execution.startNextExecution()
+                    statement.invoke()
+                    execution.finishExecution()
+
+                    if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
+                }
+            }, rampUp * index, TimeUnit.MILLISECONDS)
         }.map { it.get() }
-
     }
 
 }

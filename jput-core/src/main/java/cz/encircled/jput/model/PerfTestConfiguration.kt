@@ -47,6 +47,12 @@ data class PerfTestConfiguration(
          */
         val parallelCount: Int = 1,
 
+        /**
+         * Ramp-up in milliseconds. If parallel is 100, and the ramp-up period is 100000 (100 seconds),
+         * then JPut will take 100 seconds to get all 100 threads running, i.e. 1 second delay after each new thread
+         */
+        val rampUp: Long = 0,
+
         val isReactive: Boolean = false,
 
         /**
@@ -98,7 +104,7 @@ data class PerfTestConfiguration(
             }
 
             val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
-                    conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.isReactive, trendConfig)
+                    conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.rampUp, conf.isReactive, trendConfig)
 
             /*TODO val percentiles = conf.percentiles
             check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }

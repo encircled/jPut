@@ -1,11 +1,12 @@
 package cz.encircled.jput.runner
 
+import cz.encircled.jput.MockRecorder
+import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.MockRecorder
-import cz.encircled.jput.ShortcutsForTests
+import org.joda.time.LocalTime
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -64,6 +65,17 @@ class BaseExecutorTest : ShortcutsForTests {
 
         assertEquals(1, recorder.executions.size)
         assertEquals("recorderTest", recorder.executions[0].conf.testId)
+    }
+
+    @Test
+    fun testRampUp() {
+        val startTimes = mutableListOf<LocalTime>()
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 4, rampUp = 1000, parallelCount = 4)) {
+            startTimes.add(LocalTime.now())
+        }
+
+        // TODO asserts
+        println(startTimes)
     }
 
 }

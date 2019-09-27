@@ -48,6 +48,12 @@ annotation class PerformanceTest(
          */
         val parallel: Int = 1,
 
+        /**
+         * Ramp-up in milliseconds. If parallel is 100, and the ramp-up period is 100000 (100 seconds),
+         * then JPut will take 100 seconds to get all 100 threads running, i.e. 1 second delay after each new thread
+         */
+        val rampUp: Long = 0,
+
         val isReactive: Boolean = false,
 
         /**

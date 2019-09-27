@@ -23,7 +23,8 @@ class JPutConsoleReporter : JPutReporter {
                 "50%: ${execution.executionPercentile(0.5)}ms, " +
                 "90%: ${execution.executionPercentile(0.9)}ms, " +
                 "95%: ${execution.executionPercentile(0.95)}ms, " +
-                "99%: ${execution.executionPercentile(0.99)}ms")
+                "99%: ${execution.executionPercentile(0.99)}ms, " +
+                "count: ${execution.executionResult.size}")
     }
 
     override fun afterClass(clazz: Class<*>) {
