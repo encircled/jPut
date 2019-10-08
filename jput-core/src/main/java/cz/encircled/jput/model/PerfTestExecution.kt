@@ -41,6 +41,13 @@ data class ExecutionRun(
     val startTime: Long
         get() = execution.startTime + relativeStartTime
 
+    /**
+     * Set elapsed time as difference before current time and start time
+     */
+    fun measureElapsed() {
+        elapsedTime = (System.nanoTime() - startTime) / 1000000L
+    }
+
     override fun toString(): String = "startTime: ${startTime}, elapsed: $elapsedTime"
 
 }
@@ -95,17 +102,18 @@ data class PerfTestExecution(
         }
 
     val executionAvg: Long by lazy {
-        try {
-            getElapsedTimes().average().roundToLong()
-        } catch (e: Exception) {
-            throw e
-        }
+        if (executionResult.isEmpty()) 0
+        else getElapsedTimes().average().roundToLong()
     }
 
-    val executionMax: Long by lazy { getElapsedTimes().max()!! }
+    val executionMax: Long by lazy {
+        if (executionResult.isEmpty()) 0
+        else getElapsedTimes().max()!!
+    }
 
     fun executionPercentile(rank: Double): Long =
-            getElapsedTimes().percentile(rank).max()!!
+            if (executionResult.isEmpty()) 0
+            else getElapsedTimes().percentile(rank).max()!!
 
     fun getElapsedTimes() = executionResult.values.map { it.elapsedTime }
 
@@ -125,11 +133,6 @@ data class PerfTestExecution(
     }
 
     fun getCurrentRun() = executionResult[currentRunNum.get()]!!
-
-    fun finishExecution() {
-        val repeat = executionResult[currentRunNum.get()]!!
-        repeat.elapsedTime = (System.nanoTime() - repeat.startTime) / 1000000L
-    }
 
 }
 

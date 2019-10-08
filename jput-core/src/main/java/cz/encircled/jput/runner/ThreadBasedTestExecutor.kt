@@ -67,14 +67,21 @@ open class ThreadBasedTestExecutor {
             executor.submit(statement)
         }.map { it.get() }
 
+        var scheduledCount = 0
         val repeatsPerThread = max(1, execution.conf.repeats / execution.conf.parallelCount)
 
         (0 until execution.conf.parallelCount).map { index ->
+            // Last thread should take the rest (repeats/parallelCount division fraction)
+            val r = if (index == execution.conf.parallelCount - 1) execution.conf.repeats - scheduledCount
+            else repeatsPerThread
+
+            scheduledCount += r
+
             executor.schedule({
-                repeat(repeatsPerThread) {
+                repeat(r) {
                     execution.startNextExecution()
                     statement.invoke()
-                    execution.finishExecution()
+                    execution.getCurrentRun().measureElapsed()
 
                     if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
                 }

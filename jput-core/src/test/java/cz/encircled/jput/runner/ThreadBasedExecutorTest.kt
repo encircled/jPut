@@ -6,6 +6,7 @@ import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.*
 
 /**
@@ -82,15 +83,32 @@ class BaseExecutorTest : ShortcutsForTests {
     @Test
     fun testRampUp() {
         val startTimes = mutableListOf<Long>()
-        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 4, rampUp = 1000, parallelCount = 5)) {
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 5, rampUp = 1000, parallelCount = 5)) {
             startTimes.add(System.currentTimeMillis())
         }
 
-        assertTrue(startTimes[4] - startTimes[0] >= 1000)
+        assertEquals(5, startTimes.size)
+
+        listOf(
+                Pair(0, 1000),
+                Pair(1, 750),
+                Pair(2, 500),
+                Pair(3, 250)
+        ).forEach {
+            assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
+        }
+
         assertTrue(startTimes[4] - startTimes[0] < 1100)
-        assertTrue(startTimes[4] - startTimes[1] >= 750)
-        assertTrue(startTimes[4] - startTimes[2] >= 500)
-        assertTrue(startTimes[4] - startTimes[3] >= 250)
+    }
+
+    @Test
+    fun testCorrectRepeatsNumberInParallel() {
+        val repeats = AtomicInteger(0)
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 5, parallelCount = 2)) {
+            repeats.incrementAndGet()
+        }
+
+        assertEquals(5, repeats.get())
     }
 
 }
