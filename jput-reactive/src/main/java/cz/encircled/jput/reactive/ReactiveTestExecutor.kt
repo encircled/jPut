@@ -7,6 +7,7 @@ import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.scheduler.Schedulers
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 
 /**
@@ -41,18 +42,20 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
             countDown.await()
         }
 
+        val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
         val countDown = CountDownLatch(execution.conf.parallelCount)
 
         // TODO No ramp up
         (0 until execution.conf.repeats).toFlux()
                 .parallel(execution.conf.parallelCount)
                 .runOn(Schedulers.parallel())
-                .flatMap {
+                .flatMap { index ->
                     // TODO use execution.startNextExecution?
                     val repeat = ExecutionRun(execution)
-                    execution.executionResult[it.toLong()] = repeat
+                    execution.executionResult[index.toLong()] = repeat
 
-                    body.map { b ->
+                    println("Ramp up: ${rampUp * index}")
+                    body.delayElement(Duration.ofMillis(rampUp * index)).map { b ->
                         Pair(b, repeat)
                     }.onErrorContinue { t, _ ->
                         repeat.measureElapsed()

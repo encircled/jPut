@@ -108,6 +108,29 @@ class ReactiveTestExecutorTest {
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delay - 2 })
     }
 
+    @Test
+    @Ignore // FIXME
+    fun testRampUp() {
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRampUp", repeats = 5, rampUp = 1000, parallelCount = 5, isReactive = true)
+
+        ReactiveTestExecutor().executeTest(conf, ::reactiveBodyWithDelay)
+
+        println()
+        assertTrue(getDif("1 start", "2 start") > 240, "Actual: ${getDif("1 start", "2 start")}")
+//        assertEquals(5, startTimes.size)
+//
+//        listOf(
+//                Pair(0, 1000),
+//                Pair(1, 750),
+//                Pair(2, 500),
+//                Pair(3, 250)
+//        ).forEach {
+//            assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
+//        }
+//
+//        assertTrue(startTimes[4] - startTimes[0] < 1100)
+    }
+
     private fun getDif(left: String, right: String) =
             (invocationTimes[left]!! - invocationTimes[right]!!).absoluteValue
 
