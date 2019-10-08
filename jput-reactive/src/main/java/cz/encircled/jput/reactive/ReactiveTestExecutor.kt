@@ -15,6 +15,7 @@ fun Mono<*>.jputTest() = JPutReactive.reactiveTestBody(this)
 /**
  * @author Vlad on 21-Sep-19.
  */
+// TODO re-design a bit, should not extend ThreadBased
 class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
     // TODO delay

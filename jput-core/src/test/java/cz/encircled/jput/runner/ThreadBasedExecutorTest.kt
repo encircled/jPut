@@ -6,11 +6,7 @@ import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
-import org.joda.time.LocalTime
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 /**
  * @author Vlad on 15-Sep-19.
@@ -26,6 +22,22 @@ class BaseExecutorTest : ShortcutsForTests {
     @AfterTest
     fun after() {
         context.destroy()
+    }
+
+    @Test
+    fun testWarmUpRun() {
+        var counter = 0
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(warmUp = 9)) {
+            counter++
+        }
+
+        assertEquals(10, counter)
+
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(warmUp = 4)) {
+            counter++
+        }
+
+        assertEquals(15, counter)
     }
 
     @Test
@@ -69,13 +81,15 @@ class BaseExecutorTest : ShortcutsForTests {
 
     @Test
     fun testRampUp() {
-        val startTimes = mutableListOf<LocalTime>()
+        val startTimes = mutableListOf<Long>()
         ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 4, rampUp = 1000, parallelCount = 4)) {
-            startTimes.add(LocalTime.now())
+            startTimes.add(System.currentTimeMillis())
         }
 
-        // TODO asserts
-        println(startTimes)
+        assertTrue(startTimes[3] - startTimes[0] > 750)
+        assertTrue(startTimes[3] - startTimes[0] < 1000)
+        assertTrue(startTimes[3] - startTimes[1] > 500)
+        assertTrue(startTimes[3] - startTimes[2] > 250)
     }
 
 }
