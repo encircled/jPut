@@ -67,6 +67,14 @@ object JPut {
         }
     }
 
+    @JvmOverloads
+    fun setPerformanceTestResult(error: Throwable? = null, resultCode: Int = 500, errorMessage: String? = error?.message) =
+            setPerformanceTestResult(ExecutionRunResultDetails(resultCode, error, errorMessage))
+
+    @JvmOverloads
+    fun setPerformanceTestResult(resultCode: Int, errorMessage: String? = null) =
+            setPerformanceTestResult(ExecutionRunResultDetails(resultCode, errorMessage = errorMessage))
+
     fun getCurrentExecution(): PerfTestExecution? {
         val elem = Thread.currentThread().stackTrace.reversed().filter {
             it.className == context.currentSuite!!.name
@@ -85,7 +93,7 @@ object JPut {
         return context.testExecutions[testId]
     }
 
-    fun toMethod(element: StackTraceElement): Method? {
+    private fun toMethod(element: StackTraceElement): Method? {
         return Class.forName(element.className).declaredMethods.firstOrNull {
             it.name == element.methodName
         }

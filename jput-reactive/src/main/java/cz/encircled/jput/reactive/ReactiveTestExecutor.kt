@@ -42,6 +42,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
             chunk.toFlux()
                     .flatMap {
+                        // TODO use execution.startNextExecution?
                         val repeat = ExecutionRun(execution)
                         execution.executionResult[it.toLong()] = repeat
 

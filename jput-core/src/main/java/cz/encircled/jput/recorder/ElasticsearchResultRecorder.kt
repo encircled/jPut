@@ -4,6 +4,7 @@ import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.context.getProperty
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.search.SearchRequest
@@ -74,15 +75,25 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
         log.info("Successfully flushed to Elasticsearch")
     }
 
-    private fun convertToECSDocument(it: PerfTestExecution): List<MutableMap<String, Any>> {
+    private fun convertToECSDocument(it: PerfTestExecution): List<MutableMap<String, Any?>> {
         return it.executionResult.values.map { repeat ->
             mutableMapOf(
                     "executionId" to context.executionId,
                     "testId" to it.conf.testId,
                     "start" to DateTime(repeat.relativeStartTime / 1000000L, DateTimeZone.UTC).toDate(),
-                    "elapsed" to repeat.elapsedTime
+                    "elapsed" to repeat.elapsedTime,
+                    "resultCode" to repeat.resultDetails?.resultCode,
+                    "errorMessage" to buildErrorMessage(repeat)
             )
         }
+    }
+
+    private fun buildErrorMessage(repeat: ExecutionRun): String {
+        val details = repeat.resultDetails
+        var errorMsg = details?.errorMessage ?: ""
+        if (details?.error != null && details.error.message != details.errorMessage) errorMsg += ". ${details.error.message}"
+
+        return errorMsg
     }
 
     override fun destroy() {

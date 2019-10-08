@@ -9,9 +9,7 @@ import java.io.IOException
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 
 /**
@@ -31,12 +29,20 @@ class ReactiveTestExecutorTest {
         increment.set(1)
     }
 
-    @Test(expected = IOException::class)
+    // TODO default exception handling + set result. Maybe configurable on suit level
+    @Test
     fun testRuntimeExceptionRethrown() {
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRuntimeExceptionRethrown", isReactive = true)
-        executor.executeTest(conf) { reactiveError() }
+        try {
+            executor.executeTest(conf) { reactiveError() }
+        } catch (e: Exception) {
+            assertEquals("Test exception!", e.cause!!.message)
+            return
+        }
+
+        fail("Test exception is expected")
     }
 
     @Test(expected = IllegalStateException::class)

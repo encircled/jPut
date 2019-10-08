@@ -58,10 +58,20 @@ class UserHelpersJPutTest : ShortcutsForTests {
 
         context.testExecutions["UserHelpersJPutTest#testSetPerformanceTestResult"] = execution
 
+        val actual = {
+            execution.executionResult.values.first().resultDetails
+        }
+
         val details = ExecutionRunResultDetails(200, RuntimeException(), "testMessage")
         JPut.setPerformanceTestResult(details)
+        assertEquals(details, actual())
 
-        assertEquals(details, execution.executionResult.values.first().resultDetails)
+        JPut.setPerformanceTestResult(403)
+        assertEquals(ExecutionRunResultDetails(403), actual())
+
+        val error = RuntimeException("Test")
+        JPut.setPerformanceTestResult(error)
+        assertEquals(ExecutionRunResultDetails(500, error, "Test"), actual())
     }
 
     @Test
@@ -69,28 +79,27 @@ class UserHelpersJPutTest : ShortcutsForTests {
         val countDown = CountDownLatch(10)
 
         val execution = getTestExecution(baseConfig())
-        context.testExecutions["UserHelpersJPutTest#testFun"] = execution
+        context.testExecutions["UserHelpersJPutTest#testMultiThreadSetPerformanceTestResult"] = execution
 
         (1..10).map {
             Runnable {
-                testFun(execution, it, countDown)
+                testMultiThreadSetPerformanceTestResult(execution, it, countDown)
             }
         }.forEach {
             Thread(it).start()
         }
 
         countDown.await()
-        val actual = execution.executionResult.values.map { it.resultDetails!!.resultCode!! }.sorted()
+        val actual = execution.executionResult.values
+                .map { it.resultDetails!!.resultCode!! }.sorted()
         assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), actual)
     }
 
-    fun testFun(execution: PerfTestExecution, it: Int, countDown: CountDownLatch) {
+    private fun testMultiThreadSetPerformanceTestResult(execution: PerfTestExecution, it: Int, countDown: CountDownLatch) {
         try {
-            println("RUN ${it}")
             execution.startNextExecution()
-            Thread.sleep(50)
+            Thread.sleep(20)
             JPut.setPerformanceTestResult(ExecutionRunResultDetails(it))
-            println("DONE ${it}")
         } finally {
             countDown.countDown()
         }

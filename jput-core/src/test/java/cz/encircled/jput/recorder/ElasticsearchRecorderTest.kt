@@ -12,6 +12,7 @@ import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.ExecutionRun
+import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
@@ -70,15 +71,43 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
                 sampleSize = 5
         )))
 
-        execution.executionResult[1] = ExecutionRun(execution, 321000000L, 321L)
-        execution.executionResult[2] = ExecutionRun(execution, 4321000000L, 4321L)
+        val successCase = ExecutionRun(execution, 321000000L, 321L)
+        successCase.resultDetails = ExecutionRunResultDetails(200)
+
+        val errorAndMessageCase = ExecutionRun(execution, 123000000L, 4321L)
+        errorAndMessageCase.resultDetails = ExecutionRunResultDetails(503, RuntimeException("Whoops"), "TestError")
+
+        val onlyMessageCase = ExecutionRun(execution, 123000000L, 4321L)
+        onlyMessageCase.resultDetails = ExecutionRunResultDetails(503, errorMessage = "TestError")
+
+        val allNullCase = ExecutionRun(execution, 123000000L, 4321L)
+        allNullCase.resultDetails = ExecutionRunResultDetails()
+
+        val noDetailsCase = ExecutionRun(execution, 123000000L, 4321L)
+
+        execution.executionResult[1] = successCase
+        execution.executionResult[2] = errorAndMessageCase
+        execution.executionResult[3] = onlyMessageCase
+        execution.executionResult[4] = allNullCase
+        execution.executionResult[5] = noDetailsCase
+
         ecs.appendTrendResult(execution)
         ecs.flush()
 
-        val expected = "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"1970-01-01T00:00:00.321Z\",\"elapsed\":321,\"test1\":\"1\",\"test2\":\"abc\"}\n" +
-                "{\"index\":{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                "{\"executionId\":\"${context.executionId}\",\"testId\":\"1\",\"start\":\"1970-01-01T00:00:04.321Z\",\"elapsed\":4321,\"test1\":\"1\",\"test2\":\"abc\"}\n"
+        val builder = { run: ExecutionRun, errorMsg: String ->
+            "{\"index\":" +
+                    "{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
+                    "{\"executionId\":\"${context.executionId}\"," +
+                    "\"testId\":\"1\"," +
+                    "\"start\":\"1970-01-01T00:00:00.${run.relativeStartTime / 1000000}Z\"," +
+                    "\"elapsed\":${run.elapsedTime}," +
+                    "\"resultCode\":${run.resultDetails?.resultCode}," +
+                    "\"errorMessage\":\"${errorMsg}\"," +
+                    "\"test1\":\"1\",\"test2\":\"abc\"}\n"
+        }
+
+        val expected = builder(successCase, "") + builder(errorAndMessageCase, "TestError. Whoops") +
+                builder(onlyMessageCase, "TestError") + builder(allNullCase, "") + builder(noDetailsCase, "")
 
         wireMockServer.verify(postRequestedFor(urlEqualTo("/_bulk?timeout=1m"))
                 .withRequestBody(equalTo(expected)))
