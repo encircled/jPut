@@ -95,7 +95,11 @@ data class PerfTestExecution(
         }
 
     val executionAvg: Long by lazy {
-        getElapsedTimes().average().roundToLong()
+        try {
+            getElapsedTimes().average().roundToLong()
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     val executionMax: Long by lazy { getElapsedTimes().max()!! }

@@ -82,14 +82,15 @@ class BaseExecutorTest : ShortcutsForTests {
     @Test
     fun testRampUp() {
         val startTimes = mutableListOf<Long>()
-        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 4, rampUp = 1000, parallelCount = 4)) {
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(repeats = 4, rampUp = 1000, parallelCount = 5)) {
             startTimes.add(System.currentTimeMillis())
         }
 
-        assertTrue(startTimes[3] - startTimes[0] > 750)
-        assertTrue(startTimes[3] - startTimes[0] < 1000)
-        assertTrue(startTimes[3] - startTimes[1] > 500)
-        assertTrue(startTimes[3] - startTimes[2] > 250)
+        assertTrue(startTimes[4] - startTimes[0] >= 1000)
+        assertTrue(startTimes[4] - startTimes[0] < 1100)
+        assertTrue(startTimes[4] - startTimes[1] >= 750)
+        assertTrue(startTimes[4] - startTimes[2] >= 500)
+        assertTrue(startTimes[4] - startTimes[3] >= 250)
     }
 
 }

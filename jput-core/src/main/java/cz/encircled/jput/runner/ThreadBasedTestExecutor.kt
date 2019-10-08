@@ -7,6 +7,7 @@ import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 
 /**
@@ -60,15 +61,15 @@ open class ThreadBasedTestExecutor {
 
     open fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
         val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
-        val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / execution.conf.parallelCount else 0L
+        val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
 
         (1..execution.conf.warmUp).map {
             executor.submit(statement)
         }.map { it.get() }
 
-        val repeatsPerThread = execution.conf.repeats / execution.conf.parallelCount
+        val repeatsPerThread = max(1, execution.conf.repeats / execution.conf.parallelCount)
 
-        (1..execution.conf.parallelCount).map { index ->
+        (0 until execution.conf.parallelCount).map { index ->
             executor.schedule({
                 repeat(repeatsPerThread) {
                     execution.startNextExecution()
