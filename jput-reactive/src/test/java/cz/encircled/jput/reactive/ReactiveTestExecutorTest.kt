@@ -64,6 +64,7 @@ class ReactiveTestExecutorTest {
      */
     @Test
     fun testReactiveExecutorCorrectChunks() {
+        println("CPU cores: ${Runtime.getRuntime().availableProcessors()}")
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
