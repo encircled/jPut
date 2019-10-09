@@ -37,7 +37,7 @@ A JUnit test method must be marked with `@PerformanceTest` in order to enable th
 #### Error handling parameters
 
 - *continueOnException* - default 'true' - if true, all errors thrown by the test will be handled, preventing the unit test to fail. Result will be enriched with statusCode=500 and corresponding error message.  
-- *maxAllowedExceptionsCount* - default 0 - if count of errored tests is greater than this, the unit test will be marked as failed. 
+- *maxAllowedExceptionsCount* - default Long.MAX_VALUE - if count of errored tests is greater than this, the unit test will be marked as failed. 
 
 #### Trend analysis parameters
 

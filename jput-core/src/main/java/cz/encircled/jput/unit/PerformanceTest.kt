@@ -59,7 +59,7 @@ annotation class PerformanceTest(
         /**
          * Unit test will be marked as failed, if catched exceptions count is greater than this parameter
          */
-        val maxAllowedExceptionsCount: Long = 0,
+        val maxAllowedExceptionsCount: Long = Long.MAX_VALUE,
 
         /**
          * If true, jput will catch runtime exceptions and save errored repeats with result code "500" and corresponding error message.
