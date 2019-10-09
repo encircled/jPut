@@ -26,6 +26,10 @@ enum class PerfConstraintViolation(val messageProducer: (execution: PerfTestExec
      */
     TREND_AVG({
         "Limit avg time = ${it.executionParams["avgLimit"]} ms, actual avg time = ${it.executionAvg} ms"
+    }),
+
+    EXCEPTIONS_COUNT({
+        "Limit exceptions count = ${it.conf.maxAllowedExceptionsCount}, actual = ${it.exceptionsCount()}"
     })
 
 }

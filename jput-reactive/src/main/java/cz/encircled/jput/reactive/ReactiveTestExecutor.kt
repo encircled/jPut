@@ -54,7 +54,6 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
                     val repeat = ExecutionRun(execution)
                     execution.executionResult[index.toLong()] = repeat
 
-                    println("Ramp up: ${rampUp * index}")
                     body.delayElement(Duration.ofMillis(rampUp * index)).map { b ->
                         Pair(b, repeat)
                     }.onErrorContinue { t, _ ->

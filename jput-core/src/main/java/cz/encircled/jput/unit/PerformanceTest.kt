@@ -57,6 +57,16 @@ annotation class PerformanceTest(
         val isReactive: Boolean = false,
 
         /**
+         * Unit test will be marked as failed, if catched exceptions count is greater than this parameter
+         */
+        val maxAllowedExceptionsCount: Long = 0,
+
+        /**
+         * If true, jput will catch runtime exceptions and save errored repeats with result code "500" and corresponding error message.
+         */
+        val continueOnException: Boolean = true,
+
+        /**
          * Performance trend analyzing
          */
         val trends: Array<PerformanceTrend> = []

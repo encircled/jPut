@@ -12,7 +12,7 @@ import kotlin.test.*
 /**
  * @author Vlad on 15-Sep-19.
  */
-class BaseExecutorTest : ShortcutsForTests {
+class ThreadBasedExecutorTest : ShortcutsForTests {
 
     @BeforeTest
     fun before() {
@@ -109,6 +109,31 @@ class BaseExecutorTest : ShortcutsForTests {
         }
 
         assertEquals(5, repeats.get())
+    }
+
+    @Test
+    fun testExceptionHandledByDefault() {
+        val result = ThreadBasedTestExecutor().executeTest(baseConfig()) {
+            throw RuntimeException("Test")
+        }
+
+        val details = result.executionResult.values.first().resultDetails
+        assertEquals("Test", details.error!!.message)
+        assertEquals(500, details.resultCode)
+    }
+
+    @Test
+    fun testExceptionRethrown() {
+        try {
+            ThreadBasedTestExecutor().executeTest(baseConfig().copy(continueOnException = false)) {
+                throw RuntimeException("Test")
+            }
+        } catch (e: Exception) {
+            assertEquals("java.lang.RuntimeException: Test", e.message)
+            return
+        }
+
+        fail("Exception expected")
     }
 
 }

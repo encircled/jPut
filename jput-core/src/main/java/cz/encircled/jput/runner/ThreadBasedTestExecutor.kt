@@ -1,6 +1,7 @@
 package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
@@ -35,8 +36,10 @@ open class ThreadBasedTestExecutor {
 
     private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): List<PerfConstraintViolation> {
         val result = mutableListOf<PerfConstraintViolation>()
-        val unitViolations = context.unitPerformanceAnalyzer.analyzeUnitTrend(execution)
-        result.addAll(unitViolations)
+
+        context.unitPerformanceAnalyzers.forEach {
+            result.addAll(it.analyzeUnitTrend(execution))
+        }
 
         if (conf.trendConfiguration != null && context.resultRecorders.isNotEmpty()) {
             // Assume that first has highest priority TODO support main/slave recorders instead
@@ -80,13 +83,22 @@ open class ThreadBasedTestExecutor {
             executor.schedule({
                 repeat(r) {
                     execution.startNextExecution()
-                    statement.invoke()
-                    execution.getCurrentRun().measureElapsed()
+                    try {
+                        statement.invoke()
+                    } catch (e: Exception) {
+                        if (execution.conf.continueOnException) {
+                            execution.getCurrentRun().resultDetails = ExecutionRunResultDetails(500, e)
+                        } else {
+                            throw e
+                        }
+                    } finally {
+                        execution.getCurrentRun().measureElapsed()
+                    }
 
                     if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)
                 }
             }, rampUp * index, TimeUnit.MILLISECONDS)
-        }.map { it.get() }
+        }.forEach { it.get() }
     }
 
 }

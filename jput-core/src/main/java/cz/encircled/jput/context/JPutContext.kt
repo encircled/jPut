@@ -9,6 +9,7 @@ import cz.encircled.jput.reporter.JPutConsoleReporter
 import cz.encircled.jput.reporter.JPutReporter
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
+import cz.encircled.jput.unit.TestExceptionsAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
@@ -52,7 +53,7 @@ class JPutContext {
 
     val testExecutions: MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
 
-    lateinit var unitPerformanceAnalyzer: UnitPerformanceAnalyzer
+    lateinit var unitPerformanceAnalyzers: List<UnitPerformanceAnalyzer>
     lateinit var trendAnalyzer: TrendAnalyzer
 
     /**
@@ -64,7 +65,7 @@ class JPutContext {
 
     fun init() {
         isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
-        unitPerformanceAnalyzer = UnitPerformanceAnalyzerImpl()
+        unitPerformanceAnalyzers = listOf(UnitPerformanceAnalyzerImpl(), TestExceptionsAnalyzer())
         trendAnalyzer = SampleBasedTrendAnalyzer()
 
         getProperty(PROP_REPORTER_CLASS, "").let {

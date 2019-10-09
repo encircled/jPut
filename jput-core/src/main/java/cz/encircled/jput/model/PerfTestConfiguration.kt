@@ -56,6 +56,18 @@ data class PerfTestConfiguration(
         val isReactive: Boolean = false,
 
         /**
+         * Unit test will be marked as failed, if catched exceptions count is greater than this parameter
+         */
+        val maxAllowedExceptionsCount: Long = 0,
+
+        /**
+         * TODO implement: reactive
+         *
+         * If true, jput will catch runtime exceptions and save errored repeats with result code "500" and corresponding error message.
+         */
+        val continueOnException: Boolean = true,
+
+        /**
          * Performance trend analyzing
          */
         val trendConfiguration: TrendTestConfiguration? = null,
@@ -90,7 +102,7 @@ data class PerfTestConfiguration(
 
     companion object {
 
-        fun defaultTestId(method: Method) : String = "${method.declaringClass.simpleName}#${method.name}"
+        fun defaultTestId(method: Method): String = "${method.declaringClass.simpleName}#${method.name}"
 
         fun fromAnnotation(conf: PerformanceTest, method: Method): PerfTestConfiguration {
             val trendConfig =
@@ -104,7 +116,8 @@ data class PerfTestConfiguration(
             }
 
             val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
-                    conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.rampUp, conf.isReactive, trendConfig)
+                    conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.rampUp,
+                    conf.isReactive, conf.maxAllowedExceptionsCount, conf.continueOnException, trendConfig)
 
             /*TODO val percentiles = conf.percentiles
             check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }

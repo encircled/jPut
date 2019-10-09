@@ -14,6 +14,8 @@ interface UnitPerformanceAnalyzer {
 
 
 /**
+ * This analyzer verifies that execution times (avg, max etc) are within defined limits.
+ *
  * @author Vlad on 21-May-17.
  */
 class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
@@ -40,5 +42,17 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
 
         return result
     }
+
+}
+
+/**
+ * This analyzer verifies that count of occurred exceptions is within defined limits
+ */
+class TestExceptionsAnalyzer : UnitPerformanceAnalyzer {
+
+    override fun analyzeUnitTrend(execution: PerfTestExecution): List<PerfConstraintViolation> =
+            if (execution.exceptionsCount() > execution.conf.maxAllowedExceptionsCount) {
+                listOf(PerfConstraintViolation.EXCEPTIONS_COUNT)
+            } else emptyList()
 
 }

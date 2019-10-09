@@ -26,6 +26,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
 
     private val indexName by lazy { getProperty(JPutContext.PROP_ELASTIC_INDEX, "jput") }
 
+    // TODO ignore errors
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val conf = execution.conf.trendConfiguration!!
 
@@ -82,7 +83,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
                     "testId" to it.conf.testId,
                     "start" to DateTime(repeat.relativeStartTime / 1000000L, DateTimeZone.UTC).toDate(),
                     "elapsed" to repeat.elapsedTime,
-                    "resultCode" to repeat.resultDetails?.resultCode,
+                    "resultCode" to repeat.resultDetails.resultCode,
                     "errorMessage" to buildErrorMessage(repeat)
             )
         }

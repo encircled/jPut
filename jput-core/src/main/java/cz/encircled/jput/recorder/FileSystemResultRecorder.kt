@@ -24,6 +24,7 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
         initRuns()
     }
 
+    // TODO ignore errors
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val config = execution.conf.trendConfiguration!!
         val sample = runs.getOrDefault(execution.conf.testId, listOf())

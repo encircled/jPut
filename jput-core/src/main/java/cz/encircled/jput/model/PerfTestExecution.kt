@@ -41,6 +41,9 @@ data class ExecutionRun(
     val startTime: Long
         get() = execution.startTime + relativeStartTime
 
+    val isError: Boolean
+        get() = resultDetails.error != null || resultDetails.errorMessage != null
+
     /**
      * Set elapsed time as difference before current time and start time
      */
@@ -96,26 +99,42 @@ data class PerfTestExecution(
      */
     private val runCounter = AtomicLong()
 
+    /**
+     * Build error messages from [violations]
+     */
     val violationsErrorMessage: List<String>
         get() = violations.map {
             it.messageProducer.invoke(this)
         }
 
     val executionAvg: Long by lazy {
-        if (executionResult.isEmpty()) 0
+        if (successResults().isEmpty()) 0
         else getElapsedTimes().average().roundToLong()
     }
 
     val executionMax: Long by lazy {
-        if (executionResult.isEmpty()) 0
+        if (successResults().isEmpty()) 0
         else getElapsedTimes().max()!!
     }
 
     fun executionPercentile(rank: Double): Long =
-            if (executionResult.isEmpty()) 0
+            if (successResults().isEmpty()) 0
             else getElapsedTimes().percentile(rank).max()!!
 
-    fun getElapsedTimes() = executionResult.values.map { it.elapsedTime }
+    /**
+     * Only success [executionResult]
+     */
+    fun successResults() = executionResult.values.filter { !it.isError }
+
+    /**
+     * Count of repeats which finished with an exception
+     */
+    fun exceptionsCount() = executionResult.size - successResults().size
+
+    /**
+     * List of elapsed times of all repeats
+     */
+    fun getElapsedTimes() = successResults().map { it.elapsedTime }
 
     /**
      * Starts new execution, returns start time (nanoseconds)

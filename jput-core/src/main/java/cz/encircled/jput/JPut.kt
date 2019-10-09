@@ -9,12 +9,9 @@ import java.lang.reflect.Method
 
 /**
  * TODO list:
- * - Return result from junit test to store response status code etc
- * - markPerformanceTestFinish?
  * - Delete old entries
  * - Flat map elapsed times
  * - Timeout when max time is not set
- * - Delay between threads (ramp-up)
  * - Self warm up
  *
  * Helper functions for JPut users to control the perf tests execution
