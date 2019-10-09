@@ -58,7 +58,7 @@ data class PerfTestConfiguration(
         /**
          * Unit test will be marked as failed, if catched exceptions count is greater than this parameter
          */
-        val maxAllowedExceptionsCount: Long = 0,
+        val maxAllowedExceptionsCount: Long = Long.MAX_VALUE,
 
         /**
          * TODO implement: reactive

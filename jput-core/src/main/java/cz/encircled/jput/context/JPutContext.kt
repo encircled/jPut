@@ -1,6 +1,7 @@
 package cz.encircled.jput.context
 
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.model.SuiteConfiguration
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
@@ -15,6 +16,7 @@ import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
+import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
 lateinit var context: JPutContext
@@ -57,9 +59,14 @@ class JPutContext {
     lateinit var trendAnalyzer: TrendAnalyzer
 
     /**
-     * Currently running suite class, should be set by Runner
+     * Currently running class suite, should be set by [org.junit.runner.Runner]
      */
-    var currentSuite: Class<*>? = null
+    var currentSuite: SuiteConfiguration? = null
+
+    /**
+     * Currently running method of a suite, should be set by [org.junit.runner.Runner]
+     */
+    var currentSuiteMethod: Method? = null
 
     var resultReporters = mutableListOf<JPutReporter>(JPutConsoleReporter())
 

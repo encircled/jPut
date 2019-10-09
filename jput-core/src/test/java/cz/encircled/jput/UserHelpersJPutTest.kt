@@ -91,7 +91,7 @@ class UserHelpersJPutTest : ShortcutsForTests {
 
         countDown.await()
         val actual = execution.executionResult.values
-                .map { it.resultDetails!!.resultCode!! }.sorted()
+                .map { it.resultDetails.resultCode!! }.sorted()
         assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), actual)
     }
 

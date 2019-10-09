@@ -5,7 +5,6 @@ import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
-import java.lang.reflect.Method
 
 /**
  * TODO list:
@@ -74,27 +73,17 @@ object JPut {
             setPerformanceTestResult(ExecutionRunResultDetails(resultCode, errorMessage = errorMessage))
 
     fun getCurrentExecution(): PerfTestExecution? {
-        val elem = Thread.currentThread().stackTrace.reversed().filter {
-            it.className == context.currentSuite!!.name
-        }.firstOrNull {
-            getExecutionForStacktrace(it) != null
+        val method = context.currentSuiteMethod ?: throw IllegalStateException("Whoops, looks like you are not using [JPutJUnit4Runner]...")
+
+        check(context.currentSuite == null || !context.currentSuite!!.isParallel) {
+            "When running in parallel, it is needed to pass testId argument to all [JPut.*] methods"
         }
 
-        return if (elem != null) getExecutionForStacktrace(elem) else null
-    }
-
-    private fun getExecutionForStacktrace(it: StackTraceElement): PerfTestExecution? {
-        val method = toMethod(it) ?: return null
         val defaultTestId = PerfTestConfiguration.defaultTestId(method)
 
         val testId = context.customTestIds[defaultTestId] ?: defaultTestId
-        return context.testExecutions[testId]
-    }
 
-    private fun toMethod(element: StackTraceElement): Method? {
-        return Class.forName(element.className).declaredMethods.firstOrNull {
-            it.name == element.methodName
-        }
+        return context.testExecutions[testId]
     }
 
 }

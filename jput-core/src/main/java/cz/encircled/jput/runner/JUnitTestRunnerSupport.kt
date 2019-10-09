@@ -1,6 +1,7 @@
 package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.SuiteConfiguration
 import cz.encircled.jput.unit.PerformanceSuite
 import org.junit.runners.ParentRunner
 import org.junit.runners.model.RunnerScheduler
@@ -17,11 +18,10 @@ class JUnitTestRunnerSupport(private val clazz: Class<*>) {
         context.init()
         context.resultReporters.forEach { it.beforeClass(clazz) }
 
-        // TODO should be extracted as a separate config class later
         val suite = clazz.getAnnotation(PerformanceSuite::class.java)
-        if (suite != null && suite.parallel) parallelize(runner)
+        context.currentSuite = SuiteConfiguration.fromAnnotation(clazz, suite)
 
-        context.currentSuite = clazz
+        if (context.currentSuite!!.isParallel) parallelize(runner)
     }
 
     /**

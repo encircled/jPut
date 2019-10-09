@@ -26,6 +26,7 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
     }
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
+        context.currentSuiteMethod = method.method
         val description = describeChild(method)
 
         if (this.isIgnored(method)) run {

@@ -36,7 +36,7 @@ class ConsoleReporterTest : ShortcutsForTests {
             val split = out.toString().split("\n")
             assertTrue(split[0].contains("Starting JPut performance tests for ConsoleReporterTest"))
             assertTrue(split[1].contains("Test ConsoleReporterTest:"))
-            assertTrue(split[2].contains("avg: 51ms, max: 100ms, 50%: 50ms, 90%: 90ms, 95%: 95ms, 99%: 99ms"), split[2])
+            assertTrue(split[2].contains("avg: 51ms, max: 100ms, 50%: 50ms, 90%: 90ms, 95%: 95ms, 99%: 99ms, success count: 100, total count: 100"), split[2])
         } finally {
             System.setOut(oldStream)
         }

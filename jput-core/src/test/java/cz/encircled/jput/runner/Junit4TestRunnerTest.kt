@@ -42,6 +42,13 @@ class Junit4TestRunnerTest : ShortcutsForTests {
         ignoredTestCalled = true
     }
 
+    @Test
+    fun testCurrentSuiteIsSet() {
+        assertEquals(this::class.java, context.currentSuite!!.clazz)
+        assertFalse(context.currentSuite!!.isParallel)
+        assertEquals("testCurrentSuiteIsSet", context.currentSuiteMethod!!.name)
+    }
+
     /**
      * "z" to be last in order
      */

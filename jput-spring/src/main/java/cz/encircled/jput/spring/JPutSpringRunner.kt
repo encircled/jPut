@@ -50,6 +50,7 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
     }
 
     override fun runChild(method: FrameworkMethod, notifier: RunNotifier) {
+        context.currentSuiteMethod = method.method
         val description = describeChild(method)
 
         if (isTestMethodIgnored(method)) {
