@@ -26,17 +26,26 @@ Also, it might be used together with Elasticsearch and Kibana for visualizing th
 
 A JUnit test method must be marked with `@PerformanceTest` in order to enable the performance testing. Performance unit test configuration is following:
 
+#### Execution parameters
+
 - *warmUp* - default 0 - count of warm up test executions, which are not counted for asserting. Recommended value is > 0
 - *repeats* - count of test executions, which are counted for asserting and trend analysis
 - *maxTimeLimit* - in milliseconds, default 0 ms - max execution time limit. Test is considered failed, if elapsed time of at least one execution is greater than specified value. Max time limit check is skipped, if specified value is < 1   
 - *averageTimeLimit* - in milliseconds, default 0 ms - average execution time limit. Test is considered failed, if average time of all executions is greater than specified value. Average time limit check is skipped, if specified value is < 1
+- *useStandardDeviationAsThreshold* can be used together with *averageTimeThreshold*, result threshold will be the sum of both
+
+#### Error handling parameters
+
+- *continueOnException* - default 'true' - if true, all errors thrown by the test will be handled, preventing the unit test to fail. Result will be enriched with statusCode=500 and corresponding error message.  
+- *maxAllowedExceptionsCount* - default 0 - if count of errored tests is greater than this, the unit test will be marked as failed. 
+
+#### Trend analysis parameters
+
 - *trends* - configuration of trends testing:  
     * *sampleSize* - sample size which is used for trend analysis, i.e. only specified count of previous test executions will be used for analysis
     * *sampleSelectionStrategy* - defines the way, how the sample (a subset of results) should be chosen from the all available previous results
     * *averageTimeThreshold* - static average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus given threshold
     * *useStandardDeviationAsThreshold* - if true - use the sample standard deviation as an average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus threshold
-
-*useStandardDeviationAsThreshold* can be used together with *averageTimeThreshold*, result threshold will be the sum of both
 
 #### Examples
 
