@@ -64,6 +64,7 @@ class ReactiveTestExecutorTest {
      */
     @Test
     fun testReactiveExecutorCorrectChunks() {
+        System.setProperty("reactor.schedulers.defaultPoolSize", "4")
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
