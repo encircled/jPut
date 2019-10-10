@@ -1,6 +1,5 @@
 package cz.encircled.jput.model
 
-import cz.encircled.jput.trend.PerformanceTrend
 import cz.encircled.jput.trend.SelectionStrategy
 
 /**
@@ -39,18 +38,4 @@ data class TrendTestConfiguration(
          */
         val noisePercentile: Double = 0.0
 
-) {
-
-    companion object {
-
-        fun fromAnnotation(conf: PerformanceTrend): TrendTestConfiguration =
-                TrendTestConfiguration(
-                        conf.sampleSize,
-                        conf.averageTimeThreshold,
-                        conf.useStandardDeviationAsThreshold,
-                        conf.sampleSelectionStrategy
-                )
-
-    }
-
-}
+)

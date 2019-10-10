@@ -39,7 +39,8 @@ class JPutContext {
     /**
      * Global enabled/disabled switch
      */
-    var isPerformanceTestEnabled = true
+    val isPerformanceTestEnabled
+        get() = getProperty(PROP_ENABLED, true)
 
     var propertySources = mutableListOf(SystemPropertySource(), ClasspathFilePropertySource())
 
@@ -71,7 +72,6 @@ class JPutContext {
     var resultReporters = mutableListOf<JPutReporter>(JPutConsoleReporter())
 
     fun init() {
-        isPerformanceTestEnabled = getProperty(PROP_ENABLED, true)
         unitPerformanceAnalyzers = listOf(UnitPerformanceAnalyzerImpl(), TestExceptionsAnalyzer())
         trendAnalyzer = SampleBasedTrendAnalyzer()
 
@@ -153,6 +153,8 @@ class JPutContext {
         const val PROP_PATH_TO_STORAGE_FILE = PREFIX + "storage.file.path"
 
         const val PROP_ENV_PARAMS = PREFIX + "env.custom.params"
+
+        const val PROP_TEST_CONFIG = PREFIX + "config.test."
 
     }
 

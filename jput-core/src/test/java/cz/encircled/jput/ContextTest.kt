@@ -7,6 +7,7 @@ import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ContextTest : ShortcutsForTests {
@@ -35,6 +36,13 @@ class ContextTest : ShortcutsForTests {
         context = JPutContext()
 
         getProperty<String>("doeNotExist")
+    }
+
+    @Test
+    fun testMissingOptionalProperty() {
+        context = JPutContext()
+
+        assertNull(getOptionalProperty<String>("doeNotExist"))
     }
 
     @Test

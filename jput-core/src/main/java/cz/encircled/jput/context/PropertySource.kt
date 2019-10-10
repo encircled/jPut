@@ -2,20 +2,22 @@ package cz.encircled.jput.context
 
 import java.util.*
 
-
-inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T {
+inline fun <reified T> getOptionalProperty(key: String): T? {
     val value = context.propertySources
             .mapNotNull { it.getProperty(key) }
             .firstOrNull()
 
-    if (value.isNullOrBlank()) return defaultValue ?: throw IllegalStateException("JPut property [$key] is mandatory")
-
-    return when (T::class) {
+    return if (value.isNullOrBlank()) return null
+    else when (T::class) {
         Boolean::class -> value.toBoolean() as T
         Int::class -> value.toInt() as T
+        Long::class -> value.toLong() as T
         else -> value as T
     }
 }
+
+inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T =
+        getOptionalProperty<T>(key) ?: (defaultValue ?: throw IllegalStateException("JPut property [$key] is mandatory"))
 
 fun getCollectionProperty(key: String, defaultValue: List<String> = emptyList()): List<String> {
     val value = getProperty(key, "")

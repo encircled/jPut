@@ -1,7 +1,7 @@
 package cz.encircled.jput.runner
 
+import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.unit.PerformanceTest
 import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
@@ -17,7 +17,6 @@ import org.junit.runners.model.Statement
  * @author Vlad on 22-Sep-19.
  */
 class Junit4TestExecutor {
-
 
     var executor: ThreadBasedTestExecutor = ThreadBasedTestExecutor()
 
@@ -40,7 +39,7 @@ class Junit4TestExecutor {
             if (annotation == null || !context.isPerformanceTestEnabled) {
                 statement.evaluate()
             } else {
-                val conf = PerfTestConfiguration.fromAnnotation(annotation, method.method)
+                val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
 
                 val execution = executor.executeTest(conf) { statement.evaluate() }
 

@@ -81,8 +81,6 @@ class ReactiveTestExecutorTest {
         assertTrue(getDif("3 start", "4 start") < delay / 2)
         assertTrue(getDif("3 end", "4 end") < delay / 2)
 
-        println(executeTest.executionResult.values)
-
         // Assert that executions are actually run in parallel and haven't wait for others
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delay * 2 })
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delay - 2 })

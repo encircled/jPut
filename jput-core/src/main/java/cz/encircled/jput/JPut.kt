@@ -1,8 +1,8 @@
 package cz.encircled.jput
 
+import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.ExecutionRunResultDetails
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
@@ -80,7 +80,7 @@ object JPut {
             "When running in parallel, it is needed to pass testId argument to all [JPut.*] methods"
         }
 
-        val defaultTestId = PerfTestConfiguration.defaultTestId(method)
+        val defaultTestId = ConfigurationBuilder.defaultTestId(method)
 
         val testId = context.customTestIds[defaultTestId] ?: defaultTestId
 
