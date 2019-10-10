@@ -64,7 +64,7 @@ class ReactiveTestExecutorTest {
      */
     @Test
     fun testReactiveExecutorCorrectChunks() {
-        System.setProperty("reactor.schedulers.defaultPoolSize", "4")
+        System.setProperty("reactor.schedulers.defaultPoolSize", "2")
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
@@ -83,8 +83,6 @@ class ReactiveTestExecutorTest {
 
         println(executeTest.executionResult.values)
 
-        println("CPU ${Runtime.getRuntime().availableProcessors()}")
-        println("TIMES ${executeTest.executionResult.values}")
         // Assert that executions are actually run in parallel and haven't wait for others
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delay * 2 })
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delay - 2 })
