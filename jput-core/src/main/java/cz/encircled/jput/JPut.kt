@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory
 /**
  * TODO list:
  * - Delete old entries
- * - Flat map elapsed times
  * - Timeout when max time is not set
  * - Self warm up
- * - Tests config in props
+ * - Logging
  *
  * Helper functions for JPut users to control the perf tests execution
  *
