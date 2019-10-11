@@ -98,11 +98,11 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         val builder = { run: ExecutionRun, errorMsg: String ->
             "{\"index\":" +
                     "{\"_index\":\"jput\",\"_type\":\"jput\"}}\n" +
-                    "{\"executionId\":\"${context.executionId}\"," +
+                    "{\"executionId\":${context.executionId}," +
                     "\"testId\":\"1\"," +
                     "\"start\":\"1970-01-01T00:00:00.${run.relativeStartTime / 1000000}Z\"," +
                     "\"elapsed\":${run.elapsedTime}," +
-                    "\"resultCode\":${run.resultDetails?.resultCode}," +
+                    "\"resultCode\":${run.resultDetails.resultCode}," +
                     "\"errorMessage\":\"${errorMsg}\"," +
                     "\"test1\":\"1\",\"test2\":\"abc\"}\n"
         }
