@@ -90,11 +90,6 @@ data class PerfTestExecution(
 ) {
 
     /**
-     * Holds start time of current execution
-     */
-    private var currentRunNum: ThreadLocal<Long> = ThreadLocal.withInitial { 1L }
-
-    /**
      * Thread-safe counter
      */
     private val runCounter = AtomicLong()
@@ -145,15 +140,8 @@ data class PerfTestExecution(
         val actual = runCounter.getAndIncrement()
         val repeat = ExecutionRun(this)
         executionResult[actual] = repeat
-        currentRunNum.set(actual)
         return repeat
     }
-
-    fun resetCurrentExecutionStartTime() {
-        getCurrentRun().relativeStartTime = System.nanoTime() - startTime
-    }
-
-    fun getCurrentRun() = executionResult[currentRunNum.get()]!!
 
 }
 

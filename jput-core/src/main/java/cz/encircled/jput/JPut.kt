@@ -1,33 +1,18 @@
 package cz.encircled.jput
 
-import cz.encircled.jput.context.ConfigurationBuilder
-import cz.encircled.jput.context.context
 import cz.encircled.jput.model.ExecutionRun
-import cz.encircled.jput.model.PerfTestExecution
-import org.slf4j.LoggerFactory
 
 /**
  * TODO list:
  * - Timeout when max time is not set
  * - Self warm up
  * - Logging
- * - Pass "jput" as a test param
  *
  * Helper functions for JPut users to control the perf tests execution
  *
  * @author Vlad on 15-Sep-19.
  */
-object JPut {
-
-    private val log = LoggerFactory.getLogger(JPut::class.java)
-
-    internal fun buildErrorMessage(repeat: ExecutionRun): String {
-        val details = repeat.resultDetails
-        var errorMsg = details.errorMessage ?: ""
-        if (details.error != null && details.error.message != details.errorMessage) errorMsg += ". ${details.error.message}"
-
-        return errorMsg
-    }
+interface JPut {
 
     /**
      * This function may be called directly from the performance test to tell JPut that measurement must start from this point,
@@ -37,40 +22,24 @@ object JPut {
      *
      * ```
      * @PerformanceTest(...)
-     * public void myPerfTest() {
+     * public void myPerfTest(JPut jPut) {
      *     prepareTestData(); // takes some time...
      *
-     *     JPut.markPerformanceTestStart(); // Ignore time took by the init
+     *     jPut.markPerformanceTestStart(); // Ignore time took by the init
      *
      *     // and here goes the code which will really be measured
      *     ...
      * }
      * ```
-     *
-     * Anonymous functions are not supported yet!
      */
-    fun markPerformanceTestStart() {
-        val execution = getCurrentExecution()
+    fun markPerformanceTestStart()
 
-        if (execution == null) {
-            log.warn("Ignoring [markPerformanceTestStart] since it is called from non JPut test")
-        } else {
-            execution.resetCurrentExecutionStartTime()
-        }
-    }
+}
 
-    fun getCurrentExecution(): PerfTestExecution? {
-        val method = context.currentSuiteMethod ?: throw IllegalStateException("Whoops, looks like you are not using [JPutJUnit4Runner]...")
+class JPutImpl(private val executionRun: ExecutionRun) : JPut {
 
-        check(context.currentSuite == null || !context.currentSuite!!.isParallel) {
-            "When running in parallel, it is needed to pass testId argument to all [JPut.*] methods"
-        }
-
-        val defaultTestId = ConfigurationBuilder.defaultTestId(method)
-
-        val testId = context.customTestIds[defaultTestId] ?: defaultTestId
-
-        return context.testExecutions[testId]
+    override fun markPerformanceTestStart() {
+        executionRun.relativeStartTime = System.nanoTime() - executionRun.execution.startTime
     }
 
 }

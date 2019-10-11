@@ -26,8 +26,8 @@ class SpringIntegrationTest {
 
     @PerformanceTest(maxTimeLimit = 5000L)
     @Test
-    fun baseTest() {
-        JPut.markPerformanceTestStart()
+    fun baseTest(jPut: JPut) {
+        jPut.markPerformanceTestStart()
         Thread.sleep(4000)
         println("Hi there")
     }

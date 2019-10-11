@@ -35,10 +35,7 @@ object ConfigurationBuilder {
                 else null
 
         val testId = if (conf.testId.isBlank()) defaultTestId(method)
-        else {
-            context.customTestIds[defaultTestId(method)] = conf.testId
-            conf.testId
-        }
+        else conf.testId
 
         val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
                 conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.rampUp,

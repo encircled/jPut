@@ -1,5 +1,6 @@
 package cz.encircled.jput.reactive
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
@@ -17,14 +18,14 @@ import java.util.concurrent.CountDownLatch
 // TODO re-design a bit, should not extend ThreadBased
 class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
-    val log = LoggerFactory.getLogger(ReactiveTestExecutor::class.java)
+    private val log = LoggerFactory.getLogger(ReactiveTestExecutor::class.java)
 
     // TODO delay
-    override fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
+    override fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
         if (!execution.conf.isReactive) return super.performExecution(execution, statement)
 
         // Invoke test statement which should just return a Mono
-        val body = statement.invoke()
+        val body = statement.invoke(null)
         check(body is Mono<*>) { "Reactive test must return Mono<*> object, without subscribing/blocking." }
 
         // TODO wrong partitioning

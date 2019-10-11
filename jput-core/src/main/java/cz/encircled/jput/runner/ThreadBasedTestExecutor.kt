@@ -1,5 +1,7 @@
 package cz.encircled.jput.runner
 
+import cz.encircled.jput.JPut
+import cz.encircled.jput.JPutImpl
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestConfiguration
@@ -18,12 +20,11 @@ open class ThreadBasedTestExecutor {
 
     private val log = LoggerFactory.getLogger(ThreadBasedTestExecutor::class.java)
 
-    fun executeTest(config: PerfTestConfiguration, statement: () -> Any?): PerfTestExecution {
+    fun executeTest(config: PerfTestConfiguration, statement: (JPut?) -> Any?): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), System.nanoTime())
 
         context.resultReporters.forEach { it.beforeTest(execution) }
 
-        context.testExecutions[execution.conf.testId] = execution
         performExecution(execution, statement)
 
         execution.violations.addAll(analyzeExecutionResults(execution, config))
@@ -62,12 +63,12 @@ open class ThreadBasedTestExecutor {
         }
     }
 
-    open fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
+    open fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
         val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
 
         (1..execution.conf.warmUp).map {
-            executor.submit(statement)
+            executor.submit { statement.invoke(null) }
         }.map { it.get() }
 
         var scheduledCount = 0
@@ -84,16 +85,17 @@ open class ThreadBasedTestExecutor {
                 repeat(r) {
                     val repeat = execution.startNextExecution()
                     try {
-                        val testResult = statement.invoke()
+                        val testResult = statement.invoke(JPutImpl(repeat))
                         if (testResult is RunResult) repeat.resultDetails = testResult
                     } catch (e: Exception) {
                         if (execution.conf.continueOnException) {
-                            execution.getCurrentRun().resultDetails = RunResult(500, e)
+                            log.debug("Exception occurred during test run", e)
+                            repeat.resultDetails = RunResult(500, e)
                         } else {
                             throw e
                         }
                     } finally {
-                        execution.getCurrentRun().measureElapsed()
+                        repeat.measureElapsed()
                     }
 
                     if (execution.conf.delay > 0) Thread.sleep(execution.conf.delay)

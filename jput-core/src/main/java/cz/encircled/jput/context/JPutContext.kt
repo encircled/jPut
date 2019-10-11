@@ -1,6 +1,5 @@
 package cz.encircled.jput.context
 
-import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.SuiteConfiguration
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
@@ -17,7 +16,6 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
-import java.util.concurrent.ConcurrentHashMap
 
 lateinit var context: JPutContext
 
@@ -48,14 +46,6 @@ class JPutContext {
      * Test results recorders
      */
     val resultRecorders = mutableListOf<ResultRecorder>()
-
-    /**
-     * customTestId -> defaultTestId
-     */
-    val customTestIds = mutableMapOf<String, String>()
-
-    // TODO remove after JPut is refactored
-    val testExecutions: MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
 
     lateinit var unitPerformanceAnalyzers: List<UnitPerformanceAnalyzer>
     lateinit var trendAnalyzer: TrendAnalyzer

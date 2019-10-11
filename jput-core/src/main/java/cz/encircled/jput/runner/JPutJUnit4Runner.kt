@@ -6,6 +6,7 @@ import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
+import org.junit.runners.model.Statement
 
 /**
  * [org.junit.runner.Runner] impl for JUnit 4
@@ -44,6 +45,13 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
         } else {
             executor.executeTest(method, notifier, description, methodBlock(method))
         }
+    }
+
+    /**
+     * Allows passing [cz.encircled.jput.JPut] to the test
+     */
+    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement {
+        return InvokeMethodWithParams(test, method)
     }
 
 }

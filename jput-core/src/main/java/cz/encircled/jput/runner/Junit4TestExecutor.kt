@@ -41,7 +41,9 @@ class Junit4TestExecutor {
             } else {
                 val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
 
-                val execution = executor.executeTest(conf) { statement.evaluate() }
+                val execution = executor.executeTest(conf) {
+                    if (statement is InvokeMethodWithParams) statement.evaluateWithParams(it) else statement.evaluate()
+                }
 
                 if (execution.violations.isNotEmpty()) {
                     throw AssertionFailedError("Performance test failed.\n${execution.violationsErrorMessage}")

@@ -1,8 +1,6 @@
 package cz.encircled.jput.config
 
 import cz.encircled.jput.context.ConfigurationBuilder
-import cz.encircled.jput.context.ConfigurationBuilder.defaultTestId
-import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
@@ -47,10 +45,6 @@ class ConfigurationBuilderTest {
                         averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true
                 )
         ), config)
-
-        // Verify that custom ID is registered
-        val id = defaultTestId(function.javaMethod!!)
-        assertEquals("customTestId", context.customTestIds[id])
     }
 
     @Test

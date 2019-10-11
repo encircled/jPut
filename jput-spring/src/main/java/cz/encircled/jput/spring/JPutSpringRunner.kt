@@ -3,12 +3,14 @@ package cz.encircled.jput.spring
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.PropertySource
 import cz.encircled.jput.context.context
+import cz.encircled.jput.runner.InvokeMethodWithParams
 import cz.encircled.jput.runner.JUnitTestRunnerSupport
 import cz.encircled.jput.runner.Junit4TestExecutor
 import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
+import org.junit.runners.model.Statement
 import org.slf4j.LoggerFactory
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
@@ -70,5 +72,11 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
         }
     }
 
+    /**
+     * Allows passing [cz.encircled.jput.JPut] to the test
+     */
+    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement {
+        return InvokeMethodWithParams(test, method)
+    }
 }
 

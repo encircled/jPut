@@ -1,6 +1,6 @@
 package cz.encircled.jput.reporter
 
-import cz.encircled.jput.JPut
+import cz.encircled.jput.JPutUtils
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
@@ -31,7 +31,7 @@ class JPutConsoleReporter : JPutReporter {
                 "total count: ${execution.executionResult.size}\n")
 
         val errorsCount = execution.errorResults()
-                .map { "Code ${it.resultDetails.resultCode}, error: ${JPut.buildErrorMessage(it)}" }
+                .map { "Code ${it.resultDetails.resultCode}, error: ${JPutUtils.buildErrorMessage(it)}" }
                 .groupingBy { it }.eachCount()
 
         val errors = errorsCount.entries.joinToString("\n") {

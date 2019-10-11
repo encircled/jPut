@@ -1,6 +1,6 @@
 package cz.encircled.jput.recorder
 
-import cz.encircled.jput.JPut
+import cz.encircled.jput.JPutUtils
 import cz.encircled.jput.context.*
 import cz.encircled.jput.model.PerfTestExecution
 import org.elasticsearch.ElasticsearchStatusException
@@ -109,7 +109,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
                     "start" to DateTime(repeat.relativeStartTime / 1000000L, DateTimeZone.UTC).toDate(),
                     "elapsed" to repeat.elapsedTime,
                     "resultCode" to repeat.resultDetails.resultCode,
-                    "errorMessage" to JPut.buildErrorMessage(repeat)
+                    "errorMessage" to JPutUtils.buildErrorMessage(repeat)
             )
         }
     }

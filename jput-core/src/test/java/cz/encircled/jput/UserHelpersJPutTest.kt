@@ -1,8 +1,9 @@
 package cz.encircled.jput
 
-import cz.encircled.jput.context.context
 import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.unit.PerformanceTest
 import org.junit.runner.RunWith
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -14,38 +15,18 @@ import kotlin.test.assertTrue
 class UserHelpersJPutTest : ShortcutsForTests {
 
     @Test
-    fun testMarkPerformanceTestStart() {
+    @PerformanceTest
+    @Ignore // TODO needs to be able to run JUnit Runner from test
+    fun testMarkPerformanceTestStart(jPut: JPut) {
         val execution = getTestExecution(baseConfig())
         val originalStartTime = execution.startNextExecution().startTime
 
-        context.testExecutions["UserHelpersJPutTest#testMarkPerformanceTestStart"] = execution
-        JPut.markPerformanceTestStart()
+        jPut.markPerformanceTestStart()
 
         assertEquals(1, execution.executionResult.size)
 
         val repeat = execution.executionResult.values.toList()[0]
         assertTrue(repeat.startTime > originalStartTime)
-    }
-
-    @Test
-    fun testMarkPerformanceTestStartWithCustomTestId() {
-        val execution = getTestExecution(baseConfig())
-        val originalStartTime = execution.startNextExecution().relativeStartTime
-
-        context.customTestIds["UserHelpersJPutTest#testMarkPerformanceTestStartWithCustomTestId"] = "customId"
-        context.testExecutions["customId"] = execution
-        JPut.markPerformanceTestStart()
-
-        assertTrue(execution.executionResult.values.first().relativeStartTime > originalStartTime)
-    }
-
-    /**
-     * Simulate running it from non-JPut function
-     */
-    @Test
-    fun testMarkPerformanceTestStartFromOutside() {
-        // should not fail
-        JPut.markPerformanceTestStart()
     }
 
 }

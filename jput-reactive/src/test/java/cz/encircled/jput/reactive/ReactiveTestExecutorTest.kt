@@ -1,5 +1,6 @@
 package cz.encircled.jput.reactive
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
@@ -137,7 +138,7 @@ class ReactiveTestExecutorTest {
                 throw IOException("Test exception!")
             }
 
-    private fun reactiveBodyWithDelay() =
+    private fun reactiveBodyWithDelay(jPut: JPut?) =
             Mono.just("")
                     .map {
                         val index = increment.getAndIncrement()
