@@ -2,7 +2,6 @@ package cz.encircled.jput
 
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory
  * - Timeout when max time is not set
  * - Self warm up
  * - Logging
+ * - Pass "jput" as a test param
  *
  * Helper functions for JPut users to control the perf tests execution
  *
@@ -50,27 +50,6 @@ object JPut {
             execution.resetCurrentExecutionStartTime()
         }
     }
-
-    /**
-     * Anonymous functions are not supported yet!
-     */
-    fun setPerformanceTestResult(result: ExecutionRunResultDetails) {
-        val execution = getCurrentExecution()
-
-        if (execution == null) {
-            log.warn("Ignoring [setPerformanceTestResult] since it is called from non JPut test")
-        } else {
-            execution.getCurrentRun().resultDetails = result
-        }
-    }
-
-    @JvmOverloads
-    fun setPerformanceTestResult(error: Throwable? = null, resultCode: Int = 500, errorMessage: String? = error?.message) =
-            setPerformanceTestResult(ExecutionRunResultDetails(resultCode, error, errorMessage))
-
-    @JvmOverloads
-    fun setPerformanceTestResult(resultCode: Int, errorMessage: String? = null) =
-            setPerformanceTestResult(ExecutionRunResultDetails(resultCode, errorMessage = errorMessage))
 
     fun getCurrentExecution(): PerfTestExecution? {
         val method = context.currentSuiteMethod ?: throw IllegalStateException("Whoops, looks like you are not using [JPutJUnit4Runner]...")

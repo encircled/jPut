@@ -22,7 +22,7 @@ fun Mono<*>.jputTest() = JPutReactive.reactiveTestBody(this)
 class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
     // TODO delay
-    override fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
+    override fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
         if (!execution.conf.isReactive) return super.performExecution(execution, statement)
 
         // Invoke test statement which should just create a Mono/Flux and store it in params

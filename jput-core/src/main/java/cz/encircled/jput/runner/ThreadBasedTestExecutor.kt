@@ -18,7 +18,7 @@ open class ThreadBasedTestExecutor {
 
     private val log = LoggerFactory.getLogger(ThreadBasedTestExecutor::class.java)
 
-    fun executeTest(config: PerfTestConfiguration, statement: () -> Unit): PerfTestExecution {
+    fun executeTest(config: PerfTestConfiguration, statement: () -> Any?): PerfTestExecution {
         val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), System.nanoTime())
 
         context.resultReporters.forEach { it.beforeTest(execution) }
@@ -62,7 +62,7 @@ open class ThreadBasedTestExecutor {
         }
     }
 
-    open fun performExecution(execution: PerfTestExecution, statement: () -> Unit) {
+    open fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
         val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
 
@@ -82,9 +82,10 @@ open class ThreadBasedTestExecutor {
 
             executor.schedule({
                 repeat(r) {
-                    execution.startNextExecution()
+                    val repeat = execution.startNextExecution()
                     try {
-                        statement.invoke()
+                        val testResult = statement.invoke()
+                        if (testResult is ExecutionRunResultDetails) repeat.resultDetails = testResult
                     } catch (e: Exception) {
                         if (execution.conf.continueOnException) {
                             execution.getCurrentRun().resultDetails = ExecutionRunResultDetails(500, e)

@@ -2,6 +2,7 @@ package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
@@ -22,6 +23,15 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
         } finally {
             context.destroy()
             context.resultReporters.forEach { it.afterClass(clazz) }
+        }
+    }
+
+    /**
+     * Skip args/return type validation of performance tests
+     */
+    override fun validatePublicVoidNoArgMethods(annotation: Class<out Annotation>, isStatic: Boolean, errors: MutableList<Throwable>) {
+        if (annotation != Test::class.java) {
+            super.validatePublicVoidNoArgMethods(annotation, isStatic, errors)
         }
     }
 

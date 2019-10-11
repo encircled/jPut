@@ -5,6 +5,7 @@ import cz.encircled.jput.context.PropertySource
 import cz.encircled.jput.context.context
 import cz.encircled.jput.runner.JUnitTestRunnerSupport
 import cz.encircled.jput.runner.Junit4TestExecutor
+import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
@@ -46,6 +47,15 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
         } finally {
             context.destroy()
             context.resultReporters.forEach { it.afterClass(clazz) }
+        }
+    }
+
+    /**
+     * Skip args/return type validation of performance tests
+     */
+    override fun validatePublicVoidNoArgMethods(annotation: Class<out Annotation>, isStatic: Boolean, errors: MutableList<Throwable>) {
+        if (annotation != Test::class.java) {
+            super.validatePublicVoidNoArgMethods(annotation, isStatic, errors)
         }
     }
 

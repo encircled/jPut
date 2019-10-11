@@ -4,6 +4,7 @@ import cz.encircled.jput.MockRecorder
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
 import java.util.concurrent.atomic.AtomicInteger
@@ -89,11 +90,12 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
 
         assertEquals(5, startTimes.size)
 
+        // It should be 1000,750,500,250 - but java scheduler is not 100% precise, so let here some buffer
         listOf(
-                Pair(0, 1000),
-                Pair(1, 750),
-                Pair(2, 500),
-                Pair(3, 250)
+                Pair(0, 950),
+                Pair(1, 700),
+                Pair(2, 450),
+                Pair(3, 200)
         ).forEach {
             assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
         }
@@ -134,6 +136,41 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
         }
 
         fail("Exception expected")
+    }
+
+    @Test
+    fun testTestErrorResultAppliedWithMessageFromError() {
+        val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
+            ExecutionRunResultDetails(500, RuntimeException("Test"))
+        }
+
+        val details = result.executionResult.values.first().resultDetails
+        assertEquals(500, details.resultCode)
+        assertEquals("Test", details.errorMessage)
+    }
+
+    @Test
+    fun testTestErrorResultApplied() {
+        val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
+            ExecutionRunResultDetails(503, RuntimeException("Test"), "Whoops")
+        }
+
+        val details = result.executionResult.values.first().resultDetails
+        assertEquals(503, details.resultCode)
+        assertEquals("Whoops", details.errorMessage)
+        assertEquals("Test", details.error!!.message)
+    }
+
+    @Test
+    fun testTestSuccessResultApplied() {
+        val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
+            ExecutionRunResultDetails(200)
+        }
+
+        val details = result.executionResult.values.first().resultDetails
+        assertEquals(200, details.resultCode)
+        assertNull(details.errorMessage)
+        assertNull(details.error)
     }
 
 }
