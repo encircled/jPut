@@ -4,6 +4,8 @@ import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
 /**
+ * TODO add errors
+ *
  * @author Vlad on 22-Sep-19.
  */
 class JPutConsoleReporter : JPutReporter {

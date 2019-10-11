@@ -54,6 +54,7 @@ class JPutContext {
      */
     val customTestIds = mutableMapOf<String, String>()
 
+    // TODO remove after JPut is refactored
     val testExecutions: MutableMap<String, PerfTestExecution> = ConcurrentHashMap()
 
     lateinit var unitPerformanceAnalyzers: List<UnitPerformanceAnalyzer>

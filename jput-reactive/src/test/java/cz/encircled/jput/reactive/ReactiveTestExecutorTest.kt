@@ -4,6 +4,7 @@ import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -38,6 +39,31 @@ class ReactiveTestExecutorTest {
         assertEquals("Test exception!", executeTest.executionResult[0]!!.resultDetails.errorMessage)
     }
 
+    @Test
+    fun testWrongTestReturnType() {
+        val executor = ReactiveTestExecutor()
+
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testWrongTestReturnType", isReactive = true)
+        try {
+            executor.executeTest(conf) { "test" }
+        } catch (e: Exception) {
+            assertEquals("Reactive test must return Mono<*> object, without subscribing/blocking.", e.message)
+            return
+        }
+
+        fail("Exception expected")
+    }
+
+    @Test
+    fun testNonReactiveTest() {
+        val executor = ReactiveTestExecutor()
+
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testWrongTestReturnType", isReactive = false)
+
+        // Should just pass
+        executor.executeTest(conf) { "test" }
+    }
+
     /**
      * Test that repeats are split into chunks defined by parallel parameter
      */
@@ -66,26 +92,18 @@ class ReactiveTestExecutorTest {
     }
 
     @Test
-    @Ignore // FIXME
     fun testReactiveWarmUpExecuted() {
+        val counter = AtomicInteger(0)
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBodyWithDelay", warmUp = 4, repeats = 1, parallelCount = 3, isReactive = true)
-        val executeTest = executor.executeTest(conf, ::reactiveBodyWithDelay)
+        executor.executeTest(conf) {
+            1.toMono().map {
+                counter.getAndIncrement()
+            }
+        }
 
-        // Assert warm up chunk in paralleled (parallel is 3)
-        assertTrue(getDif("1 start", "2 start") < delay / 2)
-        assertTrue(getDif("1 start", "3 start") < delay / 2)
-        assertTrue(getDif("2 start", "3 start") < delay / 2)
-        assertTrue(getDif("1 end", "2 end") < delay / 2)
-        assertTrue(getDif("1 end", "3 end") < delay / 2)
-
-        // Assert real execution started after warm up
-        assertTrue(getDif("3 start", "4 start") >= delay)
-
-        // Assert that executions are actually run in parallel and haven't wait for others
-        assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delay * 2 })
-        assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delay - 2 })
+        assertEquals(5, counter.get())
     }
 
     @Test
