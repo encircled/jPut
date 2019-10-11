@@ -20,7 +20,7 @@ Also, it can be used for auto verifying, that performance of your application di
 
 JPut might be used together with Elasticsearch and Kibana for visualizing the performance trends.
 
-## Configuration
+## Performance tests configuration
 
 
 ## Unit test configuration
@@ -63,6 +63,26 @@ public void myUnitTest() {
 
 Such run will be marked as failed and an error will be passed to result recorders (like Kibana)
 
+
+## Global JPut configuration
+
+- *jput.enabled* - boolean - enables/disables execution of performance tests
+- *jput.reporter.class* - fully classified class name of custom Result Recorder
+- *jput.env.custom.params* - custom parameters which will be passed to Result Recorders (for example to Kibana). Might be used for example for tested application version, environment code, name of test runner etc. Format is `key1:value1,key2:value2`, i.e. value split by `:`, multiple values separated by `,` 
+
+#### ELK
+
+- *jput.storage.elastic.enabled* - boolean - enables/disables elasticsearch as a Result Recorder
+- *jput.storage.elastic.host* - elasticsearch server host name
+- *jput.storage.elastic.port* - elasticsearch server port
+- *jput.storage.elastic.scheme* - network scheme, e.g. http/https
+- *jput.storage.elastic.index* - elasticsearch index name to be used
+- *jput.storage.elastic.env.identifiers* - this property can be use to distinguish perf results from different environments or client machine. For example when tested application is running on multiple servers each with different available resources (CPU/RAM/DISC) which may affect the results. This property will be used during trend analysis to compare results from the same environment. 
+
+#### Filesystem
+
+- *jput.storage.file.enabled* - boolean - enables/disables file Result Recorder
+- *jput.storage.file.path* - absolute path to the file which will be used a a storeage
 
 ### Examples
 
