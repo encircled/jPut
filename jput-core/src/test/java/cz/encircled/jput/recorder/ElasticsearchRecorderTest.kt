@@ -47,7 +47,12 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         )))
         assertEquals(listOf(95L, 105L), ecs.getSample(execution))
 
-        wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/_search.*"), true)))
+        val testIdPredicate = "\"testId\":{\"query\":\"1\",\"operator\":\"AND\""
+        val errorPredicate = "\"errorMessage\":{\"query\":\"\",\"operator\":\"AND\""
+
+        val url = RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/_search.*"), true))
+        wireMockServer.verify(1, url.withRequestBody(containing(testIdPredicate)))
+        wireMockServer.verify(1, url.withRequestBody(containing(errorPredicate)))
     }
 
     @Test

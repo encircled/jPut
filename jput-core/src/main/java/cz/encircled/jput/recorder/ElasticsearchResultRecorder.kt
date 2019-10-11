@@ -7,6 +7,7 @@ import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.Requests
+import org.elasticsearch.index.query.Operator
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.index.query.RangeQueryBuilder
 import org.elasticsearch.index.reindex.DeleteByQueryRequest
@@ -27,16 +28,17 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
 
     private val indexName by lazy { getProperty(JPutContext.PROP_ELASTIC_INDEX, "jput") }
 
-    // TODO ignore errors
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val conf = execution.conf.trendConfiguration!!
 
         val queryBuilder = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.matchQuery("testId", execution.conf.testId))
+                .filter(QueryBuilders.matchQuery("testId", execution.conf.testId).operator(Operator.AND))
 
         getCollectionProperty(JPutContext.PROP_ELASTIC_ENV_IDENTIFIERS).forEach {
-            queryBuilder.filter(QueryBuilders.matchQuery(it, getProperty(it, "")))
+            queryBuilder.filter(QueryBuilders.matchQuery(it, getProperty(it, "")).operator(Operator.AND))
         }
+
+        queryBuilder.filter(QueryBuilders.matchQuery("errorMessage", "").operator(Operator.AND))
 
         val request = SearchRequest(indexName).source(SearchSourceBuilder().query(queryBuilder))
 
