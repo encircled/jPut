@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/jput/_delete_by_query.*"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ecs_delete_query_response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

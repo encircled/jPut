@@ -1,21 +1,22 @@
 package cz.encircled.jput.recorder
 
 import cz.encircled.jput.JPut
-import cz.encircled.jput.context.JPutContext
-import cz.encircled.jput.context.context
-import cz.encircled.jput.context.getCollectionProperty
-import cz.encircled.jput.context.getProperty
+import cz.encircled.jput.context.*
 import cz.encircled.jput.model.PerfTestExecution
 import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.Requests
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.index.query.RangeQueryBuilder
+import org.elasticsearch.index.reindex.DeleteByQueryRequest
 import org.elasticsearch.rest.RestStatus
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.joda.time.LocalDate
 import org.slf4j.LoggerFactory
+
 
 /**
  * Elasticsearch-based implementation of tests execution results recorder
@@ -74,6 +75,28 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
         client.bulk(bulk, RequestOptions.DEFAULT)
 
         log.info("Successfully flushed to Elasticsearch")
+    }
+
+    fun doCleanup() {
+        val days = getOptionalProperty<Int>(JPutContext.PROP_ELASTIC_CLEANUP_DAYS)
+        if (days != null) {
+            log.info("Removing execution older than $days days from Elasticsearch...")
+            try {
+                val deleted = deleteExecutionsOlderThan(days)
+                log.info("Successfully removed $deleted old entries from Elasticsearch!")
+            } catch (e: Exception) {
+                log.info("Error during Elasticsearch cleanup", e)
+            }
+        }
+    }
+
+    private fun deleteExecutionsOlderThan(days: Int): Long {
+        val request = DeleteByQueryRequest(indexName)
+
+        request.setQuery(RangeQueryBuilder("executionId")
+                .lt(LocalDate.now().minusDays(days).toDate().time))
+
+        return client.deleteByQuery(request, RequestOptions.DEFAULT).deleted
     }
 
     private fun convertToECSDocument(it: PerfTestExecution): List<MutableMap<String, Any?>> {

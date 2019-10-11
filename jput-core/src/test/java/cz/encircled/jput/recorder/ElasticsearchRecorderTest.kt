@@ -17,6 +17,7 @@ import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
+import org.joda.time.LocalDate
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.runner.RunWith
@@ -119,6 +120,23 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         val ecs = ElasticsearchResultRecorder(client)
         // Should not fail
         ecs.destroy()
+    }
+
+    @Test
+    fun testAutoCleanup() = testWithProps(
+            JPutContext.PROP_ELASTIC_ENABLED to "true",
+            JPutContext.PROP_ELASTIC_HOST to "localhost",
+            JPutContext.PROP_ELASTIC_PORT to "9200",
+            JPutContext.PROP_ELASTIC_CLEANUP_DAYS to "5") {
+
+        context = JPutContext()
+        context.init()
+
+        val time = LocalDate.now().minusDays(5).toDate().time
+        val expected = "{\"size\":1000,\"query\":{\"range\":{\"executionId\":{\"from\":null,\"to\":${time},\"include_lower\":true,\"include_upper\":false,\"boost\":1.0}}},\"_source\":false}"
+
+        wireMockServer.verify(postRequestedFor(urlMatching("/jput/_delete_by_query.*"))
+                .withRequestBody(equalTo(expected)))
     }
 
     companion object {

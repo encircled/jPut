@@ -5,6 +5,7 @@ import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
 import cz.encircled.jput.recorder.FileSystemResultRecorder
+import org.joda.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -15,7 +16,7 @@ class ContextTest : ShortcutsForTests {
     @Test
     fun testDefaultExecutionId() {
         context = JPutContext()
-        assertTrue(context.executionId.matches(Regex("[\\d]{13}")))
+        assertTrue(context.executionId > LocalDate.now().minusDays(1).toDate().time)
     }
 
     @Test

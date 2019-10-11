@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * TODO list:
- * - Delete old entries
  * - Timeout when max time is not set
  * - Self warm up
  * - Logging

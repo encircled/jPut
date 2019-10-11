@@ -32,8 +32,8 @@ class JPutContext {
     /**
      * Unique ID of current tests execution
      */
-    val executionId: String by lazy {
-        System.currentTimeMillis().toString()
+    val executionId: Long by lazy {
+        System.currentTimeMillis()
     }
 
     /**
@@ -106,7 +106,9 @@ class JPutContext {
             log.info("JPut is using Elasticsearch recorder: $host")
 
             val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost(host, port, scheme)))
-            resultRecorders.add(ElasticsearchResultRecorder(client))
+            val elastic = ElasticsearchResultRecorder(client)
+            elastic.doCleanup()
+            resultRecorders.add(elastic)
         }
     }
 
@@ -133,26 +135,67 @@ class JPutContext {
 
         private const val PREFIX = "jput."
 
+        /**
+         * Enables/disables execution of performance tests
+         */
         const val PROP_ENABLED = PREFIX + "enabled"
 
+        /**
+         * Fully classified class name of custom Result Recorder
+         */
         const val PROP_REPORTER_CLASS = PREFIX + "reporter.class"
 
+        /**
+         * Boolean - enables/disables elasticsearch as a Result Recorder
+         */
         const val PROP_ELASTIC_ENABLED = PREFIX + "storage.elastic.enabled"
 
+        /**
+         * Elasticsearch server host name
+         */
         const val PROP_ELASTIC_HOST = PREFIX + "storage.elastic.host"
 
+        /**
+         * Elasticsearch server port
+         */
         const val PROP_ELASTIC_PORT = PREFIX + "storage.elastic.port"
 
+        /**
+         * Network scheme, e.g. http/https
+         */
         const val PROP_ELASTIC_SCHEME = PREFIX + "storage.elastic.scheme"
 
+        /**
+         * Elasticsearch index name to be used
+         */
         const val PROP_ELASTIC_INDEX = PREFIX + "storage.elastic.index"
 
+        /**
+         * This property can be use to distinguish perf results from different environments or client machine.
+         * For example when tested application is running on multiple servers each with different available resources
+         * (CPU/RAM/DISC) which may affect the results. This property will be used during trend analysis to compare results from the same environment.
+         */
         const val PROP_ELASTIC_ENV_IDENTIFIERS = PREFIX + "storage.elastic.env.identifiers"
 
+        /**
+         * Automatically delete data older than given days from Elasticsearch
+         */
+        const val PROP_ELASTIC_CLEANUP_DAYS = PREFIX + "storage.elastic.cleanup.remove.after.days"
+
+        /**
+         * Boolean - enables/disables file Result Recorder
+         */
         const val PROP_STORAGE_FILE_ENABLED = PREFIX + "storage.file.enabled"
 
+        /**
+         * Absolute path to the file which will be used a a storeage
+         */
         const val PROP_PATH_TO_STORAGE_FILE = PREFIX + "storage.file.path"
 
+        /**
+         * Custom parameters which will be passed to Result Recorders (for example to Kibana).
+         * Might be used for example for tested application version, environment code, name of test runner etc. Format is `key1:value1,key2:value2`, i.e. value split by `:`, multiple values separated by `,`.
+         */
         const val PROP_ENV_PARAMS = PREFIX + "env.custom.params"
 
         const val PROP_TEST_CONFIG = PREFIX + "config.test."

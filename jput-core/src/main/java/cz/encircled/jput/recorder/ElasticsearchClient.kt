@@ -7,6 +7,8 @@ import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestClientBuilder
 import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.index.reindex.BulkByScrollResponse
+import org.elasticsearch.index.reindex.DeleteByQueryRequest
 
 /**
  * @author Vlad on 15-Sep-19.
@@ -17,6 +19,8 @@ interface ElasticsearchClient {
 
     fun bulk(request: BulkRequest, options: RequestOptions): BulkResponse
 
+    fun deleteByQuery(deleteByQueryRequest: DeleteByQueryRequest, options: RequestOptions): BulkByScrollResponse
+
     fun close()
 
 }
@@ -24,6 +28,9 @@ interface ElasticsearchClient {
 class ElasticsearchClientWrapper(builder: RestClientBuilder) : ElasticsearchClient {
 
     private val delegate = RestHighLevelClient(builder)
+
+    override fun deleteByQuery(deleteByQueryRequest: DeleteByQueryRequest, options: RequestOptions): BulkByScrollResponse =
+            delegate.deleteByQuery(deleteByQueryRequest, options)
 
     override fun search(searchRequest: SearchRequest, options: RequestOptions): SearchResponse =
             delegate.search(searchRequest, options)
