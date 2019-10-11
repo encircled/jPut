@@ -11,11 +11,6 @@ import reactor.core.scheduler.Schedulers
 import java.util.concurrent.CountDownLatch
 
 /**
- * Mark this [Mono] as a reactive performance test body for JPut
- */
-fun Mono<*>.jputTest() = JPutReactive.reactiveTestBody(this)
-
-/**
  * @author Vlad on 21-Sep-19.
  */
 // TODO re-design a bit, should not extend ThreadBased
@@ -25,17 +20,16 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
     override fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
         if (!execution.conf.isReactive) return super.performExecution(execution, statement)
 
-        // Invoke test statement which should just create a Mono/Flux and store it in params
-        statement.invoke()
-        val body = execution.executionParams["__executor"] as Mono<*>?
-                ?: throw IllegalStateException("Reactive function is not set for execution $execution, please use JPutReactive#reactiveTestBody")
+        // Invoke test statement which should just return a Mono
+        val body = statement.invoke()
+        check(body is Mono<*>) { "Reactive test must return Mono<*> object, without subscribing/blocking." }
 
         // TODO wrong partitioning
         (0 until execution.conf.warmUp).chunked(execution.conf.parallelCount).forEach { chunk ->
             val countDown = CountDownLatch(chunk.size)
 
             chunk.toFlux()
-                    .flatMap { body }
+                    .flatMap { body as Mono<*> }
                     .doOnNext { countDown.countDown() }
                     .subscribe()
 

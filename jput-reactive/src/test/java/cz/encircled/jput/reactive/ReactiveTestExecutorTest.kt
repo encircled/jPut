@@ -4,7 +4,6 @@ import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -37,26 +36,6 @@ class ReactiveTestExecutorTest {
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRuntimeExceptionRegistered", isReactive = true)
         val executeTest = executor.executeTest(conf) { reactiveError() }
         assertEquals("Test exception!", executeTest.executionResult[0]!!.resultDetails.errorMessage)
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun testReactiveBodyNotSet() {
-        val executor = ReactiveTestExecutor()
-
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBlock", isReactive = true)
-        executor.executeTest(conf) {
-            Mono.just(1)
-        }
-    }
-
-    @Test
-    fun testMarkingReactiveBodyFromNonJPut() {
-        JPutReactive.reactiveTestBody(1.toMono())
-    }
-
-    @Test
-    fun testMarkingReactiveBodyFromNonJPut2() {
-        1.toMono().jputTest()
     }
 
     /**
@@ -135,24 +114,22 @@ class ReactiveTestExecutorTest {
     private fun getDif(left: String, right: String) =
             (invocationTimes[left]!! - invocationTimes[right]!!).absoluteValue
 
-    private fun reactiveError() {
-        Mono.just("1").map {
-            throw IOException("Test exception!")
-        }.jputTest()
-    }
+    private fun reactiveError() =
+            Mono.just("1").map {
+                throw IOException("Test exception!")
+            }
 
-    private fun reactiveBodyWithDelay() {
-        Mono.just("")
-                .map {
-                    val index = increment.getAndIncrement()
-                    invocationTimes["$index start"] = System.currentTimeMillis()
-                    Thread.sleep(delay)
-                    index
-                }
-                .map {
-                    invocationTimes["$it end"] = System.currentTimeMillis()
-                }
-                .jputTest()
-    }
+    private fun reactiveBodyWithDelay() =
+            Mono.just("")
+                    .map {
+                        val index = increment.getAndIncrement()
+                        invocationTimes["$index start"] = System.currentTimeMillis()
+                        Thread.sleep(delay)
+                        index
+                    }
+                    .map {
+                        invocationTimes["$it end"] = System.currentTimeMillis()
+                    }
+
 
 }
