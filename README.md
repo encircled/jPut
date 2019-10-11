@@ -10,16 +10,17 @@ jPuts allows using junit tests for continuous performance testing.
 ### Unit performance testing
 
 The main goal of the unit performance testing is to ensure, that the target piece of code meets the performance requirements. 
-For unit testing, jPut uses average and max execution time metrics.
+For unit testing, jPut may use different metrics like average/max/percentile execution time. You can configure those metrics for each test, violating those constraints will cause failing the unit test.
 
 ### Performance trend testing
 
-JPut supports persisting the execution statistics, which allows to trace the changes of performance in time. 
-It can be used for verifying, that performance of your application did not degrade after a particular change in the code.
-Also, it might be used together with Elasticsearch and Kibana for visualizing the performance trends in time.
+JPut supports persisting the execution statistics, which allows to observe the trends how performance changes in time, or compare performance between different version of an application. 
+
+Also, it can be used for auto verifying, that performance of your application did not degrade after a particular change in the code. JPut can be configured to fail the build if performance resulsts degraded too much comparing to previous executions.
+
+JPut might be used together with Elasticsearch and Kibana for visualizing the performance trends.
 
 ## Configuration
-
 
 
 ## Unit test configuration
@@ -47,7 +48,23 @@ A JUnit test method must be marked with `@PerformanceTest` in order to enable th
     * *averageTimeThreshold* - static average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus given threshold
     * *useStandardDeviationAsThreshold* - if true - use the sample standard deviation as an average time threshold. Performance trend test will fail if average execution time is greater than sample average time plus threshold
 
-#### Examples
+#### Returning error result
+
+In order to pass an error message from the test, unit test should return an instance of `cz.encircled.jput.model.RunResult`, like this:
+```java
+@Test
+@PerformanceTest(...)
+public void myUnitTest() {
+   ...
+   return new RunResult(500, "Unexpected server error")
+}
+
+```
+
+Such run will be marked as failed and an error will be passed to result recorders (like Kibana)
+
+
+### Examples
 
 Unit performance test with: 2 warm up executions, 20 repeats and 100ms max time validation
 
@@ -55,7 +72,7 @@ Unit performance test with: 2 warm up executions, 20 repeats and 100ms max time 
 @Test
 @PerformanceTest(warmUp = 2, repeats = 20, maxTimeLimit = 100)
 public void myUnitTest() {
-    
+
 }
 
 ```
