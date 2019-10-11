@@ -2,6 +2,7 @@ package cz.encircled.jput
 
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
+import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
@@ -20,6 +21,14 @@ import org.slf4j.LoggerFactory
 object JPut {
 
     private val log = LoggerFactory.getLogger(JPut::class.java)
+
+    internal fun buildErrorMessage(repeat: ExecutionRun): String {
+        val details = repeat.resultDetails
+        var errorMsg = details.errorMessage ?: ""
+        if (details.error != null && details.error.message != details.errorMessage) errorMsg += ". ${details.error.message}"
+
+        return errorMsg
+    }
 
     /**
      * This function may be called directly from the performance test to tell JPut that measurement must start from this point,

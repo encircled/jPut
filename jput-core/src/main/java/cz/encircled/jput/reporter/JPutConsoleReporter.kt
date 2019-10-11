@@ -1,10 +1,10 @@
 package cz.encircled.jput.reporter
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
 /**
- * TODO add errors
  *
  * @author Vlad on 22-Sep-19.
  */
@@ -27,7 +27,18 @@ class JPutConsoleReporter : JPutReporter {
                 "95%: ${execution.executionPercentile(0.95)}ms, " +
                 "99%: ${execution.executionPercentile(0.99)}ms, " +
                 "success count: ${execution.successResults().size}, " +
-                "total count: ${execution.executionResult.size}")
+                "error count: ${execution.errorResults().size}, " +
+                "total count: ${execution.executionResult.size}\n")
+
+        val errorsCount = execution.errorResults()
+                .map { "Code ${it.resultDetails.resultCode}, error: ${JPut.buildErrorMessage(it)}" }
+                .groupingBy { it }.eachCount()
+
+        val errors = errorsCount.entries.joinToString("\n") {
+            it.key + ". Number of errors ${it.value}"
+        }
+
+        log.info("Test ${execution.conf.testId} errors:\n" + errors)
     }
 
     override fun afterClass(clazz: Class<*>) {

@@ -1,10 +1,10 @@
 package cz.encircled.jput.recorder
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.context.getProperty
-import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.search.SearchRequest
@@ -84,17 +84,9 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
                     "start" to DateTime(repeat.relativeStartTime / 1000000L, DateTimeZone.UTC).toDate(),
                     "elapsed" to repeat.elapsedTime,
                     "resultCode" to repeat.resultDetails.resultCode,
-                    "errorMessage" to buildErrorMessage(repeat)
+                    "errorMessage" to JPut.buildErrorMessage(repeat)
             )
         }
-    }
-
-    private fun buildErrorMessage(repeat: ExecutionRun): String {
-        val details = repeat.resultDetails
-        var errorMsg = details?.errorMessage ?: ""
-        if (details?.error != null && details.error.message != details.errorMessage) errorMsg += ". ${details.error.message}"
-
-        return errorMsg
     }
 
     override fun destroy() {

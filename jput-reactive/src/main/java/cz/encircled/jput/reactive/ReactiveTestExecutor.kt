@@ -4,6 +4,7 @@ import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.runner.ThreadBasedTestExecutor
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
@@ -15,6 +16,8 @@ import java.util.concurrent.CountDownLatch
  */
 // TODO re-design a bit, should not extend ThreadBased
 class ReactiveTestExecutor : ThreadBasedTestExecutor() {
+
+    val log = LoggerFactory.getLogger(ReactiveTestExecutor::class.java)
 
     // TODO delay
     override fun performExecution(execution: PerfTestExecution, statement: () -> Any?) {
@@ -30,8 +33,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
         (0 until execution.conf.warmUp).toFlux()
                 .flatMap { body as Mono<*> }
                 .onErrorContinue { t, _ ->
-                    // TODO log once added
-                    t.printStackTrace()
+                    log.warn("Error during warm up", t)
                 }
                 .doOnNext { wuCountDown.countDown() }
                 .subscribe()

@@ -126,10 +126,12 @@ data class PerfTestExecution(
      */
     fun successResults() = executionResult.values.filter { !it.isError }
 
+    fun errorResults() = executionResult.values.filter { it.isError }
+
     /**
      * Count of repeats which finished with an exception
      */
-    fun exceptionsCount() = executionResult.size - successResults().size
+    fun exceptionsCount() = errorResults().size
 
     /**
      * List of elapsed times of all repeats
