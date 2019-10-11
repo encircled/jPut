@@ -4,8 +4,8 @@ import cz.encircled.jput.MockRecorder
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
-import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfConstraintViolation
+import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.model.TrendTestConfiguration
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.*
@@ -141,7 +141,7 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
     @Test
     fun testTestErrorResultAppliedWithMessageFromError() {
         val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
-            ExecutionRunResultDetails(500, RuntimeException("Test"))
+            RunResult(500, RuntimeException("Test"))
         }
 
         val details = result.executionResult.values.first().resultDetails
@@ -152,7 +152,7 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
     @Test
     fun testTestErrorResultApplied() {
         val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
-            ExecutionRunResultDetails(503, RuntimeException("Test"), "Whoops")
+            RunResult(503, RuntimeException("Test"), "Whoops")
         }
 
         val details = result.executionResult.values.first().resultDetails
@@ -164,7 +164,7 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
     @Test
     fun testTestSuccessResultApplied() {
         val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {
-            ExecutionRunResultDetails(200)
+            RunResult(200)
         }
 
         val details = result.executionResult.values.first().resultDetails

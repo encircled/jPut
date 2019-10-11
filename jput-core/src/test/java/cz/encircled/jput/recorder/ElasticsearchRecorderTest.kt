@@ -12,7 +12,7 @@ import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.ExecutionRun
-import cz.encircled.jput.model.ExecutionRunResultDetails
+import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
@@ -72,16 +72,16 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         )))
 
         val successCase = ExecutionRun(execution, 321000000L, 321L)
-        successCase.resultDetails = ExecutionRunResultDetails(200)
+        successCase.resultDetails = RunResult(200)
 
         val errorAndMessageCase = ExecutionRun(execution, 123000000L, 4321L)
-        errorAndMessageCase.resultDetails = ExecutionRunResultDetails(503, RuntimeException("Whoops"), "TestError")
+        errorAndMessageCase.resultDetails = RunResult(503, RuntimeException("Whoops"), "TestError")
 
         val onlyMessageCase = ExecutionRun(execution, 123000000L, 4321L)
-        onlyMessageCase.resultDetails = ExecutionRunResultDetails(503, errorMessage = "TestError")
+        onlyMessageCase.resultDetails = RunResult(503, errorMessage = "TestError")
 
         val allNullCase = ExecutionRun(execution, 123000000L, 4321L)
-        allNullCase.resultDetails = ExecutionRunResultDetails()
+        allNullCase.resultDetails = RunResult()
 
         val noDetailsCase = ExecutionRun(execution, 123000000L, 4321L)
 

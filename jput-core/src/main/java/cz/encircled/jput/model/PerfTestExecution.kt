@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToLong
 
 
-data class ExecutionRunResultDetails @JvmOverloads constructor(
+data class RunResult @JvmOverloads constructor(
 
         val resultCode: Int? = null,
 
@@ -36,7 +36,7 @@ data class ExecutionRun(
          */
         var elapsedTime: Long = 0L,
 
-        var resultDetails: ExecutionRunResultDetails = ExecutionRunResultDetails(200)) {
+        var resultDetails: RunResult = RunResult(200)) {
 
     val startTime: Long
         get() = execution.startTime + relativeStartTime

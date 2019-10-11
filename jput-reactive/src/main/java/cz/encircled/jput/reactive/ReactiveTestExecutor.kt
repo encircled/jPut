@@ -1,8 +1,8 @@
 package cz.encircled.jput.reactive
 
 import cz.encircled.jput.model.ExecutionRun
-import cz.encircled.jput.model.ExecutionRunResultDetails
 import cz.encircled.jput.model.PerfTestExecution
+import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -53,7 +53,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
                         Pair(b, repeat).toMono()
                     }.onErrorContinue { t, _ ->
                         repeat.measureElapsed()
-                        repeat.resultDetails = ExecutionRunResultDetails(error = t)
+                        repeat.resultDetails = RunResult(error = t)
                     }
                 }.doOnTerminate {
                     countDown.countDown()
