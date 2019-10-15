@@ -1,8 +1,5 @@
 package cz.encircled.jput
 
-import cz.encircled.jput.deviation
-import cz.encircled.jput.percentile
-import cz.encircled.jput.variance
 import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -17,6 +14,7 @@ class StatisticsTest {
         Assert.assertEquals(4.0, listOf(1L, 5).variance(), 0.0)
         Assert.assertEquals(1.25, listOf(2L, 3, 4, 5).variance(), 0.0)
         Assert.assertEquals(200.0, listOf(50L, 60, 70, 80, 90).variance(), 0.0)
+        Assert.assertEquals(0.0, listOf<Long>().variance(), 0.0)
     }
 
     @Test

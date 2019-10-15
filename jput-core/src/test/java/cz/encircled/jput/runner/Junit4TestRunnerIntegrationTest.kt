@@ -25,8 +25,10 @@ class TestRunListener : RunListener() {
 
     val finished = mutableListOf<Description>()
 
-    override fun testAssumptionFailure(failure: Failure?) {
-        super.testAssumptionFailure(failure)
+    val assumptionFailures = mutableListOf<Failure>()
+
+    override fun testAssumptionFailure(failure: Failure) {
+        assumptionFailures.add(failure)
     }
 
     override fun testFinished(description: Description) {
@@ -54,6 +56,12 @@ class Junit4TestRunnerIntegrationTest {
             runner.run(notifier)
         }
 
+    }
+
+    @Test
+    fun testAssumptionFailedPropagated() {
+        assertEquals(1, listener.assumptionFailures.size)
+        assertEquals("testAssumptionFailedPropagated", listener.assumptionFailures[0].description.methodName)
     }
 
     @Test
@@ -104,6 +112,8 @@ class Junit4TestRunnerIntegrationTest {
         assertEquals(
                 mutableListOf<Pair<String, Any?>>(
                         "beforeClass" to Junit4TestRunnerSteps::class.java,
+
+                        "beforeTest" to "Junit4TestRunnerSteps#testAssumptionFailedPropagated",
 
                         "beforeTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",
                         "afterTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",

@@ -49,10 +49,9 @@ class Junit4TestExecutor {
                     throw AssertionFailedError("Performance test failed.\n${execution.violationsErrorMessage}")
                 }
             }
-        } catch (e: AssumptionViolatedException) {
-            eachNotifier.addFailedAssumption(e)
         } catch (e: Throwable) {
-            eachNotifier.addFailure(e)
+            if (e.cause is AssumptionViolatedException) eachNotifier.addFailedAssumption(e.cause as AssumptionViolatedException)
+            else eachNotifier.addFailure(e)
         } finally {
             eachNotifier.fireTestFinished()
         }

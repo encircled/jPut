@@ -57,6 +57,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
                         repeat.measureElapsed()
                         Pair(b, repeat).toMono()
                     }.onErrorContinue { t, _ ->
+                        // TODO add if (e is AssumptionViolatedException || !execution.conf.continueOnException) {
                         repeat.measureElapsed()
                         repeat.resultDetails = RunResult(error = t)
                     }

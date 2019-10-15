@@ -4,10 +4,11 @@ import cz.encircled.jput.JPut
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.unit.PerformanceTest
+import org.junit.Assume
 import org.junit.FixMethodOrder
 import org.junit.Ignore
-import org.junit.Test
 import org.junit.runners.MethodSorters
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -18,6 +19,12 @@ class Junit4TestRunnerSteps {
         @JvmStatic
         var testCounter = 0
 
+    }
+
+    @PerformanceTest
+    @Test
+    fun testAssumptionFailedPropagated() {
+        Assume.assumeTrue(false)
     }
 
     @PerformanceTest

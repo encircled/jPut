@@ -7,6 +7,7 @@ import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
+import org.junit.AssumptionViolatedException
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -88,11 +89,11 @@ open class ThreadBasedTestExecutor {
                         val testResult = statement.invoke(JPutImpl(repeat))
                         if (testResult is RunResult) repeat.resultDetails = testResult
                     } catch (e: Exception) {
-                        if (execution.conf.continueOnException) {
+                        if (e is AssumptionViolatedException || !execution.conf.continueOnException) {
+                            throw e
+                        } else {
                             log.debug("Exception occurred during test run", e)
                             repeat.resultDetails = RunResult(500, e)
-                        } else {
-                            throw e
                         }
                     } finally {
                         repeat.measureElapsed()
