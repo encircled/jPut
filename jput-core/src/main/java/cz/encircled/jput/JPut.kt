@@ -7,6 +7,8 @@ import cz.encircled.jput.model.ExecutionRun
  * - Timeout when max time is not set
  * - Self warm up
  * - Logging
+ * - Fix when parallel > repeats
+ * - Error on warmup
  *
  * Helper functions for JPut users to control the perf tests execution
  *

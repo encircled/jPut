@@ -1,11 +1,8 @@
-package cz.encircled.jput.spring
+package cz.encircled.jput.runner
 
 import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.PropertySource
 import cz.encircled.jput.context.context
-import cz.encircled.jput.runner.InvokeMethodWithParams
-import cz.encircled.jput.runner.JUnitTestRunnerSupport
-import cz.encircled.jput.runner.Junit4TestExecutor
 import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod

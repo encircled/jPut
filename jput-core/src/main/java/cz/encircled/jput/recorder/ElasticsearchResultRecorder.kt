@@ -98,6 +98,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
         request.setQuery(RangeQueryBuilder("executionId")
                 .lt(LocalDate.now().minusDays(days).toDate().time))
 
+        // TODO wrong result
         return client.deleteByQuery(request, RequestOptions.DEFAULT).deleted
     }
 

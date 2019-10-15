@@ -1,4 +1,4 @@
-package cz.encircled.jput.runner
+package cz.encircled.jput.executor
 
 import cz.encircled.jput.MockRecorder
 import cz.encircled.jput.ShortcutsForTests
@@ -7,6 +7,7 @@ import cz.encircled.jput.context.context
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.model.TrendTestConfiguration
+import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.*
 

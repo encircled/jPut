@@ -7,6 +7,12 @@ class TestReporter : JPutReporter {
 
     val invocations = mutableListOf<Pair<String, Any?>>()
 
+    val executions = mutableListOf<PerfTestExecution>()
+
+    fun getExecution(id: String) = executions.find {
+        it.conf.testId.endsWith(id)
+    } ?: throw RuntimeException("Test ")
+
     override fun beforeClass(clazz: Class<*>) {
         invocations.add("beforeClass" to clazz)
     }
@@ -17,6 +23,7 @@ class TestReporter : JPutReporter {
 
     override fun afterTest(execution: PerfTestExecution) {
         invocations.add("afterTest" to execution.conf.testId)
+        executions.add(execution)
     }
 
     override fun afterClass(clazz: Class<*>) {
