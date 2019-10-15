@@ -29,17 +29,17 @@ annotation class PerformanceTest(
         /**
          * Delay between test repeats, in ms
          */
-        val delay: Long = 50L,
+        val delay: Long = 0,
 
         /**
          * Upper limit for test execution time in milliseconds
          */
-        val maxTimeLimit: Long = 0L,
+        val maxTimeLimit: Long = 0,
 
         /**
          * Upper limit for average execution time when using **repeats > 1**, in milliseconds
          */
-        val averageTimeLimit: Long = 0L,
+        val averageTimeLimit: Long = 0,
 
         val percentiles: LongArray = [],
 

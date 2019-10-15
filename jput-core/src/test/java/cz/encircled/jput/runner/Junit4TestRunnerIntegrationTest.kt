@@ -75,14 +75,26 @@ class Junit4TestRunnerIntegrationTest {
 
     @Test
     fun testReturnedErrorPropagated() {
-        val expected = "Performance test failed.\n[Limit exceptions count = 1, actual = 2]"
+        val expected = "Limit exceptions count = 1, actual = 2"
         assertFailedAssertion("testReturnedErrorPropagated", expected)
+        assertExceptionsInRuns("testRuntimeExceptionCatched", "Test exception")
     }
 
     @Test
     fun testRuntimeExceptionCatched() {
-        val expected = "Performance test failed.\n[Limit exceptions count = 1, actual = 2]"
+        val expected = "Limit exceptions count = 1, actual = 2"
         assertFailedAssertion("testRuntimeExceptionCatched", expected)
+        assertExceptionsInRuns("testRuntimeExceptionCatched", "Test exception")
+    }
+
+    @Test
+    fun testMarkPerformanceTestStart() {
+        assertSuccessful("testMarkPerformanceTestStart")
+
+        assertEquals(1, getExecution("testMarkPerformanceTestStart").getElapsedTimes().size)
+
+        // Test has thread.sleep(50) and then calls 'markPerformanceTestStart'
+        assertTrue(getExecution("testMarkPerformanceTestStart").getElapsedTimes()[0] < 49)
     }
 
     @Test
@@ -92,6 +104,9 @@ class Junit4TestRunnerIntegrationTest {
         assertEquals(
                 mutableListOf<Pair<String, Any?>>(
                         "beforeClass" to Junit4TestRunnerSteps::class.java,
+
+                        "beforeTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",
+                        "afterTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",
 
                         "beforeTest" to "Junit4TestRunnerSteps#testReturnedErrorPropagated",
                         "afterTest" to "Junit4TestRunnerSteps#testReturnedErrorPropagated",
@@ -113,7 +128,24 @@ class Junit4TestRunnerIntegrationTest {
      */
     fun assertFailedAssertion(method: String, expectedAssertion: String) {
         val failure = expectFailure(method)
-        assertEquals(expectedAssertion, failure.exception.message)
+        assertEquals("Performance test failed.\n[$expectedAssertion]", failure.exception.message)
+
+        val execution = getExecution(method)
+
+        val actualViolationMsg = execution.violations.joinToString {
+            it.messageProducer.invoke(execution)
+        }
+        assertEquals(expectedAssertion, actualViolationMsg)
+    }
+
+    fun assertExceptionsInRuns(method: String, expectedError: String, resultCode: Int = 500) {
+        val execution = getExecution(method)
+
+        execution.executionResult.values.forEach {
+            assertEquals(resultCode, it.resultDetails.resultCode)
+            assertEquals(expectedError, it.resultDetails.errorMessage)
+            assertEquals(expectedError, it.resultDetails.error!!.message)
+        }
     }
 
     private fun assertSuccessful(method: String) {
@@ -121,8 +153,18 @@ class Junit4TestRunnerIntegrationTest {
                 .map { it.description.methodName }
                 .all { it != method })
 
+        val execution = getExecution(method)
+        assertTrue(execution.violations.isEmpty())
+        assertTrue(execution.executionResult.values.all {
+            it.resultDetails.resultCode == 200 &&
+                    it.resultDetails.error == null && it.resultDetails.errorMessage == null
+        })
+
         assertTrue(isTestExecuted(method))
     }
+
+    private fun getExecution(id: String) =
+            (context.resultReporters[1] as TestReporter).getExecution(id)
 
     private fun expectFailure(method: String): Failure =
             listener.failures.firstOrNull {
