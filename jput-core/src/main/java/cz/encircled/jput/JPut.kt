@@ -9,6 +9,7 @@ import cz.encircled.jput.model.ExecutionRun
  * - Logging
  * - Fix when parallel > repeats
  * - Error on warmup
+ * - Execution ID must be the same for all classes
  *
  * Helper functions for JPut users to control the perf tests execution
  *

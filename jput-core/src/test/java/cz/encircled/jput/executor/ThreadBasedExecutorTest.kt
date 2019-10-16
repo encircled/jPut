@@ -18,13 +18,7 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
 
     @BeforeTest
     fun before() {
-        context = JPutContext()
-        context.init()
-    }
-
-    @AfterTest
-    fun after() {
-        context.destroy()
+        context = JPutContext().init()
     }
 
     @Test

@@ -1,6 +1,5 @@
 package cz.encircled.jput.runner
 
-import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.PropertySource
 import cz.encircled.jput.context.context
 import org.junit.Test
@@ -31,21 +30,30 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
     val log = LoggerFactory.getLogger(JPutSpringRunner::class.java)
 
+    companion object {
+
+        var isInitialized = false
+
+    }
+
     override fun run(notifier: RunNotifier) {
-        context = JPutContext()
-        context.addPropertySource(object : PropertySource {
-            override fun getProperty(key: String): String? {
-                return testContextManager.testContext.applicationContext.environment.getProperty(key)
-            }
-        })
+        if (!isInitialized) {
+            isInitialized = true
+            context.addPropertySource(object : PropertySource {
+                override fun getProperty(key: String): String? {
+                    return testContextManager.testContext.applicationContext.environment.getProperty(key)
+                }
+            })
+
+            context.init()
+        }
 
         JUnitTestRunnerSupport(clazz).prepareRunner(this)
 
         try {
             super.run(notifier)
         } finally {
-            context.destroy()
-            context.resultReporters.forEach { it.afterClass(clazz) }
+            context.afterTestClass(clazz)
         }
     }
 

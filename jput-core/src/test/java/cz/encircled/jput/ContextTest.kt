@@ -15,13 +15,12 @@ class ContextTest : ShortcutsForTests {
 
     @Test
     fun testDefaultExecutionId() {
-        context = JPutContext()
         assertTrue(context.executionId > LocalDate.now().minusDays(1).toDate().time)
     }
 
     @Test
     fun testGetProperty() = testWithProps("getProp" to "true", "collectionProp" to "1,2") {
-        context = JPutContext()
+        context.init()
         assertEquals("true", getProperty("getProp", "def"))
         assertEquals("def", getProperty("getProp2", "def"))
 
@@ -73,8 +72,8 @@ class ContextTest : ShortcutsForTests {
         testWithProps(JPutContext.PROP_STORAGE_FILE_ENABLED to "true",
                 JPutContext.PROP_PATH_TO_STORAGE_FILE to path) {
 
-            context = JPutContext()
-            context.init()
+            context = JPutContext().init()
+
             assertEquals(1, context.resultRecorders.size)
             val recorder = context.resultRecorders[0]
             assertTrue(recorder is FileSystemResultRecorder)

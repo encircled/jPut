@@ -50,6 +50,9 @@ class Junit4TestRunnerIntegrationTest {
         @JvmStatic
         @BeforeClass
         fun runSteps() {
+            (context.resultReporters[1] as TestReporter).executions.clear()
+            (context.resultReporters[1] as TestReporter).invocations.clear()
+
             val runner = JPutJUnit4Runner(Junit4TestRunnerSteps::class.java)
             val notifier = RunNotifier()
             notifier.addListener(listener)

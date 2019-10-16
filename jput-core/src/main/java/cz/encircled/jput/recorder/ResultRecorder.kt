@@ -51,13 +51,6 @@ interface ResultRecorder {
      */
     fun flush()
 
-    /**
-     * Graceful destroy, called after test
-     */
-    fun destroy() {
-
-    }
-
 }
 
 /**

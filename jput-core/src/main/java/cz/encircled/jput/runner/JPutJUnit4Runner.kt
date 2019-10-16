@@ -1,6 +1,5 @@
 package cz.encircled.jput.runner
 
-import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import org.junit.Test
 import org.junit.runner.notification.RunNotifier
@@ -15,15 +14,23 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
 
     var executor = Junit4TestExecutor()
 
+    companion object {
+
+        var isInitialized = false
+
+    }
+
     override fun run(notifier: RunNotifier?) {
-        context = JPutContext()
+        if (!isInitialized) {
+            isInitialized = true
+            context.init()
+        }
         JUnitTestRunnerSupport(clazz).prepareRunner(this)
 
         try {
             super.run(notifier)
         } finally {
-            context.destroy()
-            context.resultReporters.forEach { it.afterClass(clazz) }
+            context.afterTestClass(clazz)
         }
     }
 

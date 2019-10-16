@@ -148,14 +148,6 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
     }
 
     @Test
-    fun testDestroy() {
-        val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("not_exist", port, "http")))
-        val ecs = ElasticsearchResultRecorder(client)
-        // Should not fail
-        ecs.destroy()
-    }
-
-    @Test
     fun testAutoCleanup() = testWithProps(
             JPutContext.PROP_ELASTIC_ENABLED to "true",
             JPutContext.PROP_ELASTIC_HOST to "localhost",

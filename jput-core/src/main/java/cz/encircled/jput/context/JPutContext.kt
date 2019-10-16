@@ -10,20 +10,20 @@ import cz.encircled.jput.reporter.JPutReporter
 import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import cz.encircled.jput.trend.TrendAnalyzer
 import cz.encircled.jput.unit.TestExceptionsAnalyzer
-import cz.encircled.jput.unit.UnitPerformanceAnalyzer
 import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
-lateinit var context: JPutContext
+var context: JPutContext = JPutContext()
 
 /**
  *
  * @author Vlad on 21-May-17.
  */
 class JPutContext {
+
 
     private val log = LoggerFactory.getLogger(JPutContext::class.java)
 
@@ -47,8 +47,9 @@ class JPutContext {
      */
     val resultRecorders = mutableListOf<ResultRecorder>()
 
-    lateinit var unitPerformanceAnalyzers: List<UnitPerformanceAnalyzer>
-    lateinit var trendAnalyzer: TrendAnalyzer
+    var unitPerformanceAnalyzers = listOf(UnitPerformanceAnalyzerImpl(), TestExceptionsAnalyzer())
+
+    var trendAnalyzer: TrendAnalyzer = SampleBasedTrendAnalyzer()
 
     /**
      * Currently running class suite, should be set by [org.junit.runner.Runner]
@@ -62,22 +63,22 @@ class JPutContext {
 
     var resultReporters = mutableListOf<JPutReporter>(JPutConsoleReporter())
 
-    fun init() {
-        unitPerformanceAnalyzers = listOf(UnitPerformanceAnalyzerImpl(), TestExceptionsAnalyzer())
-        trendAnalyzer = SampleBasedTrendAnalyzer()
-
+    fun init(): JPutContext {
         getProperty(PROP_REPORTER_CLASS, "").let {
-            if (it.isNotEmpty()) {
+            if (it.isNotEmpty() && resultReporters.all { r -> r.javaClass.name != it }) {
                 resultReporters.add(Class.forName(it).getConstructor().newInstance() as JPutReporter)
             }
         }
 
         initECSRecorder()
         initFileSystemRecorder()
+
+        return this
     }
 
     private fun initFileSystemRecorder() {
-        if (getProperty(PROP_STORAGE_FILE_ENABLED, false)) {
+        val alreadyPresent = resultRecorders.any { it is FileSystemResultRecorder }
+        if (!alreadyPresent && getProperty(PROP_STORAGE_FILE_ENABLED, false)) {
 
             val default = System.getProperty("java.io.tmpdir") + "jput-test.data"
             val pathToFile = getProperty(PROP_PATH_TO_STORAGE_FILE, default)
@@ -88,7 +89,8 @@ class JPutContext {
     }
 
     private fun initECSRecorder() {
-        if (getProperty(PROP_ELASTIC_ENABLED, false)) {
+        val alreadyPresent = resultRecorders.any { it is ElasticsearchResultRecorder }
+        if (!alreadyPresent && getProperty(PROP_ELASTIC_ENABLED, false)) {
             val host = getProperty<String>(PROP_ELASTIC_HOST)
             val port = getProperty(PROP_ELASTIC_PORT, 80)
             val scheme = getProperty(PROP_ELASTIC_SCHEME, "http")
@@ -102,17 +104,20 @@ class JPutContext {
         }
     }
 
-    fun destroy() {
+    fun afterTestClass(clazz: Class<*>) {
         resultRecorders.forEach {
             try {
                 it.flush()
             } catch (e: Exception) {
                 log.warn("Failed to flush results", e)
             }
+        }
+
+        context.resultReporters.forEach {
             try {
-                it.destroy()
+                it.afterClass(clazz)
             } catch (e: Exception) {
-                log.warn("Failed to close the recorder", e)
+                log.warn("Failed to append results to reporter", e)
             }
         }
     }

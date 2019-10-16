@@ -28,6 +28,16 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
 
     private val indexName by lazy { getProperty(JPutContext.PROP_ELASTIC_INDEX, "jput") }
 
+    init {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            try {
+                client.close()
+            } catch (e: Exception) {
+                log.warn("Failed to close ECS client", e)
+            }
+        })
+    }
+
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val conf = execution.conf.trendConfiguration!!
 
@@ -116,14 +126,6 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
                     "resultCode" to repeat.resultDetails.resultCode,
                     "errorMessage" to JPutUtils.buildErrorMessage(repeat)
             )
-        }
-    }
-
-    override fun destroy() {
-        try {
-            client.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
