@@ -56,6 +56,34 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
     }
 
     @Test
+    fun testGetSampleWithEnvParams() = testWithProps(
+            JPutContext.PROP_ENV_PARAMS to "env:localhost,namespace:1",
+            JPutContext.PROP_ELASTIC_ENV_IDENTIFIERS to "env,namespace") {
+        val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
+        val ecs = ElasticsearchResultRecorder(client)
+
+        val execution = getTestExecution(configWithTrend(TrendTestConfiguration(
+                sampleSize = 5
+        )))
+        assertEquals(listOf(95L, 105L), ecs.getSample(execution))
+
+        val predicate: (String, String) -> String = { l, r ->
+            "\"match\":{\"$l\":{\"query\":\"$r\",\"operator\":\"AND\""
+        }
+
+        val testIdPredicate = predicate("testId", "1")
+        val errorPredicate = predicate("errorMessage", "")
+        val envPredicate = predicate("env", "localhost")
+        val nsPredicate = predicate("namespace", "1")
+
+        val url = RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/jput/_search.*"), true))
+        wireMockServer.verify(1, url.withRequestBody(containing(testIdPredicate)))
+        wireMockServer.verify(1, url.withRequestBody(containing(errorPredicate)))
+        wireMockServer.verify(1, url.withRequestBody(containing(nsPredicate)))
+        wireMockServer.verify(1, url.withRequestBody(containing(envPredicate)))
+    }
+
+    @Test
     fun testGetSampleWhenIndexNotExist() = testWithProps(JPutContext.PROP_ELASTIC_INDEX to "new") {
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
         val ecs = ElasticsearchResultRecorder(client)

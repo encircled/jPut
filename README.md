@@ -77,7 +77,8 @@ Such run will be marked as failed and an error will be passed to result recorder
 - *jput.storage.elastic.port* - elasticsearch server port. Default is 80
 - *jput.storage.elastic.scheme* - network scheme, e.g. http/https. Default is http
 - *jput.storage.elastic.index* - elasticsearch index name to be used
-- *jput.storage.elastic.env.identifiers* - this property can be use to distinguish perf results from different environments or client machine. For example when tested application is running on multiple servers each with different available resources (CPU/RAM/DISC) which may affect the results. This property will be used during trend analysis to compare results from the same environment 
+- *jput.storage.elastic.env.identifiers* - this property can be use to distinguish perf results from different environments or client machine. For example when tested application is running on multiple servers each with different available resources (CPU/RAM/DISC) which may affect the results. 
+This property will be used during trend analysis to compare results from the same environment. Format is: list of property names, separated by comma. Property values must be provided using *jput.env.custom.params* property.  
 - *jput.storage.elastic.cleanup.remove.after.days* - Int - Automatically delete data older than given days from Elasticsearch 
 
 #### Filesystem

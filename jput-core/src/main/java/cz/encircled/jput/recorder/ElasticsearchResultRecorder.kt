@@ -31,14 +31,15 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
     override fun getSample(execution: PerfTestExecution): List<Long> {
         val conf = execution.conf.trendConfiguration!!
 
-        val queryBuilder = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.matchQuery("testId", execution.conf.testId).operator(Operator.AND))
+        val queryBuilder = QueryBuilders.boolQuery().filter(
+                matches("testId", execution.conf.testId))
 
         getCollectionProperty(JPutContext.PROP_ELASTIC_ENV_IDENTIFIERS).forEach {
-            queryBuilder.filter(QueryBuilders.matchQuery(it, getProperty(it, "")).operator(Operator.AND))
+            val envParam = getUserDefinedEnvParams()[it] ?: ""
+            queryBuilder.filter(matches(it, envParam))
         }
 
-        queryBuilder.filter(QueryBuilders.matchQuery("errorMessage", "").operator(Operator.AND))
+        queryBuilder.filter(matches("errorMessage", ""))
 
         val request = SearchRequest(indexName).source(SearchSourceBuilder().query(queryBuilder))
 
@@ -91,6 +92,9 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
             }
         }
     }
+
+    private fun matches(name: String, value: String) =
+            QueryBuilders.matchQuery(name, value).operator(Operator.AND)
 
     private fun deleteExecutionsOlderThan(days: Int): Long {
         val request = DeleteByQueryRequest(indexName)

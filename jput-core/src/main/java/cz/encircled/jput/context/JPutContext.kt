@@ -162,8 +162,12 @@ class JPutContext {
 
         /**
          * This property can be use to distinguish perf results from different environments or client machine.
-         * For example when tested application is running on multiple servers each with different available resources
-         * (CPU/RAM/DISC) which may affect the results. This property will be used during trend analysis to compare results from the same environment.
+         * For example when tested application is running on multiple servers each with different available resources (CPU/RAM/DISC)
+         * which may affect the results.
+         *
+         * This property will be used during trend analysis to compare results from the same environment.
+         *
+         * Format is: list of property names, separated by comma. Property values must be provided using *jput.env.custom.params* property.
          */
         const val PROP_ELASTIC_ENV_IDENTIFIERS = PREFIX + "storage.elastic.env.identifiers"
 
