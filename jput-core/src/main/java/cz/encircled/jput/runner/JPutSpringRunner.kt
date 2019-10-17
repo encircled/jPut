@@ -7,7 +7,6 @@ import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
 import org.junit.runners.model.Statement
-import org.slf4j.LoggerFactory
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 /**
@@ -26,9 +25,7 @@ class JPutSpringRunner
 @Throws(InitializationError::class)
 constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
-    val executor = Junit4TestExecutor()
-
-    val log = LoggerFactory.getLogger(JPutSpringRunner::class.java)
+    private val executor = Junit4TestExecutor()
 
     companion object {
 

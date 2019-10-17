@@ -1,22 +1,15 @@
 package cz.encircled.jput.runner
 
-import cz.encircled.jput.JPut
 import cz.encircled.jput.TestReporter
-import cz.encircled.jput.context.JPutContext
 import cz.encircled.jput.context.context
 import cz.encircled.jput.runner.steps.Junit4TestRunnerSteps
-import cz.encircled.jput.unit.PerformanceTest
 import org.junit.BeforeClass
 import org.junit.runner.Description
-import org.junit.runner.RunWith
 import org.junit.runner.notification.Failure
 import org.junit.runner.notification.RunListener
 import org.junit.runner.notification.RunNotifier
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.TestPropertySource
-
 import kotlin.test.*
 
 class TestRunListener : RunListener() {
@@ -41,24 +34,65 @@ class TestRunListener : RunListener() {
 
 }
 
-class Junit4TestRunnerIntegrationTest {
+class Junit4TestRunnerIntegrationTest : BaseIntegrationTest() {
 
     companion object {
-
-        val listener = TestRunListener()
 
         @JvmStatic
         @BeforeClass
         fun runSteps() {
-            (context.resultReporters[1] as TestReporter).executions.clear()
-            (context.resultReporters[1] as TestReporter).invocations.clear()
-
             val runner = JPutJUnit4Runner(Junit4TestRunnerSteps::class.java)
             val notifier = RunNotifier()
             notifier.addListener(listener)
             runner.run(notifier)
         }
 
+    }
+
+}
+
+
+class SpringTestRunnerIntegrationTest : BaseIntegrationTest() {
+
+    companion object {
+
+        @JvmStatic
+        @BeforeClass
+        fun runSteps() {
+            val runner = JPutSpringRunner(Junit4TestRunnerSteps::class.java)
+            val notifier = RunNotifier()
+            notifier.addListener(listener)
+            runner.run(notifier)
+        }
+
+    }
+
+}
+
+abstract class BaseIntegrationTest {
+
+    companion object {
+
+        lateinit var listener: TestRunListener
+
+        @JvmStatic
+        @BeforeClass
+        fun before() {
+            Junit4TestRunnerSteps.testCounter = 0
+            listener = TestRunListener()
+            context.init()
+
+            (context.resultReporters[1] as TestReporter).executions.clear()
+            (context.resultReporters[1] as TestReporter).invocations.clear()
+            Junit4TestRunnerSteps.isBeforeExecuted = false
+        }
+
+    }
+
+    // TODO other as well?
+    @Test
+    fun testBeforeTestExecuted() {
+        assertTrue(Junit4TestRunnerSteps.isBeforeExecuted)
     }
 
     @Test
@@ -86,9 +120,20 @@ class Junit4TestRunnerIntegrationTest {
 
     @Test
     fun testReturnedErrorPropagated() {
-        val expected = "Limit exceptions count = 1, actual = 2"
+        val expected = "Limit exceptions count = 1, actual = 1000"
         assertFailedAssertion("testReturnedErrorPropagated", expected)
         assertExceptionsInRuns("testRuntimeExceptionCatched", "Test exception")
+
+        val details = getExecution("testReturnedErrorPropagated").executionResult
+                .values.map { it.resultDetails }
+
+        // Assert that results are correctly stored in parallel execution
+
+        details.forEach {
+            assertEquals("Test exception ${it.resultCode}", it.errorMessage)
+        }
+
+        assertEquals(1000, details.map { it.resultCode }.distinct().size)
     }
 
     @Test
@@ -187,33 +232,7 @@ class Junit4TestRunnerIntegrationTest {
     private fun isTestExecuted(method: String): Boolean {
         return listener.finished
                 .map { it.methodName }
-                .any() { it == method }
-    }
-
-}
-
-/**
- * @author encir on 20-Feb-19.
- */
-@ContextConfiguration(classes = [Conf::class])
-@RunWith(JPutSpringRunner::class)
-@TestPropertySource(properties = ["jput.storage.elastic.enabled:false", "${JPutContext.PROP_STORAGE_FILE_ENABLED}:true",
-    "jput.storage.elastic.host:localhost"])
-class SpringIntegrationTest {
-
-    @PerformanceTest(maxTimeLimit = 5000L)
-    @Test
-    fun baseTest(jPut: JPut) {
-        jPut.markPerformanceTestStart()
-        Thread.sleep(4000)
-        println("Hi there")
-    }
-
-    @Test
-    fun testCurrentSuiteIsSet() {
-        assertEquals(this::class.java, context.currentSuite!!.clazz)
-        assertFalse(context.currentSuite!!.isParallel)
-        assertEquals("testCurrentSuiteIsSet", context.currentSuiteMethod!!.name)
+                .any { it == method }
     }
 
 }

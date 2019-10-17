@@ -1,5 +1,6 @@
 package cz.encircled.jput.runner
 
+import cz.encircled.jput.JPut
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
 import cz.encircled.jput.unit.PerformanceTest
@@ -19,6 +20,21 @@ import org.junit.runners.model.Statement
 class Junit4TestExecutor {
 
     var executor: ThreadBasedTestExecutor = ThreadBasedTestExecutor()
+
+    companion object {
+
+        /**
+         * Hack for [InvokeMethodWithParams] - there is no other easy way how to pass the [JPut] argument to the unit test
+         * and re-use existing JUnit Statements (like BeforeTest, AfterTest etc)
+         */
+        val jPut = ThreadLocal<JPut?>()
+
+        /**
+         * Hack for [InvokeMethodWithParams] - there is no other easy way how to receive return value from the unit test
+         * and re-use existing JUnit Statements (like BeforeTest, AfterTest etc)
+         */
+        val result = ThreadLocal<Any?>()
+    }
 
     init {
         // TODO pick executor in a better way?
@@ -42,7 +58,9 @@ class Junit4TestExecutor {
                 val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
 
                 val execution = executor.executeTest(conf) {
-                    if (statement is InvokeMethodWithParams) statement.evaluateWithParams(it) else statement.evaluate()
+                    jPut.set(it)
+                    statement.evaluate()
+                    result.get()
                 }
 
                 if (execution.violations.isNotEmpty()) {

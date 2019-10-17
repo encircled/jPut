@@ -14,23 +14,22 @@ import cz.encircled.jput.context.context
 import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.runner.JPutJUnit4Runner
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.joda.time.LocalDate
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.runner.RunWith
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * @author Vlad on 15-Sep-19.
  */
-@RunWith(JPutJUnit4Runner::class)
 open class ElasticsearchRecorderTest : ShortcutsForTests {
+
+    @BeforeTest
+    fun before() {
+        wireMockServer.resetAll()
+    }
 
     @AfterTest
     fun after() {

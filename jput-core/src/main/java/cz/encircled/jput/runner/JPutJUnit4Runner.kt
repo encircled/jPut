@@ -12,7 +12,7 @@ import org.junit.runners.model.Statement
  */
 class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
 
-    var executor = Junit4TestExecutor()
+    private val executor = Junit4TestExecutor()
 
     companion object {
 
@@ -25,6 +25,7 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
             isInitialized = true
             context.init()
         }
+
         JUnitTestRunnerSupport(clazz).prepareRunner(this)
 
         try {
@@ -47,7 +48,7 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
         context.currentSuiteMethod = method.method
         val description = describeChild(method)
 
-        if (this.isIgnored(method)) run {
+        if (isIgnored(method)) {
             notifier.fireTestIgnored(description)
         } else {
             executor.executeTest(method, notifier, description, methodBlock(method))
