@@ -1,7 +1,6 @@
 package cz.encircled.jput.recorder
 
 import cz.encircled.jput.model.PerfTestExecution
-import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,12 +32,8 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
     }
 
     override fun doFlush(data: List<PerfTestExecution>) {
-        try {
-            val mapped = data.map(this::toFileFormat)
-            Files.write(target, mapped, StandardCharsets.UTF_8, APPEND, CREATE)
-        } catch (e: IOException) {
-            throw IllegalStateException("Failed to append to file", e)
-        }
+        val mapped = data.map(this::toFileFormat)
+        Files.write(target, mapped, StandardCharsets.UTF_8, APPEND, CREATE)
     }
 
     private fun toFileFormat(execution: PerfTestExecution): String {

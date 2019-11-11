@@ -9,14 +9,14 @@ import org.junit.runner.RunWith
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * @author Vlad on 21-May-17.
  */
 @RunWith(JPutJUnit4Runner::class)
 class FileSystemRecorderTest : ShortcutsForTests {
-
-
 
     @Test
     fun testWriteResults_FSResultRecorder() {
@@ -58,6 +58,16 @@ class FileSystemRecorderTest : ShortcutsForTests {
                 "test1" to "1",
                 "test2" to "abc"
         ), writer.getUserDefinedEnvParams())
+    }
+
+    @Test
+    fun testFileCreatedIfNotExist() {
+        val temp = File.createTempFile("jput-test", "")
+        val pathToFile = temp.path + "_not_exist"
+        assertFalse(File(pathToFile).exists())
+
+        FileSystemResultRecorder(pathToFile)
+        assertTrue(File(pathToFile).exists())
     }
 
     private fun getWriter(): Pair<String, FileSystemResultRecorder> {
