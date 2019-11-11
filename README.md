@@ -34,6 +34,7 @@ A JUnit test method must be marked with `@PerformanceTest` in order to enable th
 - *maxTimeLimit* - in milliseconds, default 0 ms - max execution time limit. Test is considered failed, if elapsed time of at least one execution is greater than specified value. Max time limit check is skipped, if specified value is < 1   
 - *averageTimeLimit* - in milliseconds, default 0 ms - average execution time limit. Test is considered failed, if average time of all executions is greater than specified value. Average time limit check is skipped, if specified value is < 1
 - *useStandardDeviationAsThreshold* can be used together with *averageTimeThreshold*, result threshold will be the sum of both
+- *rampUp* - ramp-up in milliseconds. If parallel is 100, and the ramp-up period is 100000 (100 seconds), then JPut will take 100 seconds to get all 100 threads running, i.e. 1 second delay after each new thread
 
 #### Error handling parameters
 
@@ -125,4 +126,11 @@ Spring module provides JUnit 4 runner `@RunWith(JPutSpringRunner.class)`
 - Simple integration with existing CI pipelines thanks to using junit
 - Test implementation flexibility. You can use any jvm language and you are not limited in how to prepare test data / execute test / assert results. All in the code.
 - Re-use already existing code for your test data generation and validation
+- Out of the box support for performance trend analysis
+
+## JPut vs Gatling
+
+- You have even more flexibility in how you write the performance tests
+- JPut supports tests written in any JVM language
+- Create huge load from just one machine with Reactive test executor
 - Out of the box support for performance trend analysis
