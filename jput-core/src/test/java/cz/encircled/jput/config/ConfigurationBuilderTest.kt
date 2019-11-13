@@ -12,6 +12,8 @@ import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 /**
  * @author Vlad on 28-May-17.
@@ -87,6 +89,29 @@ class ConfigurationBuilderTest {
             )])
     fun trendAnnotated() {
 
+    }
+
+    @Test
+    fun testInvalidConfiguration() {
+        expectCheckException(PerfTestConfiguration("test", warmUp = -1), "warmUp")
+        expectCheckException(PerfTestConfiguration("test", warmUp = -100), "warmUp")
+
+        expectCheckException(PerfTestConfiguration("test", repeats = -10), "repeats")
+        expectCheckException(PerfTestConfiguration("test", repeats = 0), "repeats")
+
+        expectCheckException(PerfTestConfiguration("test", trendConfiguration = TrendTestConfiguration(
+                sampleSize = -1
+        )), "sample")
+    }
+
+    private fun expectCheckException(config: PerfTestConfiguration, attr: String) {
+        try {
+            config.valid()
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message!!.toLowerCase().contains(attr.toLowerCase()))
+            return
+        }
+        fail("IllegalStateException is expected")
     }
 
 }

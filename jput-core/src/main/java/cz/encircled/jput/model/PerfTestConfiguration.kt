@@ -1,7 +1,5 @@
 package cz.encircled.jput.model
 
-import java.util.*
-
 /**
  * Performance test configuration of a single junit test method
  *
@@ -67,9 +65,7 @@ data class PerfTestConfiguration(
         /**
          * Performance trend analyzing
          */
-        val trendConfiguration: TrendTestConfiguration? = null,
-
-        var percentiles: Map<Long, Double> = HashMap(1)
+        val trendConfiguration: TrendTestConfiguration? = null
 
 ) {
 
@@ -78,11 +74,6 @@ data class PerfTestConfiguration(
         check(repeats >= 1L) { "Repeats count must be > 1" }
         check(trendConfiguration == null || trendConfiguration.sampleSize >= 1) {
             "Sample size must be > 0"
-        }
-
-        for (percentile in percentiles.keys) {
-            check(percentile >= 1) { "Percentile value must be > 0" }
-            check(percentile <= 100) { "Percentile value must be < 100" }
         }
 
         return this
