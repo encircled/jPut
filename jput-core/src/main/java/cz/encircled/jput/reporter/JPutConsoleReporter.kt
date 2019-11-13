@@ -1,6 +1,5 @@
 package cz.encircled.jput.reporter
 
-import cz.encircled.jput.JPutUtils
 import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
@@ -8,9 +7,9 @@ import org.slf4j.LoggerFactory
  *
  * @author Vlad on 22-Sep-19.
  */
-class JPutConsoleReporter : JPutReporter {
+class JPutConsoleReporter : JPutBaseTextReporter() {
 
-    val log = LoggerFactory.getLogger(JPutConsoleReporter::class.java)
+    private val log = LoggerFactory.getLogger(JPutConsoleReporter::class.java)
 
     override fun beforeClass(clazz: Class<*>) {
         log.info("Starting JPut performance tests for ${clazz.simpleName}")
@@ -20,25 +19,8 @@ class JPutConsoleReporter : JPutReporter {
     }
 
     override fun afterTest(execution: PerfTestExecution) {
-        log.info("Test ${execution.conf.testId}:\n" +
-                "avg: ${execution.executionAvg}ms, max: ${execution.executionMax}ms, " +
-                "50%: ${execution.executionPercentile(0.5)}ms, " +
-                "90%: ${execution.executionPercentile(0.9)}ms, " +
-                "95%: ${execution.executionPercentile(0.95)}ms, " +
-                "99%: ${execution.executionPercentile(0.99)}ms, " +
-                "success count: ${execution.successResults().size}, " +
-                "error count: ${execution.errorResults().size}, " +
-                "total count: ${execution.executionResult.size}\n")
-
-        val errorsCount = execution.errorResults()
-                .map { "Code ${it.resultDetails.resultCode}, error: ${JPutUtils.buildErrorMessage(it)}" }
-                .groupingBy { it }.eachCount()
-
-        val errors = errorsCount.entries.joinToString("\n") {
-            it.key + ". Number of errors ${it.value}"
-        }
-
-        log.info("Test ${execution.conf.testId} errors:\n" + errors)
+        log.info(buildTextReport(execution))
+        log.info(buildErrorTextReport(execution))
     }
 
     override fun afterClass(clazz: Class<*>) {

@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -61,7 +62,7 @@ class AllureReporterTest : ShortcutsForTests {
         assertTrue(root.exists())
 
         val nested = root.list()!!
-        assertTrue(nested.size == 4)
+        assertEquals(6, nested.size)
 
         val resultFile = File("allure-results/${nested.first { it.endsWith(".json") }}")
         val allureResult = resultFile.readLines().joinToString("\n")
@@ -70,10 +71,13 @@ class AllureReporterTest : ShortcutsForTests {
 
         // Check attachments: 1 contains validation error, 2 contain metrics
         val attachments = nested.filter { it.endsWith(".txt") }.map {
-            File("allure-results/$it").readLines().joinToString()
+            File("allure-results/$it").readLines().joinToString(" ")
         }
-        assertEquals(2, attachments.filter { it == "avg: 51ms, max: 100ms, 50%: 50ms, 90%: 90ms, 95%: 95ms, 99%: 99ms" }.size)
-        assertEquals(1, attachments.filter { it == "Limit max time = 50 ms, actual max time = 100 ms" }.size)
+        assertNotNull(attachments.find { it == "Test AllureTest: avg: 51ms, max: 100ms, 50%: 50ms, 90%: 90ms, 95%: 95ms, 99%: 99ms, success count: 100, error count: 0, total count: 100" })
+        assertNotNull(attachments.find { it == "Test FailedReporterTest: avg: 51ms, max: 100ms, 50%: 50ms, 90%: 90ms, 95%: 95ms, 99%: 99ms, success count: 100, error count: 0, total count: 100" })
+        assertNotNull(attachments.find { it == "Test AllureTest errors:" })
+        assertNotNull(attachments.find { it == "Test FailedReporterTest errors:" })
+        assertNotNull(attachments.find { it == "Limit max time = 50 ms, actual max time = 100 ms" })
     }
 
 }

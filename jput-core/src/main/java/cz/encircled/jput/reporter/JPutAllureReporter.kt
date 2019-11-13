@@ -10,7 +10,7 @@ import io.qameta.allure.model.TestResult
 import io.qameta.allure.util.ResultsUtils
 
 // TODO ID of class must be different from IDs of tests
-open class JPutAllureReporter : JPutReporter {
+open class JPutAllureReporter : JPutBaseTextReporter() {
 
     private val lifecycle: AllureLifecycle = Allure.getLifecycle()
 
@@ -20,7 +20,7 @@ open class JPutAllureReporter : JPutReporter {
         val result = TestResult()
                 .withUuid(id)
                 .withName(id)
-                .withFullName(getTestCaseId(clazz))
+                .withFullName(id)
                 .withStage(Stage.SCHEDULED)
                 .withLabels(ResultsUtils.createStoryLabel(id), ResultsUtils.createHostLabel(), ResultsUtils.createThreadLabel())
                 .withDescription(id)
@@ -52,23 +52,19 @@ open class JPutAllureReporter : JPutReporter {
             } else {
                 it.withStatus(Status.PASSED)
             }
-            val metrics = "avg: ${execution.executionAvg}ms, max: ${execution.executionMax}ms, " +
-                    "50%: ${execution.executionPercentile(0.5)}ms, " +
-                    "90%: ${execution.executionPercentile(0.9)}ms, " +
-                    "95%: ${execution.executionPercentile(0.95)}ms, " +
-                    "99%: ${execution.executionPercentile(0.99)}ms"
-            Allure.addAttachment("Execution times", metrics)
+            Allure.addAttachment("Execution times", buildTextReport(execution))
+            Allure.addAttachment("Errors", buildErrorTextReport(execution))
         }
         lifecycle.stopStep(execution.conf.testId)
     }
 
-    fun getTestCaseStatus(testResult: TestResult) {
+    private fun getTestCaseStatus(testResult: TestResult) {
         val isFailed = testResult.steps.any { it.status != Status.PASSED }
 
         if (isFailed) testResult.withStatus(Status.FAILED)
         else testResult.withStatus(Status.PASSED)
     }
 
-    fun getTestCaseId(clazz: Class<*>): String = clazz.simpleName
+    private fun getTestCaseId(clazz: Class<*>): String = clazz.simpleName
 
 }

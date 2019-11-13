@@ -20,6 +20,7 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
 
     private val log = LoggerFactory.getLogger(ReactiveTestExecutor::class.java)
 
+    // TODO if reactive + has jPut arg - throw an exc
     // TODO delay
     override fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
         if (!execution.conf.isReactive) return super.performExecution(execution, statement)
