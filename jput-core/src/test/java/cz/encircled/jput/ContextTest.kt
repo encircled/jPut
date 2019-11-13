@@ -19,10 +19,19 @@ class ContextTest : ShortcutsForTests {
     }
 
     @Test
-    fun testGetProperty() = testWithProps("getProp" to "true", "collectionProp" to "1,2") {
+    fun testGetProperty() = testWithProps(
+            "getProp" to "true",
+            "numProp" to "22",
+            "collectionProp" to "1,2") {
         context.init()
         assertEquals("true", getProperty("getProp", "def"))
         assertEquals("def", getProperty("getProp2", "def"))
+
+        assertEquals(22L, getProperty("numProp"))
+        assertEquals(22L, getProperty("numProp", 23L))
+        assertEquals(23L, getProperty("numProp2", 23L))
+
+        assertEquals(22, getProperty("numProp"))
 
         assertEquals(true, getProperty("getProp", false))
         assertEquals(false, getProperty("getProp2", false))
