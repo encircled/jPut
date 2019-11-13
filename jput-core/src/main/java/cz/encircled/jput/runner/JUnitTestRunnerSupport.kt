@@ -36,12 +36,8 @@ class JUnitTestRunnerSupport(private val clazz: Class<*>) {
             }
 
             override fun finished() {
-                try {
-                    fService.shutdown();
-                    fService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                } catch (e: InterruptedException) {
-                    e.printStackTrace(System.err);
-                }
+                fService.shutdown()
+                fService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
             }
         });
     }
