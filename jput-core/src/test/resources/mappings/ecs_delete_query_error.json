@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/error/_delete_by_query.*"
+  },
+  "response": {
+    "status": 500
+  }
+}

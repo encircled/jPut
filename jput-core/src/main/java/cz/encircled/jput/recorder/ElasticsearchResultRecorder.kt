@@ -30,11 +30,7 @@ class ElasticsearchResultRecorder(private val client: ElasticsearchClient) : Thr
 
     init {
         Runtime.getRuntime().addShutdownHook(Thread {
-            try {
-                client.close()
-            } catch (e: Exception) {
-                log.warn("Failed to close ECS client", e)
-            }
+            client.close()
         })
     }
 

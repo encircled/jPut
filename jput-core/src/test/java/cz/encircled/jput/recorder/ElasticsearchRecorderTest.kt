@@ -15,6 +15,7 @@ import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.model.TrendTestConfiguration
 import org.apache.http.HttpHost
+import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.client.RestClient
 import org.joda.time.LocalDate
 import org.junit.AfterClass
@@ -95,6 +96,27 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/new/_search.*"), true)))
     }
 
+    /**
+     * Original exception must be re-thrown
+     */
+    @Test
+    fun testGetSampleWhenError() = testWithProps(JPutContext.PROP_ELASTIC_INDEX to "error") {
+        val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
+        val ecs = ElasticsearchResultRecorder(client)
+
+        val execution = getTestExecution(configWithTrend(TrendTestConfiguration(
+                sampleSize = 5
+        )))
+        try {
+            ecs.getSample(execution)
+            wireMockServer.verify(1, RequestPatternBuilder(RequestMethod.POST, UrlPattern(RegexPattern("/error/_search.*"), true)))
+        } catch (e: ElasticsearchStatusException) {
+            return@testWithProps
+        }
+
+        fail("Exception is expected")
+    }
+
     @Test
     fun testAddingEntries() = testWithProps(JPutContext.PROP_ENV_PARAMS to "test1:1,test2:abc") {
         val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost("localhost", port, "http")))
@@ -160,6 +182,27 @@ open class ElasticsearchRecorderTest : ShortcutsForTests {
         val expected = "{\"size\":1000,\"query\":{\"range\":{\"executionId\":{\"from\":null,\"to\":${time},\"include_lower\":true,\"include_upper\":false,\"boost\":1.0}}},\"_source\":false}"
 
         wireMockServer.verify(postRequestedFor(urlMatching("/jput/_delete_by_query.*"))
+                .withRequestBody(equalTo(expected)))
+    }
+
+    /**
+     * Original error must be logged, but it should not interrupt the rest
+     */
+    @Test
+    fun testAutoCleanupOnError() = testWithProps(
+            JPutContext.PROP_ELASTIC_ENABLED to "true",
+            JPutContext.PROP_ELASTIC_INDEX to "error",
+            JPutContext.PROP_ELASTIC_HOST to "localhost",
+            JPutContext.PROP_ELASTIC_PORT to "9200",
+            JPutContext.PROP_ELASTIC_CLEANUP_DAYS to "5") {
+
+        context = JPutContext()
+        context.init()
+
+        val time = LocalDate.now().minusDays(5).toDate().time
+        val expected = "{\"size\":1000,\"query\":{\"range\":{\"executionId\":{\"from\":null,\"to\":${time},\"include_lower\":true,\"include_upper\":false,\"boost\":1.0}}},\"_source\":false}"
+
+        wireMockServer.verify(postRequestedFor(urlMatching("/error/_delete_by_query.*"))
                 .withRequestBody(equalTo(expected)))
     }
 
