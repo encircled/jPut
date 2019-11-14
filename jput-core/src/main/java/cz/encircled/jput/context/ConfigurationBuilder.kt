@@ -1,9 +1,9 @@
 package cz.encircled.jput.context
 
+import cz.encircled.jput.annotation.PerformanceTest
+import cz.encircled.jput.annotation.PerformanceTrend
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.trend.PerformanceTrend
-import cz.encircled.jput.unit.PerformanceTest
 import java.lang.reflect.Method
 
 object ConfigurationBuilder {
@@ -37,15 +37,11 @@ object ConfigurationBuilder {
         val testId = if (conf.testId.isBlank()) defaultTestId(method)
         else conf.testId
 
-        val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
-                conf.maxTimeLimit, conf.averageTimeLimit, conf.parallel, conf.rampUp,
-                conf.isReactive, conf.maxAllowedExceptionsCount, conf.continueOnException, trendConfig)
+        val percentiles = conf.percentiles.associate { it.rank.toPercentile() to it.max }
 
-        /*TODO val percentiles = conf.percentiles
-        check(percentiles.size % 2 == 0) { "Percentiles parameter count must be even" }
-        for (i in 0 until percentiles.size - 1) {
-            methodConfiguration.percentiles.put(percentiles[i], percentiles[i + 1]);
-        } */
+        val methodConfiguration = PerfTestConfiguration(testId, conf.warmUp, conf.repeats, conf.delay,
+                conf.maxTimeLimit, conf.averageTimeLimit, percentiles, conf.parallel, conf.rampUp,
+                conf.isReactive, conf.maxAllowedExceptionsCount, conf.continueOnException, trendConfig)
 
         return methodConfiguration.valid()
     }
@@ -55,7 +51,10 @@ object ConfigurationBuilder {
                     conf.sampleSize,
                     conf.averageTimeThreshold,
                     conf.useStandardDeviationAsThreshold,
-                    conf.sampleSelectionStrategy
+                    conf.sampleSelectionStrategy,
+                    conf.noisePercentile.toPercentile()
             )
+
+    private fun Long.toPercentile(): Double = this / 100.0
 
 }

@@ -112,6 +112,9 @@ data class PerfTestExecution(
         else getElapsedTimes().max()!!
     }
 
+    /**
+     * Get max execution time for given percentile [rank]
+     */
     fun executionPercentile(rank: Double): Long =
             if (successResults().isEmpty()) 0
             else getElapsedTimes().percentile(rank).max()!!

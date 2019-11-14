@@ -22,6 +22,13 @@ enum class PerfConstraintViolation(val messageProducer: (execution: PerfTestExec
     }),
 
     /**
+     * Unit test, max execution time
+     */
+    UNIT_PERCENTILE({
+        "Limit ${it.executionParams["percentileRank"]} percentile time = ${it.executionParams["percentileLimit"]} ms, actual percentile time = ${it.executionParams["percentileActual"]} ms"
+    }),
+
+    /**
      * Trend test, avg execution time
      */
     TREND_AVG({

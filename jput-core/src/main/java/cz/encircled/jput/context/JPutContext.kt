@@ -1,5 +1,9 @@
 package cz.encircled.jput.context
 
+import cz.encircled.jput.analyzer.SampleBasedTrendAnalyzer
+import cz.encircled.jput.analyzer.TestExceptionsAnalyzer
+import cz.encircled.jput.analyzer.TrendAnalyzer
+import cz.encircled.jput.analyzer.UnitPerformanceAnalyzerImpl
 import cz.encircled.jput.model.SuiteConfiguration
 import cz.encircled.jput.recorder.ElasticsearchClientWrapper
 import cz.encircled.jput.recorder.ElasticsearchResultRecorder
@@ -7,10 +11,6 @@ import cz.encircled.jput.recorder.FileSystemResultRecorder
 import cz.encircled.jput.recorder.ResultRecorder
 import cz.encircled.jput.reporter.JPutConsoleReporter
 import cz.encircled.jput.reporter.JPutReporter
-import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
-import cz.encircled.jput.trend.TrendAnalyzer
-import cz.encircled.jput.unit.TestExceptionsAnalyzer
-import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory

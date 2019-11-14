@@ -113,9 +113,14 @@ class ContextTest : ShortcutsForTests {
         assertEquals(listOf(), execution.violationsErrorMessage)
 
         execution.executionParams["avgLimit"] = 300L
+        execution.executionParams["percentileRank"] = 50
+        execution.executionParams["percentileLimit"] = 300
+        execution.executionParams["percentileActual"] = 500
 
-        execution.violations.addAll(listOf(PerfConstraintViolation.UNIT_MAX, PerfConstraintViolation.UNIT_AVG, PerfConstraintViolation.TREND_AVG))
+        execution.violations.addAll(listOf(PerfConstraintViolation.UNIT_PERCENTILE, PerfConstraintViolation.UNIT_MAX,
+                PerfConstraintViolation.UNIT_AVG, PerfConstraintViolation.TREND_AVG))
         assertEquals(listOf(
+                "Limit 50 percentile time = 300 ms, actual percentile time = 500 ms",
                 "Limit max time = 300 ms, actual max time = 500 ms",
                 "Limit avg time = 300 ms, actual avg time = 500 ms",
                 "Limit avg time = 300 ms, actual avg time = 500 ms"

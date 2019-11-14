@@ -1,12 +1,13 @@
 package cz.encircled.jput.config
 
+import cz.encircled.jput.annotation.Percentile
+import cz.encircled.jput.annotation.PerformanceTest
+import cz.encircled.jput.annotation.PerformanceTrend
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.trend.PerformanceTrend
 import cz.encircled.jput.trend.SelectionStrategy
-import cz.encircled.jput.unit.PerformanceTest
 import org.junit.runner.RunWith
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
@@ -29,7 +30,8 @@ class ConfigurationBuilderTest {
         val config = ConfigurationBuilder.buildConfig(annotation, function.javaMethod!!)
 
         assertEquals(PerfTestConfiguration("ConfigurationBuilderTest#unitAnnotated",
-                warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L, parallelCount = 1
+                warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L, parallelCount = 1,
+                percentiles = mapOf(0.5 to 10L, 0.75 to 15L)
         ), config)
     }
 
@@ -44,7 +46,7 @@ class ConfigurationBuilderTest {
                 warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L, parallelCount = 1,
                 trendConfiguration = TrendTestConfiguration(
                         sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
-                        averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true
+                        averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true, noisePercentile = 0.95
                 )
         ), config)
     }
@@ -72,7 +74,10 @@ class ConfigurationBuilderTest {
     }
 
 
-    @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L)
+    @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L, percentiles = [
+        Percentile(50, 10),
+        Percentile(75, 15)
+    ])
     fun unitAnnotated() {
 
     }
@@ -85,7 +90,7 @@ class ConfigurationBuilderTest {
     @PerformanceTest(testId = "customTestId", warmUp = 1, repeats = 2, delay = 100L, maxTimeLimit = 100L, averageTimeLimit = 80L,
             trends = [PerformanceTrend(
                     sampleSize = 10, sampleSelectionStrategy = SelectionStrategy.USE_LATEST,
-                    averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true
+                    averageTimeThreshold = 40.0, useStandardDeviationAsThreshold = true, noisePercentile = 95
             )])
     fun trendAnnotated() {
 
@@ -102,6 +107,10 @@ class ConfigurationBuilderTest {
         expectCheckException(PerfTestConfiguration("test", trendConfiguration = TrendTestConfiguration(
                 sampleSize = -1
         )), "sample")
+
+        expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(-0.1 to 50L)), "percentiles")
+        expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(0.5 to -1L)), "percentiles")
+        expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(1.1 to 50L)), "percentiles")
     }
 
     private fun expectCheckException(config: PerfTestConfiguration, attr: String) {

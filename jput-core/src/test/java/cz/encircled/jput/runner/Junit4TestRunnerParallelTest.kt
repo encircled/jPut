@@ -1,6 +1,6 @@
 package cz.encircled.jput.runner
 
-import cz.encircled.jput.unit.PerformanceSuite
+import cz.encircled.jput.annotation.PerformanceSuite
 import org.junit.FixMethodOrder
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters

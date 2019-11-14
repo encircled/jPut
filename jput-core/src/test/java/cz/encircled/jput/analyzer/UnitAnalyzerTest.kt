@@ -3,9 +3,6 @@ package cz.encircled.jput.analyzer
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.unit.TestExceptionsAnalyzer
-import cz.encircled.jput.unit.UnitPerformanceAnalyzer
-import cz.encircled.jput.unit.UnitPerformanceAnalyzerImpl
 import org.junit.runner.RunWith
 import kotlin.test.Test
 
@@ -22,7 +19,7 @@ class UnitAnalyzerTest : ShortcutsForTests {
         assertValid(analyzer.analyzeUnitTrend(testRun))
     }
 
-   @Test
+    @Test
     fun testPositiveAverage() {
         val conf = baseConfig().copy(avgTimeLimit = 101L)
         val testRun = getTestExecution(conf, 99, 101)
@@ -36,6 +33,22 @@ class UnitAnalyzerTest : ShortcutsForTests {
         val testRun = getTestExecution(conf, 99, 101)
 
         assertNotValid(PerfConstraintViolation.UNIT_AVG, analyzer.analyzeUnitTrend(testRun))
+    }
+
+    @Test
+    fun testPositivePercentile() {
+        val conf = baseConfig().copy(percentiles = mapOf(0.9 to 1L))
+        val testRun = getTestExecution(conf, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2)
+
+        assertValid(analyzer.analyzeUnitTrend(testRun))
+    }
+
+    @Test
+    fun testNegativePercentile() {
+        val conf = baseConfig().copy(percentiles = mapOf(0.5 to 1L))
+        val testRun = getTestExecution(conf, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2)
+
+        assertNotValid(PerfConstraintViolation.UNIT_PERCENTILE, analyzer.analyzeUnitTrend(testRun))
     }
 
     @Test

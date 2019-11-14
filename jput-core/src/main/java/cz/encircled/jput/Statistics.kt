@@ -29,5 +29,5 @@ fun List<Long>.percentile(rank: Double): List<Long> {
 }
 
 private fun validatePercentile(rank: Double) {
-    check(!(rank <= 0.0 || rank > 1.0)) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
+    check(rank in 0.0..1.0) { "Wrong percentile [$rank], must be [0 < Q <= 1]" }
 }

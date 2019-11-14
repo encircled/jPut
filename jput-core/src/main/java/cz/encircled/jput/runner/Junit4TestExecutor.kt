@@ -1,9 +1,9 @@
 package cz.encircled.jput.runner
 
 import cz.encircled.jput.JPut
+import cz.encircled.jput.annotation.PerformanceTest
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
-import cz.encircled.jput.unit.PerformanceTest
 import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
 import org.junit.internal.runners.model.EachTestNotifier

@@ -38,6 +38,14 @@ data class PerfTestConfiguration(
         val avgTimeLimit: Long = 0L,
 
         /**
+         * Upper limits for test execution time in milliseconds within defined percentiles. Defining multiple percentiles allows
+         * to have multiple validation constraints, for instance [200ms for 75%] and [500ms for 95%].
+         *
+         * Map is rank to maxTime
+         */
+        val percentiles: Map<Double, Long> = emptyMap(),
+
+        /**
          * Count of maximum parallel executions (e.g. java threads in case of base executor or coroutines/reactive executions)
          */
         val parallelCount: Int = 1,
@@ -75,6 +83,10 @@ data class PerfTestConfiguration(
         check(trendConfiguration == null || trendConfiguration.sampleSize >= 1) {
             "Sample size must be > 0"
         }
+        percentiles.forEach {
+            check(it.key in 0.0..1.0) { "Percentiles must be within 0..100" }
+            check(it.value > 0L) { "Time limit for percentiles must be > 0" }
+        }
 
         return this
     }
@@ -85,7 +97,8 @@ data class PerfTestConfiguration(
                 ", warmUp=$warmUp ms" +
                 ", repeats=$repeats ms" +
                 ", maxTimeLimit=$maxTimeLimit ms" +
-                ", avgTimeLimit=$avgTimeLimit ms }"
+                ", avgTimeLimit=$avgTimeLimit ms }" +
+                ", percentiles=${percentiles.entries.joinToString()}"
     }
 
 }

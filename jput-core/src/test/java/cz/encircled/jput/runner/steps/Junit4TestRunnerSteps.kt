@@ -1,10 +1,10 @@
 package cz.encircled.jput.runner.steps
 
 import cz.encircled.jput.JPut
+import cz.encircled.jput.annotation.PerformanceTest
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.RunResult
 import cz.encircled.jput.runner.Conf
-import cz.encircled.jput.unit.PerformanceTest
 import org.junit.Assume
 import org.junit.Before
 import org.junit.FixMethodOrder

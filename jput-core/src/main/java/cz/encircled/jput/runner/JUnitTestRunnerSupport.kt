@@ -1,8 +1,8 @@
 package cz.encircled.jput.runner
 
+import cz.encircled.jput.annotation.PerformanceSuite
 import cz.encircled.jput.context.context
 import cz.encircled.jput.model.SuiteConfiguration
-import cz.encircled.jput.unit.PerformanceSuite
 import org.junit.runners.ParentRunner
 import org.junit.runners.model.RunnerScheduler
 import java.util.concurrent.ExecutorService

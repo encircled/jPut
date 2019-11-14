@@ -1,10 +1,9 @@
 package cz.encircled.jput.analyzer
 
+import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.TrendTestConfiguration
 import cz.encircled.jput.runner.JPutJUnit4Runner
-import cz.encircled.jput.ShortcutsForTests
-import cz.encircled.jput.trend.SampleBasedTrendAnalyzer
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals

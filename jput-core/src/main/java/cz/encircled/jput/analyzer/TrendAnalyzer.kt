@@ -1,4 +1,4 @@
-package cz.encircled.jput.trend
+package cz.encircled.jput.analyzer
 
 import cz.encircled.jput.deviation
 import cz.encircled.jput.model.PerfConstraintViolation

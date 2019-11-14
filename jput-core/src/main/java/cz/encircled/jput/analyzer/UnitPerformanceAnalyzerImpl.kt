@@ -1,4 +1,4 @@
-package cz.encircled.jput.unit
+package cz.encircled.jput.analyzer
 
 import cz.encircled.jput.model.PerfConstraintViolation
 import cz.encircled.jput.model.PerfTestExecution
@@ -30,15 +30,16 @@ class UnitPerformanceAnalyzerImpl : UnitPerformanceAnalyzer {
             result.add(PerfConstraintViolation.UNIT_MAX)
         }
 
-        //  for (Map.Entry<Long, Long> percentile : conf.percentiles.entrySet()) { TODO
-        //      long matchingCount = LongStream.of(execution.runs).filter(time -> time <= percentile.getValue()).count();
-        //      int matchingPercents = Math.round(matchingCount * 100 / conf.repeats);
-        //      if (matchingPercents < percentile.getKey()) {
-        //          String assertMessage = "\nMax time = " + percentile.getValue() + "ms \nexpected percentile = " + percentile.getKey() +
-        //                  "%\nActual percentile = " + matchingPercents + "%\n\n";
-        //          throw new AssertionFailedError(assertMessage + "Performance test failed, max time is greater then limit: " + analyzer.toString(execution, conf));
-        //      }
-        //  }
+        for (p in execution.conf.percentiles) {
+            val actual = execution.executionPercentile(p.key)
+            if (actual > p.value) {
+                result.add(PerfConstraintViolation.UNIT_PERCENTILE)
+                execution.executionParams["percentileLimit"] = p.value
+                execution.executionParams["percentileRank"] = p.key * 100
+                execution.executionParams["percentileActual"] = actual
+                break
+            }
+        }
 
         return result
     }

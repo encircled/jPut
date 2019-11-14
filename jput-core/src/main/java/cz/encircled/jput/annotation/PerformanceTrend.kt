@@ -1,6 +1,10 @@
-package cz.encircled.jput.trend
+package cz.encircled.jput.annotation
+
+import cz.encircled.jput.trend.SelectionStrategy
 
 /**
+ * Configuration for performance trend analysis, must be defined through [PerformanceTest]
+ *
  * @author Vlad on 27-May-17.
  */
 @Retention(AnnotationRetention.RUNTIME)
@@ -16,7 +20,7 @@ annotation class PerformanceTrend(
         /**
          * Defines the way, how the sample (a subset of results) should be chosen from the all available previous results
          */
-        val sampleSelectionStrategy: SelectionStrategy,
+        val sampleSelectionStrategy: SelectionStrategy = SelectionStrategy.USE_LATEST,
 
         /**
          * Static average time threshold.
@@ -30,6 +34,11 @@ annotation class PerformanceTrend(
          *
          * Performance trend test will fail if average execution time is greater than sample average time + threshold
          */
-        val useStandardDeviationAsThreshold: Boolean = false
+        val useStandardDeviationAsThreshold: Boolean = false,
+
+        /**
+         * Only result from given percentile are counted for trend tests, thus ignoring highest deviations
+         */
+        val noisePercentile: Long = 0
 
 )

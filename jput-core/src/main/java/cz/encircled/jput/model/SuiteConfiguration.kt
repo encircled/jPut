@@ -1,6 +1,6 @@
 package cz.encircled.jput.model
 
-import cz.encircled.jput.unit.PerformanceSuite
+import cz.encircled.jput.annotation.PerformanceSuite
 
 data class SuiteConfiguration(
 

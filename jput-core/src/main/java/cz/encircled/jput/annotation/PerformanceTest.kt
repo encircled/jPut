@@ -1,6 +1,4 @@
-package cz.encircled.jput.unit
-
-import cz.encircled.jput.trend.PerformanceTrend
+package cz.encircled.jput.annotation
 
 /**
  * Mark the test as a JPut performance test, allowing to assert test execution time and analyze execution time trends
@@ -41,7 +39,11 @@ annotation class PerformanceTest(
          */
         val averageTimeLimit: Long = 0,
 
-        val percentiles: LongArray = [],
+        /**
+         * Upper limits for test execution time in milliseconds within defined percentiles. Defining multiple percentiles allows
+         * to have multiple validation constraints, for instance [200ms for 75%] and [500ms for 95%]
+         */
+        val percentiles: Array<Percentile> = [],
 
         /**
          * Tests will run in parallel if threads count is greater than 1

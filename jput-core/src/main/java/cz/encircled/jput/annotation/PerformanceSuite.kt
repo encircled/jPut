@@ -1,6 +1,8 @@
-package cz.encircled.jput.unit
+package cz.encircled.jput.annotation
 
 /**
+ * Marker for class which contains multiple performance tests
+ *
  * @author Vlad on 21-Sep-19.
  */
 @Retention(AnnotationRetention.RUNTIME)
