@@ -6,6 +6,8 @@ import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
 import java.lang.reflect.Method
 
+fun Int.toPercentile(): Double = this / 100.0
+
 object ConfigurationBuilder {
 
     fun defaultTestId(method: Method): String = "${method.declaringClass.simpleName}#${method.name}"
@@ -23,9 +25,10 @@ object ConfigurationBuilder {
         val rampUp = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.rampUp") ?: conf.rampUp
         val maxAllowedExceptionsCount = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.maxAllowedExceptionsCount")
                 ?: conf.maxAllowedExceptionsCount
+        val percentiles = getOptionalMapProperty(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.percentiles") ?: conf.percentiles
 
         return conf.copy(repeats = repeats, warmUp = warmUp, delay = delay, rampUp = rampUp,
-                maxTimeLimit = maxTimeLimit, avgTimeLimit = averageTimeLimit,
+                maxTimeLimit = maxTimeLimit, avgTimeLimit = averageTimeLimit, percentiles = percentiles,
                 parallelCount = parallel, maxAllowedExceptionsCount = maxAllowedExceptionsCount)
     }
 
@@ -54,7 +57,5 @@ object ConfigurationBuilder {
                     conf.sampleSelectionStrategy,
                     conf.noisePercentile.toPercentile()
             )
-
-    private fun Long.toPercentile(): Double = this / 100.0
 
 }

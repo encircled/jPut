@@ -2,10 +2,10 @@ package cz.encircled.jput.context
 
 import java.util.*
 
-inline fun <reified T> getOptionalProperty(key: String): T? {
-    val value = context.propertySources
+internal inline fun <reified T> getOptionalProperty(key: String): T? {
+    val value = removeWhitespaces(context.propertySources
             .mapNotNull { it.getProperty(key) }
-            .firstOrNull()
+            .firstOrNull())
 
     return if (value.isNullOrBlank()) return null
     else when (T::class) {
@@ -16,18 +16,32 @@ inline fun <reified T> getOptionalProperty(key: String): T? {
     }
 }
 
-inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T =
+internal fun removeWhitespaces(str: String?): String? =
+        (str as CharSequence?)?.filter { !it.isWhitespace() }?.toString()
+
+internal inline fun <reified T> getProperty(key: String, defaultValue: T? = null): T =
         getOptionalProperty<T>(key) ?: (defaultValue ?: throw IllegalStateException("JPut property [$key] is mandatory"))
 
-fun getCollectionProperty(key: String, defaultValue: List<String> = emptyList()): List<String> {
+internal fun getCollectionProperty(key: String, defaultValue: List<String> = emptyList()): List<String> {
     val value = getProperty(key, "")
 
     return if (value.isEmpty()) defaultValue
-    else value.split(",").map { it.trim() }
+    else value.split(",")
 }
 
 /**
- * Property sources for settings
+ * Supports only Int to Long, should be re-designed if more types are needed in future
+ */
+internal fun getOptionalMapProperty(key: String): Map<Double, Long>? {
+    return getOptionalProperty<String>(key)
+            ?.split(",")
+            ?.associate {
+                it.split("=").let { s -> s[0].toInt().toPercentile() to s[1].toLong() }
+            }
+}
+
+/**
+ * Property source for JPut settings
  */
 interface PropertySource {
 

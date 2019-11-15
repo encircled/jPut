@@ -12,7 +12,7 @@ annotation class Percentile(
         /**
          * Percentile rank, i.e. [95] for 95% percentile
          */
-        val rank: Long,
+        val rank: Int,
 
         /**
          * Upper limit for test execution time in milliseconds

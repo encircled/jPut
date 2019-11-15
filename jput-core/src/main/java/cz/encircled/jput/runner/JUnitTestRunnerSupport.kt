@@ -39,7 +39,7 @@ class JUnitTestRunnerSupport(private val clazz: Class<*>) {
                 fService.shutdown()
                 fService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
             }
-        });
+        })
     }
 
 }

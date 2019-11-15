@@ -39,6 +39,6 @@ annotation class PerformanceTrend(
         /**
          * Only result from given percentile are counted for trend tests, thus ignoring highest deviations
          */
-        val noisePercentile: Long = 0
+        val noisePercentile: Int = 0
 
 )

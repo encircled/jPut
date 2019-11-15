@@ -21,6 +21,7 @@ class ContextTest : ShortcutsForTests {
     @Test
     fun testGetProperty() = testWithProps(
             "getProp" to "true",
+            "mapProp" to "100 = 200, 200=300,300=400",
             "numProp" to "22",
             "collectionProp" to "1,2") {
         context.init()
@@ -38,6 +39,9 @@ class ContextTest : ShortcutsForTests {
 
         assertEquals(listOf("1", "2"), getCollectionProperty("collectionProp", listOf("true")))
         assertEquals(listOf("true"), getCollectionProperty("collectionProp2", listOf("true")))
+
+        assertEquals(mapOf(1.0 to 200L, 2.0 to 300L, 3.0 to 400L), getOptionalMapProperty("mapProp"))
+        assertNull(getOptionalMapProperty("mapProp2"))
     }
 
     @Test(expected = IllegalStateException::class)

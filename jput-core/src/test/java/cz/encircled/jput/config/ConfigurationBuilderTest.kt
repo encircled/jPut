@@ -61,6 +61,7 @@ class ConfigurationBuilderTest {
         System.setProperty("jput.config.test.propsTest.parallel", "2")
         System.setProperty("jput.config.test.propsTest.rampUp", "1000")
         System.setProperty("jput.config.test.propsTest.maxAllowedExceptionsCount", "5")
+        System.setProperty("jput.config.test.propsTest.percentiles", "50=200,75=300")
 
         val function = this::class.functions.find { it.name == "forPropertyFileTest" }!!
         val annotation = function.annotations[0] as PerformanceTest
@@ -69,7 +70,8 @@ class ConfigurationBuilderTest {
 
         assertEquals(PerfTestConfiguration("propsTest",
                 warmUp = 2, repeats = 10, delay = 50, maxTimeLimit = 100L, avgTimeLimit = 80L,
-                parallelCount = 2, rampUp = 1000L, maxAllowedExceptionsCount = 5
+                parallelCount = 2, rampUp = 1000L, maxAllowedExceptionsCount = 5,
+                percentiles = mapOf(0.5 to 200L, 0.75 to 300L)
         ), config)
     }
 
