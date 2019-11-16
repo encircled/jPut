@@ -122,6 +122,9 @@ class JPutContext {
         }
     }
 
+    /**
+     * Index defines the priority of a given [source], where 0 is the highest
+     */
     fun addPropertySource(source: PropertySource, index: Int = 0) {
         propertySources.add(index, source)
     }
@@ -187,7 +190,7 @@ class JPutContext {
         const val PROP_STORAGE_FILE_ENABLED = PREFIX + "storage.file.enabled"
 
         /**
-         * Absolute path to the file which will be used a a storeage
+         * Absolute path to the file which will be used a a storage
          */
         const val PROP_PATH_TO_STORAGE_FILE = PREFIX + "storage.file.path"
 
