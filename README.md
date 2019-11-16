@@ -37,6 +37,15 @@ You may simulate a big load using JPut as well. In this case, it is recommended 
 
 ## Quick start
 
+Dependency management:
+```xml
+<dependency>
+    <groupId>cz.encircled</groupId>
+    <artifactId>jput</artifactId>
+    <version>${jput.version}</version>
+</dependency>
+```
+
 JPut uses JUnit tests, so the class and functions/methods structure is very similar. Examples here are written in java, but you can use any JVM language! 
 
 The test class must use `JPutJUnit4Runner` JUnit runner, like:
