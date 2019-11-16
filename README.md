@@ -7,7 +7,7 @@ JPut allows implementing continuous and load performance testing completely as a
 
 * [Use cases](#use-cases)
 * [Quick start](#quick-start)
-* [Performance tests configuration](#performance-tests-configuration)
+* [Performance tests configuration](#performance-test-configuration)
 * [Property based configuration](#property-based-configuration)
 * [Storage types](#storage-types)
 * [Property sources](#property-sources)
