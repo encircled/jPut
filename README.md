@@ -195,15 +195,15 @@ It allows to use any Spring features in the tests and will automatically attach 
 
 ### JPut vs JMeter
 
-- Create huge load from just one machine with Reactive test executor
-- Simple integration with existing CI pipelines thanks to using junit
-- Test implementation flexibility. You can use any jvm language and you are not limited in how to prepare test data / execute test / assert results. All in the code.
-- Re-use already existing code for your test data generation and validation
+- All as a code! Providing test implementation flexibility. You can use any jvm language and you are not limited in how to prepare test data / execute test / assert results.
 - Out of the box support for performance trend analysis
+- Re-use already existing code for your test data generation and validation
+- Simple integration with existing CI pipelines thanks to using junit
+- Create huge load from just one machine with Reactive test executor
 
 ### JPut vs Gatling
 
 - You have even more flexibility in how you write the performance tests
 - JPut supports tests written in any JVM language
-- Create huge load from just one machine with Reactive test executor
 - Out of the box support for performance trend analysis
+- Create huge load from just one machine with Reactive test executor

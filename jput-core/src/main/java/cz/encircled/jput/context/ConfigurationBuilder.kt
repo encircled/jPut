@@ -15,6 +15,7 @@ object ConfigurationBuilder {
     fun buildConfig(conf: PerformanceTest, method: Method): PerfTestConfiguration =
             fromContextParams(fromAnnotation(conf, method))
 
+    // TODO trends via props?
     private fun fromContextParams(conf: PerfTestConfiguration): PerfTestConfiguration {
         val repeats = getOptionalProperty<Int>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.repeats") ?: conf.repeats
         val warmUp = getOptionalProperty<Int>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.warmUp") ?: conf.warmUp
