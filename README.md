@@ -14,6 +14,7 @@ JPut allows implementing continuous and load performance testing completely as a
 * [Global config parameters](#global-jput-configuration)
 * [Spring integration](#spring-integration)
 * [Why not XYZ?](#why-not-xyz)
+* [Visualization in Kibana](#visualization-in-kibana)
 
 ## Use cases
 
@@ -135,7 +136,7 @@ key->value data types must be delimited by `,` and `=`, like: `key1=value1, key2
 
 ## Storage types
 
-As a storage for test results, JPut supports Elasticsearch or Filesystem. The main advantage of Elasticsearch is that it can be used with Kibana for visualizing the data.
+As a storage for test results, JPut supports Elasticsearch or Filesystem. The main advantage of Elasticsearch is that it can be used with Kibana for visualizing the data (details [here](#visualization-in-kibana)).
 At least one storage is mandatory for trend analysis.
 
 Configuration of both is described [here](#global-jput-configuration)
@@ -216,3 +217,68 @@ It allows to use any Spring features in the tests and will automatically attach 
 - JPut supports tests written in any JVM language
 - Out of the box support for performance trend analysis
 - Create huge load from just one machine with Reactive test executor
+
+
+
+## Visualization in Kibana
+
+Elasticsearch entry has following fields:
+
+- executionId - unique ID of a particular tests execution. Multiple performance tests have the same executionId if run all at once (for example via maven tests)
+- testId - ID of a particular perf test
+- start - test execution start time, relatively to the execution start time
+- elapsed - elapsed time in milliseconds
+- resultCode - test result code
+- errorMessage - test result error message if any
+
+Also it may contain additional user-defined parameter as described in config section before.
+
+Kibana provides a lot of possibilities how to visualize the data, most of all it depends on your requirements. Here are some common examples:
+
+#### Statistics table with metrics summary aggregated by test ID
+![img...](imgs/stat_table.png)
+
+**How to**
+
+Data Table with following params
+
+Metrics:
+- Average `elapsed`
+- Percentiles of `elapsed`
+- Max `elapsed`
+- Count
+
+Buckets:
+- Split rows by `testId` keyword
+
+#### Response times over time aggregated by test ID
+![img...](imgs/times_graph.png)
+
+**How to**
+
+Line graph with following params
+
+Metrics:
+- Max `elapsed`
+
+Buckets:
+- X-axis - Date histogram using `start`
+- Split series by `testId` keyword
+
+#### Performance trends by application version
+![img...](imgs/trend_graph.png)
+
+This graph additionally requires to set application version in Elasticsearch recorder parameters (see configuration section).
+Assuming this property is named `app.ver`.
+
+**How to**
+
+Line graph with following params
+
+Metrics:
+- Max `elapsed`
+- Percentiles `elapsed`
+
+Buckets:
+- X-axis - Ascending term using `app.ver`
+- Split series by `testId` keyword
