@@ -21,7 +21,7 @@ class ContextTest : ShortcutsForTests {
     @Test
     fun testGetProperty() = testWithProps(
             "getProp" to "true",
-            "mapProp" to "100 = 200, 200=300,300=400",
+            "mapProp" to "100 : 200, 200:300,300:400",
             "numProp" to "22",
             "collectionProp" to "1,2") {
         context.init()
