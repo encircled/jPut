@@ -36,7 +36,7 @@ internal fun getOptionalMapProperty(key: String): Map<Double, Long>? {
     return getOptionalProperty<String>(key)
             ?.split(",")
             ?.associate {
-                it.split("=").let { s -> s[0].toInt().toPercentile() to s[1].toLong() }
+                it.split(":").let { s -> s[0].toInt().toPercentile() to s[1].toLong() }
             }
 }
 

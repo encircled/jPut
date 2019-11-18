@@ -61,7 +61,7 @@ class ConfigurationBuilderTest {
         System.setProperty("jput.config.test.propsTest.parallel", "2")
         System.setProperty("jput.config.test.propsTest.rampUp", "1000")
         System.setProperty("jput.config.test.propsTest.maxAllowedExceptionsCount", "5")
-        System.setProperty("jput.config.test.propsTest.percentiles", "50=200,75=300")
+        System.setProperty("jput.config.test.propsTest.percentiles", "50:200,75:300")
 
         val function = this::class.functions.find { it.name == "forPropertyFileTest" }!!
         val annotation = function.annotations[0] as PerformanceTest
