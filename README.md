@@ -235,7 +235,7 @@ Also it may contain additional user-defined parameter as described in config sec
 
 Kibana provides a lot of possibilities how to visualize the data, most of all it depends on your requirements. Here are some common examples:
 
-#### Statistics table with metrics summary aggregated by test ID
+### Statistics table with metrics summary aggregated by test ID
 ![img...](imgs/stat_table.png)
 
 **How to**
@@ -251,7 +251,7 @@ Metrics:
 Buckets:
 - Split rows by `testId` keyword
 
-#### Response times over time aggregated by test ID
+### Response times over time aggregated by test ID
 ![img...](imgs/times_graph.png)
 
 **How to**
@@ -265,7 +265,7 @@ Buckets:
 - X-axis - Date histogram using `start`
 - Split series by `testId` keyword
 
-#### Performance trends by application version
+### Performance trends by application version
 ![img...](imgs/trend_graph.png)
 
 This graph additionally requires to set application version in Elasticsearch recorder parameters (see configuration section).
