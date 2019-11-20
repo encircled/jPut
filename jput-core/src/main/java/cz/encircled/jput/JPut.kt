@@ -9,6 +9,7 @@ import cz.encircled.jput.model.ExecutionRun
  * - Logging
  * - Fix when parallel > repeats
  * - Error on warmup
+ * - ELK retries - https://discuss.elastic.co/t/how-to-set-listener-timeout-by-high-level-rest-client/125051
  *
  * Helper functions for JPut users to control the perf tests execution
  *
