@@ -48,7 +48,7 @@ data class ExecutionRun(
      * Set elapsed time as difference before current time and start time
      */
     fun measureElapsed() {
-        elapsedTime = (System.nanoTime() - startTime) / 1000000L
+        if (elapsedTime == 0L) elapsedTime = (System.nanoTime() - startTime) / 1000000L
     }
 
     override fun toString(): String = "startTime: ${startTime}, elapsed: $elapsedTime"

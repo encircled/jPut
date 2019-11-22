@@ -150,7 +150,17 @@ abstract class BaseIntegrationTest {
         assertEquals(1, getExecution("testMarkPerformanceTestStart").getElapsedTimes().size)
 
         // Test has thread.sleep(50) and then calls 'markPerformanceTestStart'
-        assertTrue(getExecution("testMarkPerformanceTestStart").getElapsedTimes()[0] < 49)
+        assertTrue(getExecution("testMarkPerformanceTestStart").getElapsedTimes()[0] < 40)
+    }
+
+    @Test
+    fun testMarkPerformanceTestEnd() {
+        assertSuccessful("testMarkPerformanceTestEnd")
+
+        assertEquals(1, getExecution("testMarkPerformanceTestEnd").getElapsedTimes().size)
+
+        // Test calls 'markPerformanceTestEnd' and then thread.sleep(50)
+        assertTrue(getExecution("testMarkPerformanceTestEnd").getElapsedTimes()[0] < 40)
     }
 
     @Test
@@ -162,6 +172,9 @@ abstract class BaseIntegrationTest {
                         "beforeClass" to Junit4TestRunnerSteps::class.java,
 
                         "beforeTest" to "Junit4TestRunnerSteps#testAssumptionFailedPropagated",
+
+                        "beforeTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestEnd",
+                        "afterTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestEnd",
 
                         "beforeTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",
                         "afterTest" to "Junit4TestRunnerSteps#testMarkPerformanceTestStart",

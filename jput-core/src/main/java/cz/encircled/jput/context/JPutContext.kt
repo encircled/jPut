@@ -97,7 +97,9 @@ class JPutContext {
 
             log.info("JPut is using Elasticsearch recorder: $host")
 
-            val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost(host, port, scheme)))
+            val client = ElasticsearchClientWrapper(RestClient.builder(HttpHost(host, port, scheme)).setRequestConfigCallback {
+                it.setConnectTimeout(5000).setSocketTimeout(60000)
+            })
             val elastic = ElasticsearchResultRecorder(client)
             elastic.doCleanup()
             resultRecorders.add(elastic)

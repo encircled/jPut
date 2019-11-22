@@ -50,6 +50,13 @@ class Junit4TestRunnerSteps {
         jPut.markPerformanceTestStart()
     }
 
+    @PerformanceTest
+    @Test
+    fun testMarkPerformanceTestEnd(jPut: JPut) {
+        jPut.markPerformanceTestEnd()
+        Thread.sleep(50)
+    }
+
     @PerformanceTest(warmUp = 2, repeats = 2, maxTimeLimit = 5000L)
     @Test
     fun testWarmUpAndRepeatsCount() {

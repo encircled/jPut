@@ -9,7 +9,6 @@ import cz.encircled.jput.model.ExecutionRun
  * - Logging
  * - Fix when parallel > repeats
  * - Error on warmup
- * - ELK retries - https://discuss.elastic.co/t/how-to-set-listener-timeout-by-high-level-rest-client/125051
  *
  * Helper functions for JPut users to control the perf tests execution
  *
@@ -37,12 +36,35 @@ interface JPut {
      */
     fun markPerformanceTestStart()
 
+    /**
+     * This function may be called directly from the performance test to tell JPut that time measurement must end at this point,
+     * i.e. not until the end of the method. This might be useful when performance test makes some expensive assertions/cleanup after each test repeat.
+     *
+     * For example:
+     *
+     * ```
+     * @PerformanceTest(...)
+     * public void myPerfTest(JPut jPut) {
+     *     // here goes code which is actually being measured
+     *
+     *     jPut.markPerformanceTestEnd(); // Ignore time taken after this point
+     *
+     *     // some expensive assertions, cleanup etc
+     * }
+     * ```
+     */
+    fun markPerformanceTestEnd()
+
 }
 
 class JPutImpl(private val executionRun: ExecutionRun) : JPut {
 
     override fun markPerformanceTestStart() {
         executionRun.relativeStartTime = System.nanoTime() - executionRun.execution.startTime
+    }
+
+    override fun markPerformanceTestEnd() {
+        executionRun.measureElapsed()
     }
 
 }
