@@ -17,16 +17,18 @@ object ConfigurationBuilder {
 
     // TODO trends via props?
     private fun fromContextParams(conf: PerfTestConfiguration): PerfTestConfiguration {
-        val repeats = getOptionalProperty<Int>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.repeats") ?: conf.repeats
-        val warmUp = getOptionalProperty<Int>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.warmUp") ?: conf.warmUp
-        val delay = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.delay") ?: conf.delay
-        val maxTimeLimit = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.maxTimeLimit") ?: conf.maxTimeLimit
-        val averageTimeLimit = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.averageTimeLimit") ?: conf.avgTimeLimit
-        val parallel = getOptionalProperty<Int>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.parallel") ?: conf.parallelCount
-        val rampUp = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.rampUp") ?: conf.rampUp
-        val maxAllowedExceptionsCount = getOptionalProperty<Long>(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.maxAllowedExceptionsCount")
+        val p = JPutContext.PROP_TEST_CONFIG + conf.testId
+
+        val repeats = getOptionalProperty<Int>("$p.repeats") ?: conf.repeats
+        val warmUp = getOptionalProperty<Int>("$p.warmUp") ?: conf.warmUp
+        val delay = getOptionalProperty<Long>("$p.delay") ?: conf.delay
+        val maxTimeLimit = getOptionalProperty<Long>("$p.maxTimeLimit") ?: conf.maxTimeLimit
+        val averageTimeLimit = getOptionalProperty<Long>("$p.averageTimeLimit") ?: conf.avgTimeLimit
+        val parallel = getOptionalProperty<Int>("$p.parallel") ?: conf.parallelCount
+        val rampUp = getOptionalProperty<Long>("$p.rampUp") ?: conf.rampUp
+        val maxAllowedExceptionsCount = getOptionalProperty<Long>("$p.maxAllowedExceptionsCount")
                 ?: conf.maxAllowedExceptionsCount
-        val percentiles = getOptionalMapProperty(JPutContext.PROP_TEST_CONFIG + "${conf.testId}.percentiles") ?: conf.percentiles
+        val percentiles = getOptionalMapProperty("$p.percentiles") ?: conf.percentiles
 
         return conf.copy(repeats = repeats, warmUp = warmUp, delay = delay, rampUp = rampUp,
                 maxTimeLimit = maxTimeLimit, avgTimeLimit = averageTimeLimit, percentiles = percentiles,

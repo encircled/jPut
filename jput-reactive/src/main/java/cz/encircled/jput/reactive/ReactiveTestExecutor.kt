@@ -10,7 +10,9 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import reactor.core.scheduler.Schedulers
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author Vlad on 21-Sep-19.
@@ -43,12 +45,16 @@ class ReactiveTestExecutor : ThreadBasedTestExecutor() {
         wuCountDown.await()
 
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
+        val parallelIndex = AtomicLong()
         val countDown = CountDownLatch(execution.conf.parallelCount)
 
         // TODO No ramp up delayElement(Duration.ofMillis(rampUp * index))
         (0 until execution.conf.repeats).toFlux()
                 .parallel(execution.conf.parallelCount)
                 .runOn(Schedulers.parallel())
+                .flatMap {
+                    it.toMono().delayElement(Duration.ofMillis(rampUp * parallelIndex.getAndIncrement()))
+                }
                 .flatMap { index ->
                     // TODO use execution.startNextExecution?
                     val repeat = ExecutionRun(execution)

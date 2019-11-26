@@ -69,8 +69,14 @@ open class ThreadBasedTestExecutor {
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
 
         (1..execution.conf.warmUp).map {
-            executor.submit { statement.invoke(null) }
-        }.map { it.get() }
+            executor.submit {
+                try {
+                    statement.invoke(null)
+                } catch (e: Exception) {
+                    log.warn("Error during test warm up!", e)
+                }
+            }
+        }.forEach { it.get() }
 
         var scheduledCount = 0
         val repeatsPerThread = max(1, execution.conf.repeats / execution.conf.parallelCount)

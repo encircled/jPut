@@ -8,7 +8,6 @@ import cz.encircled.jput.model.ExecutionRun
  * - Self warm up
  * - Logging
  * - Fix when parallel > repeats
- * - Error on warmup
  *
  * Helper functions for JPut users to control the perf tests execution
  *

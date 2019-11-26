@@ -37,6 +37,20 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
         assertEquals(15, counter)
     }
 
+    /**
+     * Error must be logged, by test should proceed
+     */
+    @Test
+    fun testErrorDuringWarmUp() {
+        var counter = 0
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(warmUp = 1, repeats = 1)) {
+            counter++
+            throw RuntimeException("Test")
+        }
+
+        assertEquals(2, counter)
+    }
+
     @Test
     fun testUnitAnalyzerIsRun() {
         val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {

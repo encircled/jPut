@@ -7,6 +7,7 @@ import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.io.IOException
+import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
@@ -107,8 +108,8 @@ class ReactiveTestExecutorTest {
         assertEquals(5, counter.get())
     }
 
+    // FIXME
     @Test
-    @Ignore // FIXME
     fun testRampUp() {
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRampUp", repeats = 5, rampUp = 1000, parallelCount = 5, isReactive = true)
 
@@ -116,18 +117,23 @@ class ReactiveTestExecutorTest {
 
         println()
         assertTrue(getDif("1 start", "2 start") > 240, "Actual: ${getDif("1 start", "2 start")}")
-//        assertEquals(5, startTimes.size)
-//
-//        listOf(
-//                Pair(0, 1000),
-//                Pair(1, 750),
-//                Pair(2, 500),
-//                Pair(3, 250)
-//        ).forEach {
-//            assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
-//        }
-//
-//        assertTrue(startTimes[4] - startTimes[0] < 1100)
+        /* assertEquals(5, startTimes.size)
+
+         listOf(
+                 Pair(0, 1000),
+                 Pair(1, 750),
+                 Pair(2, 500),
+                 Pair(3, 250)
+         ).forEach {
+             assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
+         }
+
+         assertTrue(startTimes[4] - startTimes[0] < 1100)*/
+    }
+
+    @Test
+    fun test() {
+        URL("http://seznam.cz").openConnection()
     }
 
     private fun getDif(left: String, right: String) =
