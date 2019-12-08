@@ -8,21 +8,17 @@ import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.Statement
 
 /**
- * [org.junit.runner.Runner] impl for JUnit 4
+ * Provides JPut testing functionality to stanrad JUnit4 tests
+ *
+ * @param clazz the test class to be run
  */
 class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
 
-    private val executor = Junit4TestExecutor()
-
-    companion object {
-
-        var isInitialized = false
-
-    }
+    private val executor = PutTestExecutorForJUnitRunner()
 
     override fun run(notifier: RunNotifier?) {
-        if (!isInitialized) {
-            isInitialized = true
+        if (!executor.isInitialized) {
+            executor.isInitialized = true
             context.init()
         }
 
@@ -58,8 +54,6 @@ class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(cla
     /**
      * Allows passing [cz.encircled.jput.JPut] to the test
      */
-    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement {
-        return InvokeMethodWithParams(test, method)
-    }
+    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement = InvokeMethodWithParams(test, method)
 
 }

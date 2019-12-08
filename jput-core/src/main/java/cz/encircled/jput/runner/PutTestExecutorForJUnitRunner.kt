@@ -13,19 +13,21 @@ import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.Statement
 
 /**
- * TODO redesign executors / inheritance / composition
+ * All JUnit runners should delegate execution to this class
  *
  * @author Vlad on 22-Sep-19.
  */
-class Junit4TestExecutor {
+class PutTestExecutorForJUnitRunner {
 
-    var executor: ThreadBasedTestExecutor = ThreadBasedTestExecutor()
+    private var realExecutor: ThreadBasedTestExecutor = ThreadBasedTestExecutor()
+
+    var isInitialized = false
 
     companion object {
 
         /**
          * Hack for [InvokeMethodWithParams] - there is no other easy way how to pass the [JPut] argument to the unit test
-         * and re-use existing JUnit Statements (like BeforeTest, AfterTest etc)
+         * and at the same time re-use existing JUnit Statements (like BeforeTest, AfterTest etc)
          */
         val jPut = ThreadLocal<JPut?>()
 
@@ -40,7 +42,7 @@ class Junit4TestExecutor {
         // TODO pick executor in a better way?
         try {
             val reactive = Class.forName("cz.encircled.jput.reactive.ReactiveTestExecutor")
-            executor = reactive.getConstructor().newInstance() as ThreadBasedTestExecutor
+            realExecutor = reactive.getConstructor().newInstance() as ThreadBasedTestExecutor
         } catch (e: ClassNotFoundException) {
             // OK
         }
@@ -52,26 +54,28 @@ class Junit4TestExecutor {
 
         try {
             val annotation = method.getAnnotation(PerformanceTest::class.java)
-            if (annotation == null || !context.isPerformanceTestEnabled) {
-                statement.evaluate()
-            } else {
-                val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
 
-                val execution = executor.executeTest(conf) {
-                    jPut.set(it)
-                    statement.evaluate()
-                    result.get()
-                }
-
-                if (execution.violations.isNotEmpty()) {
-                    throw AssertionFailedError("Performance test failed.\n${execution.violationsErrorMessage}")
-                }
-            }
+            if (context.isPerformanceTestEnabled || annotation != null) runJPutTest(annotation, method, statement)
+            else statement.evaluate()
         } catch (e: Throwable) {
             if (e.cause is AssumptionViolatedException) eachNotifier.addFailedAssumption(e.cause as AssumptionViolatedException)
             else eachNotifier.addFailure(e)
         } finally {
             eachNotifier.fireTestFinished()
+        }
+    }
+
+    private fun runJPutTest(annotation: PerformanceTest, method: FrameworkMethod, statement: Statement) {
+        val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
+
+        val execution = realExecutor.executeTest(conf) {
+            jPut.set(it)
+            statement.evaluate()
+            result.get()
+        }
+
+        if (execution.violations.isNotEmpty()) {
+            throw AssertionFailedError("Performance test failed.\n${execution.violationsErrorMessage}")
         }
     }
 

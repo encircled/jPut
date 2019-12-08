@@ -5,37 +5,23 @@ import cz.encircled.jput.context.context
 import org.junit.Test
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.model.FrameworkMethod
-import org.junit.runners.model.InitializationError
 import org.junit.runners.model.Statement
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 
 /**
- * @author Vlad on 20-May-17.
- */
-class JPutSpringRunner
-
-/**
  * Construct a new `SpringJUnit4ClassRunner` and initialize a
- * [org.springframework.test.context.TestContextManager] to provide Spring testing functionality to
+ * [org.springframework.test.context.TestContextManager] to provide JPut and Spring testing functionality to
  * standard JUnit tests.
  *
  * @param clazz the test class to be run
- * @see .createTestContextManager
  */
-@Throws(InitializationError::class)
-constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
+class JPutSpringRunner(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
-    private val executor = Junit4TestExecutor()
-
-    companion object {
-
-        var isInitialized = false
-
-    }
+    private val executor = PutTestExecutorForJUnitRunner()
 
     override fun run(notifier: RunNotifier) {
-        if (!isInitialized) {
-            isInitialized = true
+        if (!executor.isInitialized) {
+            executor.isInitialized = true
             context.addPropertySource(object : PropertySource {
                 override fun getProperty(key: String): String? {
                     return testContextManager.testContext.applicationContext.environment.getProperty(key)
@@ -77,8 +63,7 @@ constructor(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
     /**
      * Allows passing [cz.encircled.jput.JPut] to the test
      */
-    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement {
-        return InvokeMethodWithParams(test, method)
-    }
+    override fun methodInvoker(method: FrameworkMethod, test: Any): Statement = InvokeMethodWithParams(test, method)
+
 }
 
