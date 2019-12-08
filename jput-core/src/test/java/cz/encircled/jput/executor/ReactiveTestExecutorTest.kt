@@ -91,7 +91,7 @@ class ReactiveTestExecutorTest {
         assertTrue(getDif("1 start", "3 start") >= delayWithError)
 
         // Assert second chunk in paralleled
-        assertTrue(getDif("3 start", "4 start") < delay / 2)
+        assertTrue(getDif("3 start", "4 start") < delay / 2, getDif("3 start", "4 start").toString())
         assertTrue(getDif("3 end", "4 end") < delay / 2)
 
         // Assert that executions are actually run in parallel and haven't wait for others
@@ -123,18 +123,19 @@ class ReactiveTestExecutorTest {
 
         println()
         assertTrue(getDif("1 start", "2 start") > 240, "Actual: ${getDif("1 start", "2 start")}")
-        /* assertEquals(5, startTimes.size)
 
-         listOf(
-                 Pair(0, 1000),
-                 Pair(1, 750),
-                 Pair(2, 500),
-                 Pair(3, 250)
-         ).forEach {
-             assertTrue(startTimes[4] - startTimes[it.first] >= it.second - 2, "${startTimes[4] - startTimes[it.first]} for $it")
-         }
+        getDif("1 start", "2 start")
 
-         assertTrue(startTimes[4] - startTimes[0] < 1100)*/
+        listOf(
+                Pair(1, 950),
+                Pair(2, 700),
+                Pair(3, 450),
+                Pair(4, 200)
+        ).forEach {
+            assertTrue(getDif("${it.first} start", "5 start") > it.second)
+        }
+
+        assertTrue(getDif("1 start", "5 start") < 1100)
     }
 
     @Test
