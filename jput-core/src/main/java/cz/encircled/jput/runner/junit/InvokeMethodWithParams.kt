@@ -1,7 +1,7 @@
-package cz.encircled.jput.runner
+package cz.encircled.jput.runner.junit
 
-import cz.encircled.jput.runner.PutTestExecutorForJUnitRunner.Companion.jPut
-import cz.encircled.jput.runner.PutTestExecutorForJUnitRunner.Companion.result
+import cz.encircled.jput.runner.junit.PutTestExecutorForJUnitRunner.Companion.jPut
+import cz.encircled.jput.runner.junit.PutTestExecutorForJUnitRunner.Companion.result
 import org.junit.internal.runners.statements.InvokeMethod
 import org.junit.runners.model.FrameworkMethod
 

@@ -1,4 +1,4 @@
-package cz.encircled.jput.runner
+package cz.encircled.jput.runner.junit
 
 import cz.encircled.jput.annotation.PerformanceSuite
 import cz.encircled.jput.context.context

@@ -2,6 +2,8 @@ package cz.encircled.jput.runner
 
 import cz.encircled.jput.TestReporter
 import cz.encircled.jput.context.context
+import cz.encircled.jput.runner.junit.JPutJUnit4Runner
+import cz.encircled.jput.runner.junit.JPutSpringRunner
 import cz.encircled.jput.runner.steps.Junit4TestRunnerSteps
 import org.junit.BeforeClass
 import org.junit.Ignore

@@ -4,8 +4,7 @@ import cz.encircled.jput.JPut
 import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
-import cz.encircled.jput.runner.ThreadBasedTestExecutor
-import org.slf4j.LoggerFactory
+import cz.encircled.jput.runner.BaseTestExecutor
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
@@ -17,15 +16,12 @@ import java.util.concurrent.atomic.AtomicLong
 /**
  * @author Vlad on 21-Sep-19.
  */
-// TODO re-design a bit, should not extend ThreadBased
-class ReactiveTestExecutor : ThreadBasedTestExecutor() {
-
-    private val log = LoggerFactory.getLogger(ReactiveTestExecutor::class.java)
+class ReactiveTestExecutor : BaseTestExecutor() {
 
     // TODO if reactive + has jPut arg - throw an exc
     // TODO delay
     override fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
-        if (!execution.conf.isReactive) return super.performExecution(execution, statement)
+        check(execution.conf.isReactive)
 
         // Invoke test statement which should just return a Mono
         val body = statement.invoke(null)

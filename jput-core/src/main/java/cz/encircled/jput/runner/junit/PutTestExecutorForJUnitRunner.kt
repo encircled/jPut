@@ -1,9 +1,11 @@
-package cz.encircled.jput.runner
+package cz.encircled.jput.runner.junit
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.annotation.PerformanceTest
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
+import cz.encircled.jput.runner.BaseTestExecutor
+import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
 import org.junit.internal.runners.model.EachTestNotifier
@@ -19,7 +21,7 @@ import org.junit.runners.model.Statement
  */
 class PutTestExecutorForJUnitRunner {
 
-    private var realExecutor: ThreadBasedTestExecutor = ThreadBasedTestExecutor()
+    private var realExecutor: BaseTestExecutor = ThreadBasedTestExecutor()
 
     var isInitialized = false
 
@@ -42,7 +44,7 @@ class PutTestExecutorForJUnitRunner {
         // TODO pick executor in a better way?
         try {
             val reactive = Class.forName("cz.encircled.jput.reactive.ReactiveTestExecutor")
-            realExecutor = reactive.getConstructor().newInstance() as ThreadBasedTestExecutor
+            realExecutor = reactive.getConstructor().newInstance() as BaseTestExecutor
         } catch (e: ClassNotFoundException) {
             // OK
         }
@@ -55,7 +57,7 @@ class PutTestExecutorForJUnitRunner {
         try {
             val annotation = method.getAnnotation(PerformanceTest::class.java)
 
-            if (context.isPerformanceTestEnabled || annotation != null) runJPutTest(annotation, method, statement)
+            if (context.isPerformanceTestEnabled && annotation != null) runJPutTest(annotation, method, statement)
             else statement.evaluate()
         } catch (e: Throwable) {
             if (e.cause is AssumptionViolatedException) eachNotifier.addFailedAssumption(e.cause as AssumptionViolatedException)

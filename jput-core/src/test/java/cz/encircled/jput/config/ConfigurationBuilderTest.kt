@@ -6,7 +6,7 @@ import cz.encircled.jput.annotation.PerformanceTrend
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.TrendTestConfiguration
-import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.runner.junit.JPutJUnit4Runner
 import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
 import kotlin.reflect.full.functions

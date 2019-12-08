@@ -2,7 +2,7 @@ package cz.encircled.jput.reactive
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.model.PerfTestConfiguration
-import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.runner.junit.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
@@ -62,8 +62,10 @@ class ReactiveTestExecutorTest {
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testWrongTestReturnType", isReactive = false)
 
-        // Should just pass
-        executor.executeTest(conf) { "test" }
+        // Should fail
+        assertFails {
+            executor.executeTest(conf) { "test" }
+        }
     }
 
     /**

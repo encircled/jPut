@@ -1,4 +1,4 @@
-package cz.encircled.jput.runner
+package cz.encircled.jput.runner.junit
 
 import cz.encircled.jput.context.context
 import org.junit.Test

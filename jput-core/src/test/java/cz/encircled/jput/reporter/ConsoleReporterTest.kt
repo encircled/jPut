@@ -3,7 +3,7 @@ package cz.encircled.jput.reporter
 import cz.encircled.jput.ShortcutsForTests
 import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.RunResult
-import cz.encircled.jput.runner.JPutJUnit4Runner
+import cz.encircled.jput.runner.junit.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import kotlin.test.Test
 import kotlin.test.assertTrue

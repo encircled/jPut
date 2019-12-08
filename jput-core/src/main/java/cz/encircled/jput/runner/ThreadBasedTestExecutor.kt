@@ -2,13 +2,9 @@ package cz.encircled.jput.runner
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.JPutImpl
-import cz.encircled.jput.context.context
-import cz.encircled.jput.model.PerfConstraintViolation
-import cz.encircled.jput.model.PerfTestConfiguration
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
 import org.junit.AssumptionViolatedException
-import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -17,54 +13,9 @@ import kotlin.math.max
 /**
  * Executes particular piece of code (junit test, or any other function) and runs performance and trend assertions.
  */
-open class ThreadBasedTestExecutor {
+open class ThreadBasedTestExecutor : BaseTestExecutor() {
 
-    private val log = LoggerFactory.getLogger(ThreadBasedTestExecutor::class.java)
-
-    fun executeTest(config: PerfTestConfiguration, statement: (JPut?) -> Any?): PerfTestExecution {
-        val execution = PerfTestExecution(config, mutableMapOf("id" to context.executionId), System.nanoTime())
-
-        context.resultReporters.forEach { it.beforeTest(execution) }
-
-        performExecution(execution, statement)
-
-        execution.violations.addAll(analyzeExecutionResults(execution, config))
-
-        writeResults(execution)
-        context.resultReporters.forEach { it.afterTest(execution) }
-
-        return execution
-    }
-
-    private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): List<PerfConstraintViolation> {
-        val result = mutableListOf<PerfConstraintViolation>()
-
-        context.unitPerformanceAnalyzers.forEach {
-            result.addAll(it.analyzeUnitTrend(execution))
-        }
-
-        if (conf.trendConfiguration != null && context.resultRecorders.isNotEmpty()) {
-            // Assume that first has highest priority TODO support main/slave recorders instead
-            val sample = context.resultRecorders[0].getSample(execution)
-
-            if (sample.size >= conf.trendConfiguration.sampleSize) {
-                val trendViolations = context.trendAnalyzer.analyzeTestTrend(execution, sample)
-                result.addAll(trendViolations)
-            } else {
-                log.info("Skipping performance trend assertions since current sample size is too small [current is ${sample.size}]")
-            }
-        }
-
-        return result
-    }
-
-    private fun writeResults(execution: PerfTestExecution) {
-        context.resultRecorders.forEach {
-            it.appendTrendResult(execution)
-        }
-    }
-
-    open fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
+    override fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
         val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
 
