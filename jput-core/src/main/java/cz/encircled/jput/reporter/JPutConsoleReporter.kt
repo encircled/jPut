@@ -4,6 +4,7 @@ import cz.encircled.jput.model.PerfTestExecution
 import org.slf4j.LoggerFactory
 
 /**
+ * Implementation of [JPutReporter] which prints simple JPut report to the system.out
  *
  * @author Vlad on 22-Sep-19.
  */

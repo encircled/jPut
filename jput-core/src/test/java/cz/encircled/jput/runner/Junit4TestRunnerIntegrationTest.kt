@@ -85,8 +85,8 @@ abstract class BaseIntegrationTest {
             listener = TestRunListener()
             context.init()
 
-            (context.resultReporters[1] as TestReporter).executions.clear()
-            (context.resultReporters[1] as TestReporter).invocations.clear()
+            (context.resultReporters[0] as TestReporter).executions.clear()
+            (context.resultReporters[0] as TestReporter).invocations.clear()
             Junit4TestRunnerSteps.isBeforeExecuted = false
         }
 
@@ -169,7 +169,7 @@ abstract class BaseIntegrationTest {
 
     @Test
     fun testReporterIsInvokedCorrectly() {
-        val reporter = context.resultReporters[1] as TestReporter
+        val reporter = context.resultReporters[0] as TestReporter
 
         assertEquals(
                 mutableListOf<Pair<String, Any?>>(
@@ -239,7 +239,7 @@ abstract class BaseIntegrationTest {
     }
 
     private fun getExecution(id: String) =
-            (context.resultReporters[1] as TestReporter).getExecution(id)
+            (context.resultReporters[0] as TestReporter).getExecution(id)
 
     private fun expectFailure(method: String): Failure =
             listener.failures.firstOrNull {

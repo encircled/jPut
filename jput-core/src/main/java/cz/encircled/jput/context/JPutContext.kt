@@ -61,9 +61,13 @@ class JPutContext {
      */
     var currentSuiteMethod: Method? = null
 
-    var resultReporters = mutableListOf<JPutReporter>(JPutConsoleReporter())
+    var resultReporters = mutableListOf<JPutReporter>()
 
     fun init(): JPutContext {
+        if (!getProperty(PROP_REPORTER_CONSOLE_DISABLED, false)) {
+            resultReporters.add(JPutConsoleReporter())
+        }
+
         getProperty(PROP_REPORTER_CLASS, "").let {
             if (it.isNotEmpty() && resultReporters.all { r -> r.javaClass.name != it }) {
                 resultReporters.add(Class.forName(it).getConstructor().newInstance() as JPutReporter)
@@ -144,6 +148,11 @@ class JPutContext {
          * Fully classified class name of custom Result Recorder
          */
         const val PROP_REPORTER_CLASS = PREFIX + "reporter.class"
+
+        /**
+         * Disables default console reporter
+         */
+        const val PROP_REPORTER_CONSOLE_DISABLED = PREFIX + "reporter.console.disabled"
 
         /**
          * Boolean - enables/disables elasticsearch as a Result Recorder

@@ -27,17 +27,17 @@ class ReactiveTestExecutor : BaseTestExecutor() {
         check(body is Mono<*>) { "Reactive test must return Mono<*> object, without subscribing/blocking." }
 
         // TODO wrong partitioning
-        val wuCountDown = CountDownLatch(execution.conf.warmUp)
+        val warmUpCountDown = CountDownLatch(execution.conf.warmUp)
 
         (0 until execution.conf.warmUp).toFlux()
                 .flatMap { body as Mono<*> }
                 .onErrorContinue { t, _ ->
                     log.warn("Error during warm up", t)
                 }
-                .doOnNext { wuCountDown.countDown() }
+                .doOnNext { warmUpCountDown.countDown() }
                 .subscribe()
 
-        wuCountDown.await()
+        warmUpCountDown.await()
 
         val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
         val parallelIndex = AtomicLong()
