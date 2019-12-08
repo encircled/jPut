@@ -23,6 +23,11 @@ data class PerfTestConfiguration(
         val repeats: Int = 1,
 
         /**
+         * TODO
+         */
+        val runTime: Long = 0L,
+
+        /**
          * Delay between test repeats, in ms
          */
         val delay: Long = 0L,

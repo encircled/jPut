@@ -1,7 +1,7 @@
 package cz.encircled.jput
 
 import kotlin.math.pow
-import kotlin.math.roundToLong
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 fun List<Long>.deviation(): Double = sqrt(variance())
@@ -16,16 +16,19 @@ fun List<Long>.variance(): Double {
     }
 }
 
-fun round(value: Double) = value.roundToLong()
-
 /**
+ * List must be ordered
+ *
  * @param rank target percentile
  * @return values below `percentile`
  */
 fun List<Long>.percentile(rank: Double): List<Long> {
     validatePercentile(rank)
+    for (i in 1 until size) {
+        check(get(i) >= get(i - 1)) { "List must be ordered!" }
+    }
 
-    return subList(0, round(size * rank).toInt())
+    return subList(0, (size * rank).roundToInt())
 }
 
 private fun validatePercentile(rank: Double) {

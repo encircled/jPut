@@ -56,7 +56,9 @@ data class ExecutionRun(
 }
 
 /**
- * Represents the execution state of a particular performance test
+ * Represents the execution state of a particular performance test.
+ *
+ * All execution result functions/attributes are cached after first usage
  *
  * @author Vlad on 20-May-17.
  */
@@ -103,38 +105,43 @@ data class PerfTestExecution(
         }
 
     val executionAvg: Long by lazy {
-        if (successResults().isEmpty()) 0
+        if (successResults.isEmpty()) 0
         else getElapsedTimes().average().roundToLong()
     }
 
     val executionMax: Long by lazy {
-        if (successResults().isEmpty()) 0
+        if (successResults.isEmpty()) 0
         else getElapsedTimes().max()!!
+    }
+
+    /**
+     * Only success [executionResult]
+     */
+    val successResults: Collection<ExecutionRun> by lazy {
+        executionResult.values.filter { !it.isError }.sortedBy { it.elapsedTime }
+    }
+
+    val errorResults: Collection<ExecutionRun> by lazy {
+        executionResult.values.filter { it.isError }.sortedBy { it.elapsedTime }
     }
 
     /**
      * Get max execution time for given percentile [rank]
      */
     fun executionPercentile(rank: Double): Long =
-            if (successResults().isEmpty()) 0
+            if (successResults.isEmpty()) 0
             else getElapsedTimes().percentile(rank).max()!!
 
-    /**
-     * Only success [executionResult]
-     */
-    fun successResults() = executionResult.values.filter { !it.isError }
-
-    fun errorResults() = executionResult.values.filter { it.isError }
 
     /**
      * Count of repeats which finished with an exception
      */
-    fun exceptionsCount() = errorResults().size
+    fun exceptionsCount() = errorResults.size
 
     /**
      * List of elapsed times of all repeats
      */
-    fun getElapsedTimes() = successResults().map { it.elapsedTime }
+    fun getElapsedTimes() = successResults.map { it.elapsedTime }
 
     /**
      * Starts new execution, returns start time (nanoseconds)

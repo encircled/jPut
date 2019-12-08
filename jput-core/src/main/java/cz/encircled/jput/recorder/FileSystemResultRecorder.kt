@@ -25,7 +25,9 @@ class FileSystemResultRecorder(pathToFile: String) : ThreadsafeResultRecorder() 
 
     // TODO ignore error results
     override fun getSample(execution: PerfTestExecution): List<Long> {
-        val config = execution.conf.trendConfiguration!!
+        check(execution.conf.trendConfiguration != null) { "Trend configuration must be defined" }
+
+        val config = execution.conf.trendConfiguration
         val sample = runs.getOrDefault(execution.conf.testId, listOf())
 
         return subList(sample, config.sampleSize, config.sampleSelectionStrategy)

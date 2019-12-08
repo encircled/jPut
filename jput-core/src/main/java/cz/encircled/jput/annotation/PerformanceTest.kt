@@ -25,6 +25,11 @@ annotation class PerformanceTest(
         val repeats: Int = 1,
 
         /**
+         * TODO
+         */
+        val runTime: String = "",
+
+        /**
          * Delay between test repeats, in ms
          */
         val delay: Long = 0,

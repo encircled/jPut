@@ -25,8 +25,9 @@ class ConsoleReporterTest : ShortcutsForTests {
             val reporter = JPutConsoleReporter()
             val execution = getTestExecution(baseConfig().copy(testId = "ConsoleReporterTest"))
 
-            (1..100).forEach {
-                execution.executionResult[it.toLong()] = ExecutionRun(execution, 0L, it.toLong())
+            var i = 0L
+            (1..100).reversed().forEach {
+                execution.executionResult[i++] = ExecutionRun(execution, 0L, it.toLong())
             }
 
             listOf(

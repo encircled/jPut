@@ -12,12 +12,12 @@ abstract class JPutBaseTextReporter : JPutReporter {
                     "90%: ${execution.executionPercentile(0.9)}ms, " +
                     "95%: ${execution.executionPercentile(0.95)}ms, " +
                     "99%: ${execution.executionPercentile(0.99)}ms, " +
-                    "success count: ${execution.successResults().size}, " +
-                    "error count: ${execution.errorResults().size}, " +
+                    "success count: ${execution.successResults.size}, " +
+                    "error count: ${execution.errorResults.size}, " +
                     "total count: ${execution.executionResult.size}\n"
 
     internal fun buildErrorTextReport(execution: PerfTestExecution): String {
-        val errorsCount = execution.errorResults()
+        val errorsCount = execution.errorResults
                 .map { "Code ${it.resultDetails.resultCode}, error: ${JPutUtils.buildErrorMessage(it)}" }
                 .groupingBy { it }.eachCount()
 

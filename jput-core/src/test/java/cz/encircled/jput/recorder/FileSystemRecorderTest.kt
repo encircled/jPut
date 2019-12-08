@@ -23,23 +23,27 @@ class FileSystemRecorderTest : ShortcutsForTests {
         val (pathToFile, writer) = getWriter()
 
         val config = configWithTrend(TrendTestConfiguration(100, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
+        val configUseLast = configWithTrend(TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_LATEST))
         val configWithSampleLimit = configWithTrend(TrendTestConfiguration(4, sampleSelectionStrategy = SelectionStrategy.USE_FIRST))
 
-        val run = getTestExecution(config, 100, 110, 120)
-        val runWithSampleLimit = getTestExecution(configWithSampleLimit, 100, 110, 120)
+        val run = getTestExecution(config, 100, 110, 120, 90)
+        val runWithSampleLimit = getTestExecution(configWithSampleLimit, 100, 110, 120, 95)
 
         writer.appendTrendResult(run)
-        writer.appendTrendResult(getTestExecution(baseConfig(), 130, 115, 105))
+        writer.appendTrendResult(getTestExecution(baseConfig(), 130, 115, 105, 100))
         writer.flush()
 
         // Read previously written data
 
         val reader = FileSystemResultRecorder(pathToFile)
         var runs = reader.getSample(run)
-        assertEquals(listOf<Long>(100, 110, 120, 130, 115, 105), runs)
+        assertEquals(listOf<Long>(90, 100, 100, 105, 110, 115, 120, 130), runs.sorted())
 
         runs = reader.getSample(runWithSampleLimit)
-        assertEquals(listOf<Long>(100, 110, 120, 130), runs)
+        assertEquals(listOf<Long>(90, 100, 110, 120), runs.sorted())
+
+        runs = reader.getSample(getTestExecution(configUseLast))
+        assertEquals(listOf<Long>(100, 105, 115, 130), runs.sorted())
     }
 
     @Test

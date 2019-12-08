@@ -51,6 +51,17 @@ class ThreadBasedExecutorTest : ShortcutsForTests {
         assertEquals(2, counter)
     }
 
+    // TODO test for reactive as well
+    @Ignore // FIXME
+    @Test
+    fun testTimeBasedRun() {
+        val start = System.currentTimeMillis()
+        ThreadBasedTestExecutor().executeTest(baseConfig().copy(runTime = 30)) {
+        }
+
+        assertTrue(System.currentTimeMillis() - start >= 29)
+    }
+
     @Test
     fun testUnitAnalyzerIsRun() {
         val result = ThreadBasedTestExecutor().executeTest(baseConfig().copy(maxTimeLimit = 10L)) {

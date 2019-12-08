@@ -11,10 +11,7 @@ import cz.encircled.jput.trend.SelectionStrategy
 import org.junit.runner.RunWith
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaMethod
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 /**
  * @author Vlad on 28-May-17.
@@ -30,7 +27,7 @@ class ConfigurationBuilderTest {
         val config = ConfigurationBuilder.buildConfig(annotation, function.javaMethod!!)
 
         assertEquals(PerfTestConfiguration("ConfigurationBuilderTest#unitAnnotated",
-                warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L, parallelCount = 1,
+                warmUp = 1, repeats = 2, runTime = 50000, delay = 100, maxTimeLimit = 100L, avgTimeLimit = 80L, parallelCount = 1,
                 percentiles = mapOf(0.5 to 10L, 0.75 to 15L)
         ), config)
     }
@@ -76,7 +73,7 @@ class ConfigurationBuilderTest {
     }
 
 
-    @PerformanceTest(warmUp = 1, repeats = 2, delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L, percentiles = [
+    @PerformanceTest(warmUp = 1, repeats = 2, runTime = "50sec", delay = 100, maxTimeLimit = 100L, averageTimeLimit = 80L, percentiles = [
         Percentile(50, 10),
         Percentile(75, 15)
     ])
@@ -113,6 +110,27 @@ class ConfigurationBuilderTest {
         expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(-0.1 to 50L)), "percentiles")
         expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(0.5 to -1L)), "percentiles")
         expectCheckException(PerfTestConfiguration("test", percentiles = mapOf(1.1 to 50L)), "percentiles")
+    }
+
+    @Test
+    fun testDurationParsing() {
+        assertEquals(2 * 1000L, ConfigurationBuilder.parseDuration("2sec"))
+        assertEquals((60 * 1000L) + (2 * 1000L), ConfigurationBuilder.parseDuration("1min 2sec"))
+        assertEquals((2 * 60 * 60 * 1000L) + (3 * 60 * 1000L) + (2 * 1000L), ConfigurationBuilder.parseDuration("2h 3min 2sec"))
+    }
+
+    @Test
+    fun testInvalidDurationString() {
+        assertFails("Duration property [2 sec] is invalid, must be in format: 1h 1min 1sec") {
+            ConfigurationBuilder.parseDuration("2 sec")
+        }
+        assertFails("Duration property [2sec 1min] is invalid, must be in format: 1h 1min 1sec") {
+            ConfigurationBuilder.parseDuration("2sec 1min")
+        }
+
+        assertFails("Duration property [2d] is invalid, must be in format: 1h 1min 1sec") {
+            ConfigurationBuilder.parseDuration("2d")
+        }
     }
 
     private fun expectCheckException(config: PerfTestConfiguration, attr: String) {

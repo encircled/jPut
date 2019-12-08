@@ -5,7 +5,6 @@ import cz.encircled.jput.context.getCollectionProperty
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.trend.SelectionStrategy
 import org.slf4j.LoggerFactory
-import java.util.*
 
 /**
  * @author Vlad on 21-May-17.
@@ -25,7 +24,6 @@ interface ResultRecorder {
             when (strategy) {
                 SelectionStrategy.USE_FIRST -> sample.subList(0, size)
                 SelectionStrategy.USE_LATEST -> sample.subList(sample.size - size, sample.size)
-                else -> throw UnsupportedOperationException()
             }
         } else {
             sample
