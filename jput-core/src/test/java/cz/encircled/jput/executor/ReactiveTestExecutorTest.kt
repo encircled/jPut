@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.io.IOException
-import java.net.URL
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
@@ -24,6 +23,8 @@ class ReactiveTestExecutorTest {
     private var increment = AtomicInteger(1)
 
     private val delay = 100L
+
+    private val startTime = System.currentTimeMillis()
 
     private val invocationTimes = ConcurrentHashMap<String, Long>()
 
@@ -77,11 +78,18 @@ class ReactiveTestExecutorTest {
         // TODO this probably affects all the other tests...
         System.setProperty("reactor.schedulers.defaultPoolSize", "2")
 
-        val delayWithError = delay - 2
+        val delayWithError = delay - 4
         val executor = ReactiveTestExecutor()
 
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks",
+                repeats = 4,
+                parallelCount = 2,
+                isReactive = true,
+                delay = delay
+        )
         val executeTest = executor.executeTest(conf, ::reactiveBodyWithDelay)
+
+        println(invocationTimes.mapValues { it.value - startTime }.toSortedMap())
 
         // Assert chunk in paralleled
         assertTrue(getDif("1 start", "2 start") < delay / 2)
@@ -97,6 +105,10 @@ class ReactiveTestExecutorTest {
         // Assert that executions are actually run in parallel and haven't wait for others
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delayWithError * 2 })
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delayWithError })
+        /**
+         * {1 end=231, 1 start=231, 2 end=231, 2 start=231, 3 end=231, 3 start=231, 4 end=231, 4 start=231}
+
+         */
     }
 
     @Test
@@ -114,14 +126,12 @@ class ReactiveTestExecutorTest {
         assertEquals(15, counter.get())
     }
 
-    // FIXME
     @Test
     fun testRampUp() {
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRampUp", repeats = 5, rampUp = 1000, parallelCount = 5, isReactive = true)
 
         ReactiveTestExecutor().executeTest(conf, ::reactiveBodyWithDelay)
 
-        println()
         assertTrue(getDif("1 start", "2 start") > 240, "Actual: ${getDif("1 start", "2 start")}")
 
         getDif("1 start", "2 start")
@@ -138,11 +148,6 @@ class ReactiveTestExecutorTest {
         assertTrue(getDif("1 start", "5 start") < 1100)
     }
 
-    @Test
-    fun test() {
-        URL("http://seznam.cz").openConnection()
-    }
-
     private fun getDif(left: String, right: String) =
             (invocationTimes[left]!! - invocationTimes[right]!!).absoluteValue
 
@@ -156,7 +161,7 @@ class ReactiveTestExecutorTest {
                     .map {
                         val index = increment.getAndIncrement()
                         invocationTimes["$index start"] = System.currentTimeMillis()
-                        Thread.sleep(delay)
+//                        Thread.sleep(delay)
                         index
                     }
                     .map {

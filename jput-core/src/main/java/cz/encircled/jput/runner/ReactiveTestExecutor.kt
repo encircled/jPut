@@ -43,7 +43,6 @@ class ReactiveTestExecutor : BaseTestExecutor() {
         val parallelIndex = AtomicLong()
         val countDown = CountDownLatch(execution.conf.parallelCount)
 
-        // TODO No ramp up delayElement(Duration.ofMillis(rampUp * index))
         (0 until execution.conf.repeats).toFlux()
                 .parallel(execution.conf.parallelCount)
                 .runOn(Schedulers.parallel())
@@ -57,7 +56,9 @@ class ReactiveTestExecutor : BaseTestExecutor() {
 
                     body.flatMap { b ->
                         repeat.measureElapsed()
-                        Pair(b, repeat).toMono()
+                        Pair(b, repeat).toMono().delayElement(
+                                Duration.ofMillis(execution.conf.delay)
+                        )
                     }.onErrorContinue { t, _ ->
                         // TODO add if (e is AssumptionViolatedException || !execution.conf.continueOnException) {
                         repeat.measureElapsed()
@@ -69,7 +70,6 @@ class ReactiveTestExecutor : BaseTestExecutor() {
                 .subscribe()
 
         countDown.await()
-
     }
 
 }
