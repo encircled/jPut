@@ -25,7 +25,7 @@ object ConfigurationBuilder {
     fun buildConfig(conf: PerformanceTest, method: Method): PerfTestConfiguration =
             fromContextParams(fromAnnotation(conf, method))
 
-    private val durationPattern: Regex = Regex("[\\d]+h [\\d]+min [\\d]+sec|[\\d]+min [\\d]+sec|[\\d]+sec")
+    private val durationPattern: Regex = Regex("[\\d]+h [\\d]+min [\\d]+sec|[\\d]+min [\\d]+sec|[\\d]+sec|[\\d]+min|[\\d]+h [\\d]+min|[\\d]+h")
 
     /**
      * Parse duration in milliseconds from a [src] string in format like "1h 2min 3sec"
@@ -33,12 +33,13 @@ object ConfigurationBuilder {
     fun parseDuration(src: String): Long {
         if (src.isBlank()) return 0L
 
-        val regex = durationPattern
-        check(src.matches(regex)) { "Duration property [$src] is invalid, must be in format: 1h 1min 1sec" }
+        check(src.matches(durationPattern)) { "Duration property [$src] is invalid, must be in format: 1h 1min 1sec" }
 
         var enriched = src
-        if (!enriched.contains("min")) enriched = "0min $enriched"
-        if (!enriched.contains("h")) enriched = "0h $enriched"
+        if (!enriched.contains("h")) {
+            if (!enriched.contains("min")) enriched = "0min $enriched"
+            enriched = "0h $enriched"
+        }
 
         val formatter = durationFormatter
 

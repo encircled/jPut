@@ -114,22 +114,24 @@ class ConfigurationBuilderTest {
 
     @Test
     fun testDurationParsing() {
-        assertEquals(2 * 1000L, ConfigurationBuilder.parseDuration("2sec"))
-        assertEquals((60 * 1000L) + (2 * 1000L), ConfigurationBuilder.parseDuration("1min 2sec"))
-        assertEquals((2 * 60 * 60 * 1000L) + (3 * 60 * 1000L) + (2 * 1000L), ConfigurationBuilder.parseDuration("2h 3min 2sec"))
+        val hours_2 = 2 * 60 * 60 * 1000L
+        val mins_3 = 3 * 60 * 1000L
+        val sec_2 = 2 * 1000L
+
+        assertEquals(sec_2, ConfigurationBuilder.parseDuration("2sec"))
+        assertEquals(mins_3 + sec_2, ConfigurationBuilder.parseDuration("3min 2sec"))
+        assertEquals(60 * 1000L, ConfigurationBuilder.parseDuration("1min"))
+        assertEquals(hours_2, ConfigurationBuilder.parseDuration("2h"))
+        assertEquals(hours_2 + mins_3, ConfigurationBuilder.parseDuration("2h 3min"))
+        assertEquals(hours_2 + mins_3 + sec_2, ConfigurationBuilder.parseDuration("2h 3min 2sec"))
     }
 
     @Test
     fun testInvalidDurationString() {
-        assertFails("Duration property [2 sec] is invalid, must be in format: 1h 1min 1sec") {
-            ConfigurationBuilder.parseDuration("2 sec")
-        }
-        assertFails("Duration property [2sec 1min] is invalid, must be in format: 1h 1min 1sec") {
-            ConfigurationBuilder.parseDuration("2sec 1min")
-        }
-
-        assertFails("Duration property [2d] is invalid, must be in format: 1h 1min 1sec") {
-            ConfigurationBuilder.parseDuration("2d")
+        listOf("2 sec", "2sec 1min", "2d").forEach {
+            assertFails("Duration property [$it] is invalid, must be in format: 1h 1min 1sec") {
+                ConfigurationBuilder.parseDuration(it)
+            }
         }
     }
 
