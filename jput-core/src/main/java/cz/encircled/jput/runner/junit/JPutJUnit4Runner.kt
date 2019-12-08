@@ -14,7 +14,7 @@ import org.junit.runners.model.Statement
  */
 class JPutJUnit4Runner(private val clazz: Class<*>) : BlockJUnit4ClassRunner(clazz) {
 
-    private val executor = PutTestExecutorForJUnitRunner()
+    private val executor = JPutTestExecutorForJUnitRunner()
 
     override fun run(notifier: RunNotifier?) {
         if (!executor.isInitialized) {

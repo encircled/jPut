@@ -1,7 +1,8 @@
-package cz.encircled.jput.reactive
+package cz.encircled.jput.executor
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.model.PerfTestConfiguration
+import cz.encircled.jput.runner.ReactiveTestExecutor
 import cz.encircled.jput.runner.junit.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono

@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
  */
 class JPutSpringRunner(private val clazz: Class<*>) : SpringJUnit4ClassRunner(clazz) {
 
-    private val executor = PutTestExecutorForJUnitRunner()
+    private val executor = JPutTestExecutorForJUnitRunner()
 
     override fun run(notifier: RunNotifier) {
         if (!executor.isInitialized) {

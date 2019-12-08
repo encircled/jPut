@@ -26,8 +26,6 @@
     </licenses>
     <modules>
         <module>jput-core</module>
-        <module>jput-reactive</module>
-        <module>jput-test</module>
     </modules>
 
     <developers>

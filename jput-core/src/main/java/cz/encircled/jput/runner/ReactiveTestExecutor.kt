@@ -1,10 +1,9 @@
-package cz.encircled.jput.reactive
+package cz.encircled.jput.runner
 
 import cz.encircled.jput.JPut
 import cz.encircled.jput.model.ExecutionRun
 import cz.encircled.jput.model.PerfTestExecution
 import cz.encircled.jput.model.RunResult
-import cz.encircled.jput.runner.BaseTestExecutor
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono

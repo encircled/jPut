@@ -5,6 +5,7 @@ import cz.encircled.jput.annotation.PerformanceTest
 import cz.encircled.jput.context.ConfigurationBuilder
 import cz.encircled.jput.context.context
 import cz.encircled.jput.runner.BaseTestExecutor
+import cz.encircled.jput.runner.ReactiveTestExecutor
 import cz.encircled.jput.runner.ThreadBasedTestExecutor
 import junit.framework.AssertionFailedError
 import org.junit.AssumptionViolatedException
@@ -19,9 +20,11 @@ import org.junit.runners.model.Statement
  *
  * @author Vlad on 22-Sep-19.
  */
-class PutTestExecutorForJUnitRunner {
+class JPutTestExecutorForJUnitRunner {
 
-    private var realExecutor: BaseTestExecutor = ThreadBasedTestExecutor()
+    private val threadBasedExecutor: BaseTestExecutor = ThreadBasedTestExecutor()
+
+    private var reactiveExecutor: BaseTestExecutor = ReactiveTestExecutor()
 
     var isInitialized = false
 
@@ -38,16 +41,6 @@ class PutTestExecutorForJUnitRunner {
          * and re-use existing JUnit Statements (like BeforeTest, AfterTest etc)
          */
         val result = ThreadLocal<Any?>()
-    }
-
-    init {
-        // TODO pick executor in a better way?
-        try {
-            val reactive = Class.forName("cz.encircled.jput.reactive.ReactiveTestExecutor")
-            realExecutor = reactive.getConstructor().newInstance() as BaseTestExecutor
-        } catch (e: ClassNotFoundException) {
-            // OK
-        }
     }
 
     fun executeTest(method: FrameworkMethod, notifier: RunNotifier, description: Description, statement: Statement) {
@@ -69,8 +62,9 @@ class PutTestExecutorForJUnitRunner {
 
     private fun runJPutTest(annotation: PerformanceTest, method: FrameworkMethod, statement: Statement) {
         val conf = ConfigurationBuilder.buildConfig(annotation, method.method)
+        val executor = if (conf.isReactive) reactiveExecutor else threadBasedExecutor
 
-        val execution = realExecutor.executeTest(conf) {
+        val execution = executor.executeTest(conf) {
             jPut.set(it)
             statement.evaluate()
             result.get()
