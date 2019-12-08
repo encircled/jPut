@@ -74,7 +74,10 @@ class ReactiveTestExecutorTest {
      */
     @Test
     fun testReactiveExecutorCorrectChunks() {
+        // TODO this probably affects all the other tests...
         System.setProperty("reactor.schedulers.defaultPoolSize", "2")
+
+        val delayWithError = delay - 2
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testReactiveExecutorCorrectChunks", repeats = 4, parallelCount = 2, isReactive = true)
@@ -85,15 +88,15 @@ class ReactiveTestExecutorTest {
         assertTrue(getDif("1 end", "2 end") < delay / 2)
 
         // Assert delay between chunks
-        assertTrue(getDif("1 start", "3 start") >= delay)
+        assertTrue(getDif("1 start", "3 start") >= delayWithError)
 
         // Assert second chunk in paralleled
         assertTrue(getDif("3 start", "4 start") < delay / 2)
         assertTrue(getDif("3 end", "4 end") < delay / 2)
 
         // Assert that executions are actually run in parallel and haven't wait for others
-        assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delay * 2 })
-        assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delay - 2 })
+        assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delayWithError * 2 })
+        assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delayWithError })
     }
 
     @Test
@@ -101,14 +104,14 @@ class ReactiveTestExecutorTest {
         val counter = AtomicInteger(0)
         val executor = ReactiveTestExecutor()
 
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBodyWithDelay", warmUp = 4, repeats = 1, parallelCount = 3, isReactive = true)
+        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#reactiveBodyWithDelay", warmUp = 14, repeats = 1, parallelCount = 3, isReactive = true)
         executor.executeTest(conf) {
             1.toMono().map {
                 counter.getAndIncrement()
             }
         }
 
-        assertEquals(5, counter.get())
+        assertEquals(15, counter.get())
     }
 
     // FIXME
