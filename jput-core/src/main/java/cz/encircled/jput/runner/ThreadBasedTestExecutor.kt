@@ -17,7 +17,7 @@ open class ThreadBasedTestExecutor : BaseTestExecutor() {
 
     override fun performExecution(execution: PerfTestExecution, statement: (JPut?) -> Any?) {
         val executor = Executors.newScheduledThreadPool(execution.conf.parallelCount)
-        val rampUp = if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
+        val rampUp = rampUpPerThread(execution)
 
         (1..execution.conf.warmUp).map {
             executor.submit {

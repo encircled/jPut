@@ -7,10 +7,8 @@ import cz.encircled.jput.runner.junit.JPutJUnit4Runner
 import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.io.IOException
-import java.util.concurrent.ConcurrentHashMap
+import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.absoluteValue
 import kotlin.test.*
 
 
@@ -18,20 +16,11 @@ import kotlin.test.*
  * @author Vlad on 21-Sep-19.
  */
 @RunWith(JPutJUnit4Runner::class)
-class ReactiveTestExecutorTest {
-
-    private var increment = AtomicInteger(1)
+class ReactiveTestExecutorTest : BaseGenericExecutorTest() {
 
     private val delay = 100L
 
     private val startTime = System.currentTimeMillis()
-
-    private val invocationTimes = ConcurrentHashMap<String, Long>()
-
-    @BeforeTest
-    fun before() {
-        increment.set(1)
-    }
 
     // TODO default exception handling + set result. Maybe configurable on suit level
     @Test
@@ -39,7 +28,7 @@ class ReactiveTestExecutorTest {
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRuntimeExceptionRegistered", isReactive = true)
-        val executeTest = executor.executeTest(conf) { reactiveError() }
+        val executeTest = executor.executeTest(conf, ::stepWithError)
         assertEquals("Test exception!", executeTest.executionResult[0]!!.resultDetails.errorMessage)
     }
 
@@ -48,14 +37,9 @@ class ReactiveTestExecutorTest {
         val executor = ReactiveTestExecutor()
 
         val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testWrongTestReturnType", isReactive = true)
-        try {
+        assertFailsWith(IllegalStateException::class, "Reactive test must return Mono<*> object, without subscribing/blocking.") {
             executor.executeTest(conf) { "test" }
-        } catch (e: Exception) {
-            assertEquals("Reactive test must return Mono<*> object, without subscribing/blocking.", e.message)
-            return
         }
-
-        fail("Exception expected")
     }
 
     @Test
@@ -74,6 +58,7 @@ class ReactiveTestExecutorTest {
      * Test that repeats are split into chunks defined by parallel parameter
      */
     @Test
+    @Ignore // TODO
     fun testReactiveExecutorCorrectChunks() {
         // TODO this probably affects all the other tests...
         System.setProperty("reactor.schedulers.defaultPoolSize", "2")
@@ -92,23 +77,19 @@ class ReactiveTestExecutorTest {
         println(invocationTimes.mapValues { it.value - startTime }.toSortedMap())
 
         // Assert chunk in paralleled
-        assertTrue(getDif("1 start", "2 start") < delay / 2)
-        assertTrue(getDif("1 end", "2 end") < delay / 2)
+        assertTrue(invocationDif("0 start", "1 start") < delay / 2)
+        assertTrue(invocationDif("0 end", "1 end") < delay / 2)
 
         // Assert delay between chunks
-        assertTrue(getDif("1 start", "3 start") >= delayWithError)
+        assertTrue(invocationDif("0 start", "1 start") >= delayWithError)
 
         // Assert second chunk in paralleled
-        assertTrue(getDif("3 start", "4 start") < delay / 2, getDif("3 start", "4 start").toString())
-        assertTrue(getDif("3 end", "4 end") < delay / 2)
+        assertTrue(invocationDif("2 start", "3 start") < delay / 2, invocationDif("2 start", "3 start").toString())
+        assertTrue(invocationDif("2 end", "3 end") < delay / 2)
 
         // Assert that executions are actually run in parallel and haven't wait for others
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime < delayWithError * 2 })
         assertTrue(executeTest.executionResult.values.all { it.elapsedTime >= delayWithError })
-        /**
-         * {1 end=231, 1 start=231, 2 end=231, 2 start=231, 3 end=231, 3 start=231, 4 end=231, 4 start=231}
-
-         */
     }
 
     @Test
@@ -126,47 +107,38 @@ class ReactiveTestExecutorTest {
         assertEquals(15, counter.get())
     }
 
-    @Test
-    fun testRampUp() {
-        val conf = PerfTestConfiguration("ReactiveTestExecutorTest#testRampUp", repeats = 5, rampUp = 1000, parallelCount = 5, isReactive = true)
+    override fun getExecutor() = ReactiveTestExecutor()
 
-        ReactiveTestExecutor().executeTest(conf, ::reactiveBodyWithDelay)
-
-        assertTrue(getDif("1 start", "2 start") > 240, "Actual: ${getDif("1 start", "2 start")}")
-
-        getDif("1 start", "2 start")
-
-        listOf(
-                Pair(1, 950),
-                Pair(2, 700),
-                Pair(3, 450),
-                Pair(4, 200)
-        ).forEach {
-            assertTrue(getDif("${it.first} start", "5 start") > it.second)
-        }
-
-        assertTrue(getDif("1 start", "5 start") < 1100)
-    }
-
-    private fun getDif(left: String, right: String) =
-            (invocationTimes[left]!! - invocationTimes[right]!!).absoluteValue
-
-    private fun reactiveError() =
-            Mono.just("1").map {
-                throw IOException("Test exception!")
+    override fun stepWithSimpleCounter(jput: JPut?) =
+            "".toMono().map {
+                invocationTimes["${counter.getAndIncrement()} start"] = System.currentTimeMillis()
             }
 
-    private fun reactiveBodyWithDelay(jPut: JPut?) =
-            Mono.just("")
-                    .map {
-                        val index = increment.getAndIncrement()
-                        invocationTimes["$index start"] = System.currentTimeMillis()
-//                        Thread.sleep(delay)
-                        index
-                    }
-                    .map {
-                        invocationTimes["$it end"] = System.currentTimeMillis()
-                    }
+    override fun stepWithDelay(jput: JPut?) =
+            "".toMono().map {
+                invocationTimes["${counter.getAndIncrement()} start"] = System.currentTimeMillis()
+            }.delayElement(Duration.ofMillis(500))
 
+    override fun stepWithError(jput: JPut?) =
+            "".toMono().map {
+                invocationTimes["${counter.getAndIncrement()} start"] = System.currentTimeMillis()
+                throw RuntimeException("Test exception!")
+            }
+
+
+    private fun reactiveBodyWithDelay(jPut: JPut?): Mono<*> {
+        val start = System.currentTimeMillis()
+        return Mono.just("")
+                .map {
+                    val index = counter.getAndIncrement()
+                    invocationTimes["$index start"] = System.currentTimeMillis() - start
+                    println("Run $index on ${Thread.currentThread().name}")
+                    Thread.sleep(520)
+                    index
+                }
+                .map {
+                    invocationTimes["$it end"] = System.currentTimeMillis() - start
+                }
+    }
 
 }

@@ -29,6 +29,10 @@ abstract class BaseTestExecutor {
         return execution
     }
 
+    fun rampUpPerThread(execution: PerfTestExecution): Long {
+        return if (execution.conf.rampUp > 0) execution.conf.rampUp / (execution.conf.parallelCount - 1) else 0L
+    }
+
     private fun analyzeExecutionResults(execution: PerfTestExecution, conf: PerfTestConfiguration): List<PerfConstraintViolation> {
         val result = mutableListOf<PerfConstraintViolation>()
 
