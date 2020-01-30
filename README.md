@@ -3,7 +3,7 @@
 
 # Java Performance Unit Testing
 
-JPut allows implementing continuous and load performance testing completely as a code (any JVM language) using JUnit tests. 
+JPut allows implementing continuous and load performance testing completely as a code (any JVM language) using JUnit tests. The main goal of JPut is to bring a simple way how to verify that recent changes in the code did not affect its performance.
 
 * [Use cases](#use-cases)
 * [Quick start](#quick-start)
