@@ -42,7 +42,7 @@ Dependency management:
 ```xml
 <dependency>
     <groupId>cz.encircled</groupId>
-    <artifactId>jput</artifactId>
+    <artifactId>jput-core</artifactId>
     <version>${jput.version}</version>
 </dependency>
 ```
